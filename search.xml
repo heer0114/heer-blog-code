@@ -1,6 +1,77 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
+    <title>Java17环境配置- MacOS</title>
+    <url>/posts/21377094/</url>
+    <content><![CDATA[<p><code>Java 17</code>是一种新版本的Java开发环境，使用<code>Java 17</code>进行程序开发时需要在计算机上安装<code>Java 17</code>环境。本文将介绍如何在<code>MacOS</code>中配置<code>Java 17</code>环境。</p>
+<h2 id="macos系统中配置java-17环境"><a class="markdownIt-Anchor" href="#macos系统中配置java-17环境"></a> MacOS系统中配置Java 17环境：</h2>
+<h3 id="1-下载java-17安装包"><a class="markdownIt-Anchor" href="#1-下载java-17安装包"></a> 1. 下载Java 17安装包。</h3>
+<p>在<a class="link"   href="https://www.oracle.com/java/technologies/javase/jdk17-archive-downloads.html" >Oracle官网 <i class="fa-regular fa-arrow-up-right-from-square fa-sm"></i></a>上下载<code>Java 17</code><br />
+的安装包，选择与MacOS系统相应的版本。</p>
+<h3 id="2-安装java-17"><a class="markdownIt-Anchor" href="#2-安装java-17"></a> 2. 安装<code>Java 17</code>。</h3>
+<p>双击下载好的<code>Java 17</code>安装包，按照步骤进行安装即可。</p>
+<h3 id="3-配置环境变量"><a class="markdownIt-Anchor" href="#3-配置环境变量"></a> 3. 配置环境变量。</h3>
+<div class="tabs" id="tab-first-unique-01"><ul class="nav-tabs"><li class="tab active"><a class="#first-unique-01-1">macOS 10.15+（zsh）</a></li><li class="tab"><a class="#first-unique-01-2">macOS 10.15之前（bash）</a></li></ul><div class="tab-content"><div class="tab-pane active" id="first-unique-01-1"><ol>
+<li>
+<p>打开<i class="fa-solid fa-rectangle-terminal"></i><code>Terminal</code>（中文叫<code>终端</code>）应用程序。</p>
+</li>
+<li>
+<p>在命令行输入以下命令，编辑<code>~/.zshrc</code>文件：</p>
+<div class="highlight-container" data-rel="Shell"><figure class="iseeu highlight shell"><table><tr><td class="code"><pre><span class="line">nano ~/.zshrc </span><br></pre></td></tr></table></figure></div>
+</li>
+<li>
+<p>在文件的最后，加入如下信息</p>
+<div class="highlight-container" data-rel="Shell"><figure class="iseeu highlight shell"><table><tr><td class="code"><pre><span class="line">export PATH=&quot;/Library/Java/JavaVirtualMachines/jdk-17.jdk/Contents/Home/bin:$PATH&quot;</span><br></pre></td></tr></table></figure></div>
+</li>
+<li>
+<p>按下“Ctrl+X”键，选择“Y”保存文件并按“Enter”键退出编辑。</p>
+</li>
+<li>
+<p>执行以下命令让修改后的环境变量生效：</p>
+<div class="highlight-container" data-rel="Shell"><figure class="iseeu highlight shell"><table><tr><td class="code"><pre><span class="line">source ~/.zshrc</span><br></pre></td></tr></table></figure></div>
+</li>
+<li>
+<p>验证Java 17是否配置成功。</p>
+<div class="highlight-container" data-rel="Shell"><figure class="iseeu highlight shell"><table><tr><td class="code"><pre><span class="line">java -version</span><br><span class="line"></span><br><span class="line">java version &quot;17.0.1&quot; 2021-01-17 LTS</span><br><span class="line">Java(TM) SE Runtime Environment (build 17.0.1+9-LTS-190)</span><br><span class="line">Java HotSpot(TM) 64-Bit Server VM (build 17.0.1+9-LTS-190, mixed mode, sharing)</span><br></pre></td></tr></table></figure></div>
+</li>
+</ol></div><div class="tab-pane" id="first-unique-01-2"><ol>
+<li>
+<p>打开<i class="fa-solid fa-rectangle-terminal"></i><code>Terminal</code>（中文叫<code>终端</code>）应用程序。</p>
+</li>
+<li>
+<p>在命令行输入以下命令，编辑<code>~/.bash_profile</code>文件：</p>
+<div class="highlight-container" data-rel="Shell"><figure class="iseeu highlight shell"><table><tr><td class="code"><pre><span class="line">nano ~/.bash_profile</span><br></pre></td></tr></table></figure></div>
+</li>
+<li>
+<p>在文件的最后，加入如下信息</p>
+<div class="highlight-container" data-rel="Shell"><figure class="iseeu highlight shell"><table><tr><td class="code"><pre><span class="line">export PATH=&quot;/Library/Java/JavaVirtualMachines/jdk-17.jdk/Contents/Home/bin:$PATH&quot;</span><br></pre></td></tr></table></figure></div>
+</li>
+<li>
+<p>按下“Ctrl+X”键，选择“Y”保存文件并按“Enter”键退出编辑。</p>
+</li>
+<li>
+<p>执行以下命令让修改后的环境变量生效：</p>
+<div class="highlight-container" data-rel="Shell"><figure class="iseeu highlight shell"><table><tr><td class="code"><pre><span class="line">source ~/.bash_profile</span><br></pre></td></tr></table></figure></div>
+</li>
+<li>
+<p>验证Java 17是否配置成功。</p>
+<div class="highlight-container" data-rel="Shell"><figure class="iseeu highlight shell"><table><tr><td class="code"><pre><span class="line">java -version</span><br><span class="line"></span><br><span class="line">java version &quot;17.0.1&quot; 2021-01-17 LTS</span><br><span class="line">Java(TM) SE Runtime Environment (build 17.0.1+9-LTS-190)</span><br><span class="line">Java HotSpot(TM) 64-Bit Server VM (build 17.0.1+9-LTS-190, mixed mode, sharing)</span><br></pre></td></tr></table></figure></div>
+</li>
+</ol></div></div></div>
+<h3 id="4-配置完成"><a class="markdownIt-Anchor" href="#4-配置完成"></a> 4. 配置完成</h3>
+<p>经过上诉步骤操作完成后，我们就可以子啊本地计算机进行Java程序的开发了。</p>
+]]></content>
+      <categories>
+        <category>Java</category>
+        <category>Java 基础</category>
+        <category>Java 环境</category>
+      </categories>
+      <tags>
+        <tag>Java</tag>
+        <tag>Java 环境配置</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>Java环境配置（JDK17+）</title>
     <url>/posts/4027a16b/</url>
     <content><![CDATA[<p><code>Java 17</code>是一种新版本的Java开发环境，使用<code>Java 17</code>进行程序开发时需要在计算机上安装<code>Java 17</code>环境。本文将介绍如何在<code>Windows、Linux、MacOS</code>中配置<code>Java 17</code>环境。</p>
@@ -97,77 +168,6 @@
       </tags>
   </entry>
   <entry>
-    <title>Java17环境配置- MacOS</title>
-    <url>/posts/21377094/</url>
-    <content><![CDATA[<p><code>Java 17</code>是一种新版本的Java开发环境，使用<code>Java 17</code>进行程序开发时需要在计算机上安装<code>Java 17</code>环境。本文将介绍如何在<code>MacOS</code>中配置<code>Java 17</code>环境。</p>
-<h2 id="macos系统中配置java-17环境"><a class="markdownIt-Anchor" href="#macos系统中配置java-17环境"></a> MacOS系统中配置Java 17环境：</h2>
-<h3 id="1-下载java-17安装包"><a class="markdownIt-Anchor" href="#1-下载java-17安装包"></a> 1. 下载Java 17安装包。</h3>
-<p>在<a class="link"   href="https://www.oracle.com/java/technologies/javase/jdk17-archive-downloads.html" >Oracle官网 <i class="fa-regular fa-arrow-up-right-from-square fa-sm"></i></a>上下载<code>Java 17</code><br />
-的安装包，选择与MacOS系统相应的版本。</p>
-<h3 id="2-安装java-17"><a class="markdownIt-Anchor" href="#2-安装java-17"></a> 2. 安装<code>Java 17</code>。</h3>
-<p>双击下载好的<code>Java 17</code>安装包，按照步骤进行安装即可。</p>
-<h3 id="3-配置环境变量"><a class="markdownIt-Anchor" href="#3-配置环境变量"></a> 3. 配置环境变量。</h3>
-<div class="tabs" id="tab-first-unique-01"><ul class="nav-tabs"><li class="tab active"><a class="#first-unique-01-1">macOS 10.15+（zsh）</a></li><li class="tab"><a class="#first-unique-01-2">macOS 10.15之前（bash）</a></li></ul><div class="tab-content"><div class="tab-pane active" id="first-unique-01-1"><ol>
-<li>
-<p>打开<i class="fa-solid fa-rectangle-terminal"></i><code>Terminal</code>（中文叫<code>终端</code>）应用程序。</p>
-</li>
-<li>
-<p>在命令行输入以下命令，编辑<code>~/.zshrc</code>文件：</p>
-<div class="highlight-container" data-rel="Shell"><figure class="iseeu highlight shell"><table><tr><td class="code"><pre><span class="line">nano ~/.zshrc </span><br></pre></td></tr></table></figure></div>
-</li>
-<li>
-<p>在文件的最后，加入如下信息</p>
-<div class="highlight-container" data-rel="Shell"><figure class="iseeu highlight shell"><table><tr><td class="code"><pre><span class="line">export PATH=&quot;/Library/Java/JavaVirtualMachines/jdk-17.jdk/Contents/Home/bin:$PATH&quot;</span><br></pre></td></tr></table></figure></div>
-</li>
-<li>
-<p>按下“Ctrl+X”键，选择“Y”保存文件并按“Enter”键退出编辑。</p>
-</li>
-<li>
-<p>执行以下命令让修改后的环境变量生效：</p>
-<div class="highlight-container" data-rel="Shell"><figure class="iseeu highlight shell"><table><tr><td class="code"><pre><span class="line">source ~/.zshrc</span><br></pre></td></tr></table></figure></div>
-</li>
-<li>
-<p>验证Java 17是否配置成功。</p>
-<div class="highlight-container" data-rel="Shell"><figure class="iseeu highlight shell"><table><tr><td class="code"><pre><span class="line">java -version</span><br><span class="line"></span><br><span class="line">java version &quot;17.0.1&quot; 2021-01-17 LTS</span><br><span class="line">Java(TM) SE Runtime Environment (build 17.0.1+9-LTS-190)</span><br><span class="line">Java HotSpot(TM) 64-Bit Server VM (build 17.0.1+9-LTS-190, mixed mode, sharing)</span><br></pre></td></tr></table></figure></div>
-</li>
-</ol></div><div class="tab-pane" id="first-unique-01-2"><ol>
-<li>
-<p>打开<i class="fa-solid fa-rectangle-terminal"></i><code>Terminal</code>（中文叫<code>终端</code>）应用程序。</p>
-</li>
-<li>
-<p>在命令行输入以下命令，编辑<code>~/.bash_profile</code>文件：</p>
-<div class="highlight-container" data-rel="Shell"><figure class="iseeu highlight shell"><table><tr><td class="code"><pre><span class="line">nano ~/.bash_profile</span><br></pre></td></tr></table></figure></div>
-</li>
-<li>
-<p>在文件的最后，加入如下信息</p>
-<div class="highlight-container" data-rel="Shell"><figure class="iseeu highlight shell"><table><tr><td class="code"><pre><span class="line">export PATH=&quot;/Library/Java/JavaVirtualMachines/jdk-17.jdk/Contents/Home/bin:$PATH&quot;</span><br></pre></td></tr></table></figure></div>
-</li>
-<li>
-<p>按下“Ctrl+X”键，选择“Y”保存文件并按“Enter”键退出编辑。</p>
-</li>
-<li>
-<p>执行以下命令让修改后的环境变量生效：</p>
-<div class="highlight-container" data-rel="Shell"><figure class="iseeu highlight shell"><table><tr><td class="code"><pre><span class="line">source ~/.bash_profile</span><br></pre></td></tr></table></figure></div>
-</li>
-<li>
-<p>验证Java 17是否配置成功。</p>
-<div class="highlight-container" data-rel="Shell"><figure class="iseeu highlight shell"><table><tr><td class="code"><pre><span class="line">java -version</span><br><span class="line"></span><br><span class="line">java version &quot;17.0.1&quot; 2021-01-17 LTS</span><br><span class="line">Java(TM) SE Runtime Environment (build 17.0.1+9-LTS-190)</span><br><span class="line">Java HotSpot(TM) 64-Bit Server VM (build 17.0.1+9-LTS-190, mixed mode, sharing)</span><br></pre></td></tr></table></figure></div>
-</li>
-</ol></div></div></div>
-<h3 id="4-配置完成"><a class="markdownIt-Anchor" href="#4-配置完成"></a> 4. 配置完成</h3>
-<p>经过上诉步骤操作完成后，我们就可以子啊本地计算机进行Java程序的开发了。</p>
-]]></content>
-      <categories>
-        <category>Java</category>
-        <category>Java 基础</category>
-        <category>Java 环境</category>
-      </categories>
-      <tags>
-        <tag>Java</tag>
-        <tag>Java 环境配置</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>Java环境配置（JDK1.8）</title>
     <url>/posts/4c8e8e1b/</url>
     <content><![CDATA[<p>Java是一种广泛使用的编程语言，在进行 Java 程序编写之前，需要在本地计算机上安装 Java 环境。不同的操作系统下 Java的安装与配置方法略有不同。本篇博客将介绍 Java 环境在 Windows、Linux、MacOS 中的配置方法。</p>
@@ -251,18 +251,6 @@
       </tags>
   </entry>
   <entry>
-    <title>字符串String 类</title>
-    <url>/posts/95fd8e29/</url>
-    <content><![CDATA[]]></content>
-      <categories>
-        <category>Java</category>
-        <category>Java 基础</category>
-      </categories>
-      <tags>
-        <tag>Java</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>整型int | Integer类</title>
     <url>/posts/861b070c/</url>
     <content><![CDATA[]]></content>
@@ -286,6 +274,20 @@
       <tags>
         <tag>Java</tag>
         <tag>Java 内存区域</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Java对象之没用就捐了！</title>
+    <url>/posts/11efc367/</url>
+    <content><![CDATA[]]></content>
+      <categories>
+        <category>Java</category>
+        <category>JVM</category>
+        <category>Java 对象</category>
+      </categories>
+      <tags>
+        <tag>Java</tag>
+        <tag>Java 对象</tag>
       </tags>
   </entry>
   <entry>
@@ -317,35 +319,8 @@
       </tags>
   </entry>
   <entry>
-    <title>Java对象之没用就捐了！</title>
-    <url>/posts/11efc367/</url>
-    <content><![CDATA[]]></content>
-      <categories>
-        <category>Java</category>
-        <category>JVM</category>
-        <category>Java 对象</category>
-      </categories>
-      <tags>
-        <tag>Java</tag>
-        <tag>Java 对象</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>Redis数据类型之列表</title>
     <url>/posts/7eaf8552/</url>
-    <content><![CDATA[]]></content>
-      <categories>
-        <category>Redis</category>
-        <category>基础知识</category>
-        <category>数据类型</category>
-      </categories>
-      <tags>
-        <tag>Redis</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>Redis数据类型之字符串</title>
-    <url>/posts/6ff312cc/</url>
     <content><![CDATA[]]></content>
       <categories>
         <category>Redis</category>
@@ -364,6 +339,31 @@
         <category>Redis</category>
         <category>设计实现</category>
         <category>数据结构</category>
+      </categories>
+      <tags>
+        <tag>Redis</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>字符串String 类</title>
+    <url>/posts/95fd8e29/</url>
+    <content><![CDATA[]]></content>
+      <categories>
+        <category>Java</category>
+        <category>Java 基础</category>
+      </categories>
+      <tags>
+        <tag>Java</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Redis数据类型之字符串</title>
+    <url>/posts/6ff312cc/</url>
+    <content><![CDATA[]]></content>
+      <categories>
+        <category>Redis</category>
+        <category>基础知识</category>
+        <category>数据类型</category>
       </categories>
       <tags>
         <tag>Redis</tag>
