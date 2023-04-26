@@ -72,6 +72,78 @@
       </tags>
   </entry>
   <entry>
+    <title>方法引用</title>
+    <url>/posts/4b34576e/</url>
+    <content><![CDATA[<p>在Java 8中，方法引用（method reference）是一种方便的语法，可以将现有的方法作为Lambda表达式传递。这样做可以简化代码，并且使得代码更加易于理解和修改。本文将介绍Java方法引用的基本概念、语法和使用方法。</p>
+<div class="note note-yellow"><p>阅读本篇内容默认认为你已经掌握了<a href="https://blog.heer.love/posts/a65f2ab8/">函数接口</a>、<a href="https://blog.heer.love/posts/9fa75fc1/">Lambda 表达式</a></p>
+</div>
+<h2 id="什么是方法引用"><a class="markdownIt-Anchor" href="#什么是方法引用"></a> 什么是方法引用？</h2>
+<p>方法引用是一种语法，用于将现有的方法作为Lambda表达式传递。通常情况下，我们需要定义一个Lambda表达式来表示一个匿名函数，然后把它传递给另一个函数。但是，如果这个Lambda表达式只是调用了一个已经存在的方法，那么就可以使用方法引用来代替Lambda表达式。方法引用的基本思想是：如果存在一个现有方法，它正好满足Lambda表达式的参数和返回类型，那么就可以使用方法引用来代替Lambda表达式。</p>
+<h2 id="方法引用的语法"><a class="markdownIt-Anchor" href="#方法引用的语法"></a> 方法引用的语法</h2>
+<p>方法引用使用<code>::</code>符号来表示。它的语法有以下几种形式：</p>
+<ul>
+<li>静态方法引用：<code>ClassName::methodName</code></li>
+<li>实例方法引用：<code>objectName::methodName</code></li>
+<li>特定类的任意对象方法引用：<code>ClassName::methodName</code></li>
+<li>构造方法引用：<code>ClassName::new</code></li>
+</ul>
+<p>其中，静态方法引用和实例方法引用是最常用的两种形式。其他两种形式通常用于特殊情况。</p>
+<h3 id="静态方法引用"><a class="markdownIt-Anchor" href="#静态方法引用"></a> 静态方法引用</h3>
+<p>静态方法引用使用<code>ClassName::methodName</code>的形式。例如，如果存在一个静态方法<code>Integer.parseInt(String)</code>，我们可以使用如下的代码来引用它：</p>
+<div class="highlight-container" data-rel="Java"><figure class="iseeu highlight java"><table><tr><td class="code"><pre><span class="line">Function&lt;String, Integer&gt; parser = Integer::parseInt;</span><br></pre></td></tr></table></figure></div>
+<p>上面的代码将<code>Integer.parseInt()</code>方法作为一个函数对象赋值给了<code>parser</code>变量。这样，在程序中就可以像使用其他函数一样使用这个函数对象了。</p>
+<h3 id="实例方法引用"><a class="markdownIt-Anchor" href="#实例方法引用"></a> 实例方法引用</h3>
+<p>实例方法引用使用<code>objectName::methodName</code>的形式。例如，如果存在一个实例方法<code>String.toUpperCase()</code>，我们可以使用如下的代码来引用它：</p>
+<div class="highlight-container" data-rel="Java"><figure class="iseeu highlight java"><table><tr><td class="code"><pre><span class="line">UnaryOperator&lt;String&gt; converter = String::toUpperCase;</span><br></pre></td></tr></table></figure></div>
+<p>上面的代码将<code>String.toUpperCase()</code>方法作为一个函数对象赋值给了<code>converter</code>变量。这样，在程序中就可以像使用其他函数一样使用这个函数对象了。注意：在这个例子中，<code>String::toUpperCase</code>是一个无参方法，因此返回值类型必须与函数接口的返回值类型相同（即<code>UnaryOperator&lt;String&gt;</code>）。</p>
+<h2 id="总结"><a class="markdownIt-Anchor" href="#总结"></a> 总结</h2>
+<p>Java方法引用是一种方便的语法，用于简化Lambda表达式并使代码更加易于理解和修改。方法引用通常可以用于函数式接口的参数或者返回值，以便将现有方法转换成函数式接口的实例。掌握方法引用的基本语法和相关技巧，可以让我们更加高效地编写Java代码。</p>
+]]></content>
+      <categories>
+        <category>Java</category>
+        <category>Java 基础</category>
+        <category>函数编程</category>
+      </categories>
+      <tags>
+        <tag>Java</tag>
+        <tag>Java 8</tag>
+        <tag>函数编程</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Lambda 表达式</title>
+    <url>/posts/9fa75fc1/</url>
+    <content><![CDATA[<p>Lambda表达式是Java 8中新增的一种编程语法，它允许我们将一个函数作为参数传给另一个函数。Lambda表达式可以简化代码，使其更加易读和简洁。本文将介绍Java Lambda表达式的语法。</p>
+<h2 id="基本语法"><a class="markdownIt-Anchor" href="#基本语法"></a> 基本语法</h2>
+<p>Lambda表达式的基本语法如下：</p>
+<div class="highlight-container" data-rel="Java"><figure class="iseeu highlight java"><table><tr><td class="code"><pre><span class="line">(parameter list) -&gt; &#123; lambda body &#125;</span><br></pre></td></tr></table></figure></div>
+<p>其中，<code>parameter list</code>是参数列表，可以是空的，也可以包含一个或多个参数；<code>lambda body</code>是Lambda表达式的执行体，可以是一个表达式或代码块。</p>
+<p>例如，以下Lambda表达式没有任何参数，执行体只有一个输出语句：</p>
+<div class="highlight-container" data-rel="Java"><figure class="iseeu highlight java"><table><tr><td class="code"><pre><span class="line">() -&gt; System.out.println(<span class="string">&quot;Hello, Lambda!&quot;</span>);</span><br></pre></td></tr></table></figure></div>
+<p>以下Lambda表达式有一个参数，执行体是一个表达式：</p>
+<div class="highlight-container" data-rel="Java"><figure class="iseeu highlight java"><table><tr><td class="code"><pre><span class="line">x -&gt; x * x</span><br></pre></td></tr></table></figure></div>
+<p>以下Lambda表达式有两个参数，执行体是一个代码块：</p>
+<div class="highlight-container" data-rel="Java"><figure class="iseeu highlight java"><table><tr><td class="code"><pre><span class="line">(x, y) -&gt; &#123;</span><br><span class="line">    <span class="type">int</span> <span class="variable">sum</span> <span class="operator">=</span> x + y;</span><br><span class="line">    <span class="keyword">return</span> sum;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></div>
+<h2 id="类型推断"><a class="markdownIt-Anchor" href="#类型推断"></a> 类型推断</h2>
+<p>在Java 8之前，需要显式地指定Lambda表达式的函数接口类型。但是，在Java 8中引入了类型推断机制，可以根据上下文自动推断Lambda表达式的函数接口类型。例如：</p>
+<div class="highlight-container" data-rel="Java"><figure class="iseeu highlight java"><table><tr><td class="code"><pre><span class="line">List&lt;String&gt; list = Arrays.asList(<span class="string">&quot;foo&quot;</span>, <span class="string">&quot;bar&quot;</span>);</span><br><span class="line">list.forEach((String s) -&gt; System.out.println(s));</span><br></pre></td></tr></table></figure></div>
+<p>由于<code>list</code>是一个<code>List&lt;String&gt;</code>类型的集合，因此Lambda表达式<code>(String s) -&gt; System.out.println(s)</code>的函数接口类型也可以自动推断出来。因此，我们可以省略函数接口类型的显式声明：</p>
+<div class="highlight-container" data-rel="Java"><figure class="iseeu highlight java"><table><tr><td class="code"><pre><span class="line">list.forEach(s -&gt; System.out.println(s));</span><br></pre></td></tr></table></figure></div>
+<h2 id="总结"><a class="markdownIt-Anchor" href="#总结"></a> 总结</h2>
+<p>Java Lambda表达式是一种简洁、易读且功能强大的编程语法。它可以使代码更加简单、清晰，并可用于各种场合。掌握Lambda表达式的基本语法和相关技巧，可以让我们更加高效地编写Java代码。</p>
+]]></content>
+      <categories>
+        <category>Java</category>
+        <category>Java 基础</category>
+        <category>函数编程</category>
+      </categories>
+      <tags>
+        <tag>Java</tag>
+        <tag>Java 8</tag>
+        <tag>函数编程</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>函数接口</title>
     <url>/posts/a65f2ab8/</url>
     <content><![CDATA[<p>Java 8 中引入了函数式编程的概念，其中函数接口是重要的一部分。函数接口是指只有一个抽象方法的接口，可以使用 lambda 表达式或方法引用来实现该抽象方法。在函数式编程中，函数接口通常用于表示某个操作，例如转换、过滤或消费数据等。通过将函数接口作为参数传递到方法中，可以轻松地实现这些操作。</p>
@@ -119,44 +191,6 @@
       </tags>
   </entry>
   <entry>
-    <title>方法引用</title>
-    <url>/posts/4b34576e/</url>
-    <content><![CDATA[<p>阅读本篇内容默认认为你已经掌握了<code>函数接口</code>、<code>Lambda 表达式</code></p>
-<p>在Java 8中，方法引用（method reference）是一种方便的语法，可以将现有的方法作为Lambda表达式传递。这样做可以简化代码，并且使得代码更加易于理解和修改。本文将介绍Java方法引用的基本概念、语法和使用方法。</p>
-<h2 id="什么是方法引用"><a class="markdownIt-Anchor" href="#什么是方法引用"></a> 什么是方法引用？</h2>
-<p>方法引用是一种语法，用于将现有的方法作为Lambda表达式传递。通常情况下，我们需要定义一个Lambda表达式来表示一个匿名函数，然后把它传递给另一个函数。但是，如果这个Lambda表达式只是调用了一个已经存在的方法，那么就可以使用方法引用来代替Lambda表达式。方法引用的基本思想是：如果存在一个现有方法，它正好满足Lambda表达式的参数和返回类型，那么就可以使用方法引用来代替Lambda表达式。</p>
-<h2 id="方法引用的语法"><a class="markdownIt-Anchor" href="#方法引用的语法"></a> 方法引用的语法</h2>
-<p>方法引用使用<code>::</code>符号来表示。它的语法有以下几种形式：</p>
-<ul>
-<li>静态方法引用：<code>ClassName::methodName</code></li>
-<li>实例方法引用：<code>objectName::methodName</code></li>
-<li>特定类的任意对象方法引用：<code>ClassName::methodName</code></li>
-<li>构造方法引用：<code>ClassName::new</code></li>
-</ul>
-<p>其中，静态方法引用和实例方法引用是最常用的两种形式。其他两种形式通常用于特殊情况。</p>
-<h3 id="静态方法引用"><a class="markdownIt-Anchor" href="#静态方法引用"></a> 静态方法引用</h3>
-<p>静态方法引用使用<code>ClassName::methodName</code>的形式。例如，如果存在一个静态方法<code>Integer.parseInt(String)</code>，我们可以使用如下的代码来引用它：</p>
-<div class="highlight-container" data-rel="Java"><figure class="iseeu highlight java"><table><tr><td class="code"><pre><span class="line">Function&lt;String, Integer&gt; parser = Integer::parseInt;</span><br></pre></td></tr></table></figure></div>
-<p>上面的代码将<code>Integer.parseInt()</code>方法作为一个函数对象赋值给了<code>parser</code>变量。这样，在程序中就可以像使用其他函数一样使用这个函数对象了。</p>
-<h3 id="实例方法引用"><a class="markdownIt-Anchor" href="#实例方法引用"></a> 实例方法引用</h3>
-<p>实例方法引用使用<code>objectName::methodName</code>的形式。例如，如果存在一个实例方法<code>String.toUpperCase()</code>，我们可以使用如下的代码来引用它：</p>
-<div class="highlight-container" data-rel="Java"><figure class="iseeu highlight java"><table><tr><td class="code"><pre><span class="line">UnaryOperator&lt;String&gt; converter = String::toUpperCase;</span><br></pre></td></tr></table></figure></div>
-<p>上面的代码将<code>String.toUpperCase()</code>方法作为一个函数对象赋值给了<code>converter</code>变量。这样，在程序中就可以像使用其他函数一样使用这个函数对象了。注意：在这个例子中，<code>String::toUpperCase</code>是一个无参方法，因此返回值类型必须与函数接口的返回值类型相同（即<code>UnaryOperator&lt;String&gt;</code>）。</p>
-<h2 id="总结"><a class="markdownIt-Anchor" href="#总结"></a> 总结</h2>
-<p>Java方法引用是一种方便的语法，用于简化Lambda表达式并使代码更加易于理解和修改。方法引用通常可以用于函数式接口的参数或者返回值，以便将现有方法转换成函数式接口的实例。掌握方法引用的基本语法和相关技巧，可以让我们更加高效地编写Java代码。</p>
-]]></content>
-      <categories>
-        <category>Java</category>
-        <category>Java 基础</category>
-        <category>函数编程</category>
-      </categories>
-      <tags>
-        <tag>Java</tag>
-        <tag>Java 8</tag>
-        <tag>函数编程</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>HashMap - 基本原理</title>
     <url>/posts/fcb831a5/</url>
     <content><![CDATA[<p>HashMap是Java中最常用的数据结构之一，它将键映射到值，允许我们通过Key来快速检索和获取Value。在Java 8中，HashMap进行了一些优化和改进，以提高性能和减少冲突。本文将介绍Java8 HashMap的基本原理和实现方式。</p>
@@ -189,36 +223,156 @@
       </tags>
   </entry>
   <entry>
-    <title>Lambda 表达式</title>
-    <url>/posts/9fa75fc1/</url>
-    <content><![CDATA[<p>Lambda表达式是Java 8中新增的一种编程语法，它允许我们将一个函数作为参数传给另一个函数。Lambda表达式可以简化代码，使其更加易读和简洁。本文将介绍Java Lambda表达式的语法。</p>
-<h2 id="基本语法"><a class="markdownIt-Anchor" href="#基本语法"></a> 基本语法</h2>
-<p>Lambda表达式的基本语法如下：</p>
-<div class="highlight-container" data-rel="Java"><figure class="iseeu highlight java"><table><tr><td class="code"><pre><span class="line">(parameter list) -&gt; &#123; lambda body &#125;</span><br></pre></td></tr></table></figure></div>
-<p>其中，<code>parameter list</code>是参数列表，可以是空的，也可以包含一个或多个参数；<code>lambda body</code>是Lambda表达式的执行体，可以是一个表达式或代码块。</p>
-<p>例如，以下Lambda表达式没有任何参数，执行体只有一个输出语句：</p>
-<div class="highlight-container" data-rel="Java"><figure class="iseeu highlight java"><table><tr><td class="code"><pre><span class="line">() -&gt; System.out.println(<span class="string">&quot;Hello, Lambda!&quot;</span>);</span><br></pre></td></tr></table></figure></div>
-<p>以下Lambda表达式有一个参数，执行体是一个表达式：</p>
-<div class="highlight-container" data-rel="Java"><figure class="iseeu highlight java"><table><tr><td class="code"><pre><span class="line">x -&gt; x * x</span><br></pre></td></tr></table></figure></div>
-<p>以下Lambda表达式有两个参数，执行体是一个代码块：</p>
-<div class="highlight-container" data-rel="Java"><figure class="iseeu highlight java"><table><tr><td class="code"><pre><span class="line">(x, y) -&gt; &#123;</span><br><span class="line">    <span class="type">int</span> <span class="variable">sum</span> <span class="operator">=</span> x + y;</span><br><span class="line">    <span class="keyword">return</span> sum;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></div>
-<h2 id="类型推断"><a class="markdownIt-Anchor" href="#类型推断"></a> 类型推断</h2>
-<p>在Java 8之前，需要显式地指定Lambda表达式的函数接口类型。但是，在Java 8中引入了类型推断机制，可以根据上下文自动推断Lambda表达式的函数接口类型。例如：</p>
-<div class="highlight-container" data-rel="Java"><figure class="iseeu highlight java"><table><tr><td class="code"><pre><span class="line">List&lt;String&gt; list = Arrays.asList(<span class="string">&quot;foo&quot;</span>, <span class="string">&quot;bar&quot;</span>);</span><br><span class="line">list.forEach((String s) -&gt; System.out.println(s));</span><br></pre></td></tr></table></figure></div>
-<p>由于<code>list</code>是一个<code>List&lt;String&gt;</code>类型的集合，因此Lambda表达式<code>(String s) -&gt; System.out.println(s)</code>的函数接口类型也可以自动推断出来。因此，我们可以省略函数接口类型的显式声明：</p>
-<div class="highlight-container" data-rel="Java"><figure class="iseeu highlight java"><table><tr><td class="code"><pre><span class="line">list.forEach(s -&gt; System.out.println(s));</span><br></pre></td></tr></table></figure></div>
+    <title>HashMap - get()</title>
+    <url>/posts/e59e566/</url>
+    <content><![CDATA[<p>在Java编程中，HashMap是一个重要的数据结构，它可以方便地存储和访问键值对。其中，get()方法是HashMap实现中的关键部分之一。在本篇博文中，我们将对Java8中的HashMap get()方法进行详细解析，并探讨其实现原理。</p>
+<h2 id="实现原理"><a class="markdownIt-Anchor" href="#实现原理"></a> 实现原理</h2>
+<p>在Java8中，HashMap的核心代码位于java.util.HashMap类中，其中get()方法被定义为：</p>
+<div class="highlight-container" data-rel="Java"><figure class="iseeu highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> V <span class="title function_">get</span><span class="params">(Object key)</span> &#123;</span><br><span class="line">    Node&lt;K,V&gt; e;</span><br><span class="line">    <span class="comment">// 计算键的哈希码，查找并返回与指定键关联的值。</span></span><br><span class="line">    <span class="keyword">return</span> (e = getNode(hash(key), key)) == <span class="literal">null</span> ? <span class="literal">null</span> : e.value;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></div>
+<p>从上面的代码可以看出，get()方法主要完成两个操作：</p>
+<ol>
+<li>计算键的哈希码（通过调用hash(key)方法）。</li>
+<li>查找并返回与指定键关联的值。</li>
+</ol>
+<p>接下来，我们将逐个分析这些操作。</p>
+<h3 id="哈希码的计算"><a class="markdownIt-Anchor" href="#哈希码的计算"></a> 哈希码的计算</h3>
+<p>在Java中，Object类包含hashCode()方法，该方法返回对象的哈希码。因此，在HashMap中，我们可以轻松地使用key.hashCode()方法计算键的哈希码。<a href="https://blog.heer.love/posts/c0f9b6a9/">hash()</a>方法点击跳转到隔壁。</p>
+<div class="highlight-container" data-rel="Java"><figure class="iseeu highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">// 计算hash</span></span><br><span class="line"><span class="keyword">final</span> <span class="type">int</span> <span class="title function_">hash</span><span class="params">(Object key)</span> &#123;</span><br><span class="line">    <span class="type">int</span> h;</span><br><span class="line">    <span class="keyword">return</span> (key == <span class="literal">null</span>) ? <span class="number">0</span> : (h = key.hashCode()) ^ (h &gt;&gt;&gt; <span class="number">16</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></div>
+<h3 id="查找并返回值"><a class="markdownIt-Anchor" href="#查找并返回值"></a> 查找并返回值</h3>
+<p>在HashMap中，键值对存储在Node&lt;K,V&gt;类型的节点中。因此，查找指定键的值需要执行以下操作：</p>
+<ol>
+<li>根据键的哈希值找到对应的桶。</li>
+<li>遍历桶中的链表，查找具有相同键的节点。</li>
+<li>如果找到这样的节点，则返回其值。否则，返回null。</li>
+</ol>
+<p>具体而言，getNode()方法完成了上述操作：</p>
+<div class="highlight-container" data-rel="Java"><figure class="iseeu highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">final</span> Node&lt;K,V&gt; <span class="title function_">getNode</span><span class="params">(<span class="type">int</span> hash, Object key)</span> &#123;</span><br><span class="line">    <span class="comment">// 声明一个Node数组tab</span></span><br><span class="line">    Node&lt;K,V&gt;[] tab;</span><br><span class="line">    <span class="comment">// 声明两个Node节点first和e</span></span><br><span class="line">    Node&lt;K,V&gt; first, e; </span><br><span class="line">    <span class="comment">// 声明一个int类型变量n，代表桶的数量</span></span><br><span class="line">    <span class="type">int</span> n; </span><br><span class="line">    <span class="comment">// 声明一个泛型K类型变量k，代表key</span></span><br><span class="line">    K k; </span><br><span class="line"></span><br><span class="line">    <span class="comment">// 判断table不为空，n大于0，并且hash对应的桶不为空</span></span><br><span class="line">    <span class="keyword">if</span> ((tab = table) != <span class="literal">null</span> &amp;&amp; (n = tab.length) &gt; <span class="number">0</span> &amp;&amp;</span><br><span class="line">        (first = tab[(n - <span class="number">1</span>) &amp; hash]) != <span class="literal">null</span>) &#123; </span><br><span class="line">        <span class="keyword">if</span> (first.hash == hash &amp;&amp; <span class="comment">// 判断第一个节点的hash值是否等于指定hash值</span></span><br><span class="line">            ((k = first.key) == key || (key != <span class="literal">null</span> &amp;&amp; key.equals(k)))) <span class="comment">// 判断第一个节点的key是否等于指定key</span></span><br><span class="line">            <span class="comment">// 如果第一个节点就是要查找的节点，则直接返回该节点</span></span><br><span class="line">            <span class="keyword">return</span> first;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> ((e = first.next) != <span class="literal">null</span>) &#123; <span class="comment">// 如果第一个节点的下一个节点不为空</span></span><br><span class="line">            <span class="keyword">if</span> (first <span class="keyword">instanceof</span> TreeNode) <span class="comment">// 判断该链表是否已经树化</span></span><br><span class="line">                <span class="comment">// 如果已经树化，则调用getTreeNode方法继续查找</span></span><br><span class="line">                <span class="keyword">return</span> ((TreeNode&lt;K,V&gt;)first).getTreeNode(hash, key); </span><br><span class="line">            <span class="keyword">do</span> &#123; <span class="comment">// 否则遍历链表</span></span><br><span class="line">                <span class="keyword">if</span> (e.hash == hash &amp;&amp;</span><br><span class="line">                    ((k = e.key) == key || (key != <span class="literal">null</span> &amp;&amp; key.equals(k))))</span><br><span class="line">                    <span class="comment">// 如果找到了指定的节点，则直接返回</span></span><br><span class="line">                    <span class="keyword">return</span> e; </span><br><span class="line">            &#125; <span class="keyword">while</span> ((e = e.next) != <span class="literal">null</span>); <span class="comment">// 遍历链表</span></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// 如果没有找到对应的节点，则返回null</span></span><br><span class="line">    <span class="keyword">return</span> <span class="literal">null</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure></div>
+<p>从上面的代码可以看出，getNode()方法首先通过哈希值找到对应的桶，然后遍历桶中的链表，查找与指定键关联的节点。如果找到了这样的节点，则返回其值；否则返回null。</p>
+<h2 id="性能分析"><a class="markdownIt-Anchor" href="#性能分析"></a> 性能分析</h2>
+<p>在HashMap中，get()方法是最常用的操作之一，它可以高效地访问键值对并提供快速的响应时间。具体而言，get()方法的时间复杂度为O(1)，即与HashMap中存储的元素数量无关。然而，在实际编程中，get()方法的性能可能会受到以下因素的影响：</p>
+<h3 id="哈希冲突"><a class="markdownIt-Anchor" href="#哈希冲突"></a> 哈希冲突</h3>
+<p>由于哈希表的大小是有限的，所以在不同的键上生成的哈希码可能会相同。这种情况称为哈希冲突（Hash Collision）。当发生哈希冲突时，HashMap将使用链表或红黑树等数据结构来存储具有相同哈希码的节点。因此，如果HashMap中存在大量哈希冲突，那么查找键值对的效率将会降低。</p>
+<h3 id="初始容量和加载因子"><a class="markdownIt-Anchor" href="#初始容量和加载因子"></a> 初始容量和加载因子</h3>
+<p>HashMap的初始容量和加载因子也会影响get()方法的性能。在创建HashMap对象时，我们需要指定其初始容量和加载因子。如果初始容量较小或加载因子较大，那么HashMap就需要频繁调整自身的大小，从而使get()方法的性能下降。</p>
 <h2 id="总结"><a class="markdownIt-Anchor" href="#总结"></a> 总结</h2>
-<p>Java Lambda表达式是一种简洁、易读且功能强大的编程语法。它可以使代码更加简单、清晰，并可用于各种场合。掌握Lambda表达式的基本语法和相关技巧，可以让我们更加高效地编写Java代码。</p>
+<p>get()方法是HashMap中最常用的方法之一。它通过计算键的哈希值和查找与指定键关联的节点来实现访问键值对。具体而言，get()方法首先调用hash(key)方法计算键的哈希码，然后使用getNode()方法在桶中查找相应的节点。如果找到了这样的节点，则返回其值；否则返回null。</p>
+<p>在实际编程中，我们需要注意哈希冲突、初始容量和加载因子等因素，以提高get()方法的性能。同时，我们也可以考虑使用其他数据结构，例如TreeMap，来代替HashMap，从而满足不同的需求。</p>
 ]]></content>
       <categories>
         <category>Java</category>
         <category>Java 基础</category>
-        <category>函数编程</category>
+        <category>HashMap</category>
       </categories>
       <tags>
         <tag>Java</tag>
-        <tag>Java 8</tag>
-        <tag>函数编程</tag>
+        <tag>HashMap</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>HashMap - hash()</title>
+    <url>/posts/c0f9b6a9/</url>
+    <content><![CDATA[<p>在Java编程中，HashMap是一个重要的数据结构，它可以方便地存储和访问键值对。其中，hash()方法是HashMap实现中的关键部分之一。在本篇博文中，我们将对Java8中的HashMap hash()方法进行解析。</p>
+<h2 id="hash方法概述"><a class="markdownIt-Anchor" href="#hash方法概述"></a> Hash()方法概述</h2>
+<p>在Java8中，HashMap的核心代码位于java.util.HashMap类中，其中hash()方法被定义为：</p>
+<div class="highlight-container" data-rel="Java"><figure class="iseeu highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">final</span> <span class="type">int</span> <span class="title function_">hash</span><span class="params">(Object key)</span> &#123;</span><br><span class="line">    <span class="type">int</span> h;</span><br><span class="line">    <span class="keyword">return</span> (key == <span class="literal">null</span>) ? <span class="number">0</span> : (h = key.hashCode()) ^ (h &gt;&gt;&gt; <span class="number">16</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></div>
+<p>从上面的代码可以看出，hash()方法主要完成两个操作：</p>
+<ol>
+<li>计算键的哈希码（通过调用key.hashCode()方法）。</li>
+<li>对哈希码进行微调，以保证分布均匀。</li>
+</ol>
+<p>接下来，我们将逐个分析这些操作。</p>
+<h3 id="计算键的哈希码"><a class="markdownIt-Anchor" href="#计算键的哈希码"></a> 计算键的哈希码</h3>
+<p>在Java中，Object类包含hashCode()方法，该方法返回对象的哈希码。因此，在HashMap中，我们可以轻松地使用key.hashCode()方法计算键的哈希码。</p>
+<p>然而，如果键是null，则需要特殊处理。在这种情况下，HashMap会将哈希码设置为0。</p>
+<div class="highlight-container" data-rel="Java"><figure class="iseeu highlight java"><table><tr><td class="code"><pre><span class="line">(key == <span class="literal">null</span>) ? <span class="number">0</span> : (h = key.hashCode())</span><br></pre></td></tr></table></figure></div>
+<h3 id="微调哈希码"><a class="markdownIt-Anchor" href="#微调哈希码"></a> 微调哈希码</h3>
+<p>第二个操作是对哈希码进行微调。 虽然key.hashCode()方法产生的哈希值很好，但它可能不适合HashMap中的所有情况。例如，在哈希表中使用的桶数为2的幂时，最低位可能会被过于频繁地使用，这可能会导致性能问题。</p>
+<p>因此，HashMap使用了以下技巧对哈希码进行微调：</p>
+<div class="highlight-container" data-rel="Java"><figure class="iseeu highlight java"><table><tr><td class="code"><pre><span class="line">(h = key.hashCode()) ^ (h &gt;&gt;&gt; <span class="number">16</span>);</span><br></pre></td></tr></table></figure></div>
+<p>其中，&quot;^&quot;运算符表示按位异或操作。这个操作将哈希码的高16位与低16位混合在一起。这有助于减少哈希码中的碰撞，并增加桶的数量。</p>
+<div class="note-large notel-green"><div class="notel-title"><p>”^“相较于”&amp;“、”|“计算Hash值的优点</p>
+</div><div class="notel-content"><ol>
+<li>高效性：异或操作比位与或位或操作更快，因为它不需要检查每个位的值。</li>
+<li>混淆性：通过将哈希码的高位和低位进行异或，可以使得哈希码的各个部分都对最终的哈希值产生影响。这有助于减少哈希冲突，提高HashMap的性能。</li>
+<li>均匀性：异或操作可以保持哈希码的均匀性，这是在HashMap中实现高效散列的关键。</li>
+</ol>
+ </div></div>
+<h2 id="总结"><a class="markdownIt-Anchor" href="#总结"></a> 总结</h2>
+<p>HashMap是Java编程中重要的数据结构之一。其核心代码包括hash()方法，它通过计算键的哈希码并对其进行微调来保证分布均匀。具体而言，hash()方法首先调用key.hashCode()方法计算哈希码，然后使用异或运算符对其进行微调。使用这些技术，HashMap可以高效地存储和快速访问键值对。</p>
+]]></content>
+      <categories>
+        <category>Java</category>
+        <category>Java 基础</category>
+        <category>HashMap</category>
+      </categories>
+      <tags>
+        <tag>Java</tag>
+        <tag>HashMap</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>HashMap - put()</title>
+    <url>/posts/80dd519a/</url>
+    <content><![CDATA[<p>在 Java 8 中，HashMap 是一种常见的数据结构，用于存储键值对。put() 方法是其中最常用且最重要的方法之一。本文将详细介绍 Java 8 HashMap 的 put() 方法。</p>
+<h2 id="hashmap-概述"><a class="markdownIt-Anchor" href="#hashmap-概述"></a> HashMap 概述</h2>
+<p>HashMap 是一种基于哈希表实现的 Map 接口，使用键值对（key-value）的方式进行存储。HashMap 的 key 和 value 都可以为 null，但是同一个 key 只能映射到一个 value 上。HashMap 是非线程安全的，不支持并发访问，需要进行同步处理。</p>
+<h2 id="put-方法"><a class="markdownIt-Anchor" href="#put-方法"></a> put() 方法</h2>
+<p>put() 方法用于将指定的键值对添加到 HashMap 中。语法如下：</p>
+<div class="highlight-container" data-rel="Java"><figure class="iseeu highlight java"><table><tr><td class="code"><pre><span class="line">V <span class="title function_">put</span><span class="params">(K key, V value)</span></span><br></pre></td></tr></table></figure></div>
+<p>其中，K 表示 key 的类型，V 表示 value 的类型。</p>
+<h3 id="实现原理"><a class="markdownIt-Anchor" href="#实现原理"></a> 实现原理</h3>
+<p>Java 8 中的 HashMap 底层实现采用数组 + 链表/红黑树的方式实现。当向 HashMap 中添加元素时，会首先根据 key 的 hash 值确定该元素在数组中的位置，并将其添加到对应位置上。如果该位置已经有元素了，则会以链表或红黑树的形式将其连接起来。</p>
+<p>在 HashMap 中，每个位置上存储的是一个 Node 对象，包含 key、value 和指向下一个 Node 对象的指针。如果某个位置上的元素过多，就会将其转化成红黑树，以提高查询效率。</p>
+<h3 id="put-方法的实现"><a class="markdownIt-Anchor" href="#put-方法的实现"></a> put() 方法的实现</h3>
+<p>下面是 HashMap 中 put() 方法的源代码：</p>
+<div class="highlight-container" data-rel="Java"><figure class="iseeu highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">final</span> V <span class="title function_">putVal</span><span class="params">(<span class="type">int</span> hash, K key, V value, <span class="type">boolean</span> onlyIfAbsent, <span class="type">boolean</span> evict)</span> &#123;</span><br><span class="line">    Node&lt;K,V&gt;[] tab;          <span class="comment">// 定义 Node 数组</span></span><br><span class="line">    Node&lt;K,V&gt; p;              <span class="comment">// 定义 Node 变量</span></span><br><span class="line">    <span class="type">int</span> n, i;                 <span class="comment">// 定义 table 长度变量及索引变量</span></span><br><span class="line">    <span class="comment">// 如果 table 数组为空，则调用 resize() 方法进行数组初始化</span></span><br><span class="line">    <span class="keyword">if</span> ((tab = table) == <span class="literal">null</span> || (n = tab.length) == <span class="number">0</span>)</span><br><span class="line">        n = (tab = resize()).length;</span><br><span class="line">    <span class="comment">// 计算当前键值对的哈希值在 table 数组中的索引位置</span></span><br><span class="line">    <span class="keyword">if</span> ((p = tab[i = (n - <span class="number">1</span>) &amp; hash]) == <span class="literal">null</span>)</span><br><span class="line">        <span class="comment">// 如果计算得到的索引位置为 null，则新建节点并插入该位置</span></span><br><span class="line">        tab[i] = newNode(hash, key, value, <span class="literal">null</span>);</span><br><span class="line">    <span class="keyword">else</span> &#123;</span><br><span class="line">        Node&lt;K,V&gt; e; K k;</span><br><span class="line">        <span class="comment">// 如果当前索引位置存在元素，则判断元素类型是否为树节点类型</span></span><br><span class="line">        <span class="keyword">if</span> (p.hash == hash &amp;&amp;</span><br><span class="line">            ((k = p.key) == key || (key != <span class="literal">null</span> &amp;&amp; key.equals(k))))</span><br><span class="line">            e = p;</span><br><span class="line">        <span class="keyword">else</span> <span class="keyword">if</span> (p <span class="keyword">instanceof</span> TreeNode)</span><br><span class="line">            <span class="comment">// 如果当前节点类型为树节点，则在树节点上执行插入操作</span></span><br><span class="line">            e = ((TreeNode&lt;K,V&gt;)p).putTreeVal(<span class="built_in">this</span>, tab, hash, key, value);</span><br><span class="line">        <span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="comment">// 否则按链表方式进行插入操作</span></span><br><span class="line">            <span class="keyword">for</span> (<span class="type">int</span> <span class="variable">binCount</span> <span class="operator">=</span> <span class="number">0</span>; ; ++binCount) &#123;</span><br><span class="line">                <span class="keyword">if</span> ((e = p.next) == <span class="literal">null</span>) &#123;</span><br><span class="line">                    <span class="comment">// 如果当前节点的下一个节点为 null，则新建节点并插入到链表尾部</span></span><br><span class="line">                    p.next = newNode(hash, key, value, <span class="literal">null</span>);</span><br><span class="line">                    <span class="comment">// 如果链表长度大于等于树化阈值，则执行树化操作</span></span><br><span class="line">                    <span class="keyword">if</span> (binCount &gt;= TREEIFY_THRESHOLD - <span class="number">1</span>)</span><br><span class="line">                        treeifyBin(tab, hash);</span><br><span class="line">                    <span class="keyword">break</span>;</span><br><span class="line">                &#125;</span><br><span class="line">                <span class="comment">// 否则继续遍历链表查找是否存在相同键的节点</span></span><br><span class="line">                <span class="keyword">if</span> (e.hash == hash &amp;&amp;</span><br><span class="line">                    ((k = e.key) == key || (key != <span class="literal">null</span> &amp;&amp; key.equals(k))))</span><br><span class="line">                    <span class="keyword">break</span>;</span><br><span class="line">                p = e;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">// 如果找到了相同键的节点，则更新该节点的值</span></span><br><span class="line">        <span class="keyword">if</span> (e != <span class="literal">null</span>) &#123; </span><br><span class="line">            <span class="type">V</span> <span class="variable">oldValue</span> <span class="operator">=</span> e.value;</span><br><span class="line">            <span class="keyword">if</span> (!onlyIfAbsent || oldValue == <span class="literal">null</span>)</span><br><span class="line">                e.value = value;</span><br><span class="line">            afterNodeAccess(e);</span><br><span class="line">            <span class="keyword">return</span> oldValue;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// 更新 modCount 并检查是否需要扩容</span></span><br><span class="line">    ++modCount;</span><br><span class="line">    <span class="keyword">if</span> (++size &gt; threshold)</span><br><span class="line">        resize();</span><br><span class="line">    afterNodeInsertion(evict);</span><br><span class="line">    <span class="keyword">return</span> <span class="literal">null</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></div>
+<p>该方法的实现非常复杂，但是可以大致分为三个步骤：</p>
+<ol>
+<li>首先根据 key 的 hash 值确定该元素在数组中的位置。</li>
+<li>如果该位置为空，则直接将其添加到对应位置上；如果该位置已经有元素了，则需要进行链表或红黑树的操作。</li>
+<li>最后更新 HashMap 的 size 和 modCount 属性，并调用 afterNodeInsertion() 方法完成插入操作。</li>
+</ol>
+<h2 id="总结"><a class="markdownIt-Anchor" href="#总结"></a> 总结</h2>
+<p>总体来说，Java 8 中 HashMap 的 <code>put()</code> 方法依然采用了 拉链法 解决哈希冲突的问题，但是通过提高阈值和优化树化过程，它有着更好的性能表现。</p>
+]]></content>
+      <categories>
+        <category>Java</category>
+        <category>Java 基础</category>
+        <category>HashMap</category>
+      </categories>
+      <tags>
+        <tag>Java</tag>
+        <tag>HashMap</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>HashMap - resize()</title>
+    <url>/posts/80dd519a/</url>
+    <content><![CDATA[<p>在 Java 中，HashMap 是一个非常重要的集合类，它采用哈希表来存储键值对。当数据量变大时，需要调整哈希表的大小，以保证更好的性能和空间使用。resize() 方法就是 HashMap 进行扩容或缩减容量的方法。</p>
+<h2 id="什么情况下需要-resize-方法"><a class="markdownIt-Anchor" href="#什么情况下需要-resize-方法"></a> 什么情况下需要 resize() 方法</h2>
+<p>当 HashMap 存储的数据超过了负载因子乘以当前容量时（即元素个数 &gt; 负载因子 * 容量），就需要进行 resize 操作。负载因子通常为 0.75，在之前的 JDK 版本中是默认值为 0.75，JDK 1.8 开始可以自定义负载因子。</p>
+<p>resize 操作的目的是为了让 HashMap 在扩容或缩减容量后仍然能保持较低的查找和插入成本。如果 HashMap 中的键值对数量过多，则会导致哈希冲突概率增加，从而影响 HashMap 的性能。如果数量太少，则会造成空间浪费。</p>
+<h2 id="实现原理"><a class="markdownIt-Anchor" href="#实现原理"></a> 实现原理</h2>
+<p>HashMap 的 resize() 方法的实现原理涉及到两个主要步骤：</p>
+<ol>
+<li>创建新的数组并重新分配元素：首先根据新的容量创建一个新的数组，然后遍历原来的数组，并将所有元素重新分配到新数组中。</li>
+<li>调整哈希值：重新分配元素时，需要调整每个键值对的哈希值。这是因为在 Java 中，哈希值是由对象的 hashCode() 方法计算出来的。而当数组大小改变时，hashCode() 值需要重新计算。</li>
+</ol>
+<p>具体实现过程可以通过以下源码逐行解释：</p>
+<div class="highlight-container" data-rel="Java"><figure class="iseeu highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">final</span> Node&lt;K,V&gt;[] resize() &#123;</span><br><span class="line">    Node&lt;K,V&gt;[] oldTab = table; <span class="comment">// 保存原数组</span></span><br><span class="line"></span><br><span class="line">    <span class="type">int</span> <span class="variable">oldCap</span> <span class="operator">=</span> (oldTab == <span class="literal">null</span>) ? <span class="number">0</span> : oldTab.length; <span class="comment">// 计算原数组长度</span></span><br><span class="line">    <span class="type">int</span> <span class="variable">oldThr</span> <span class="operator">=</span> threshold; <span class="comment">// 计算原阈值</span></span><br><span class="line">    <span class="type">int</span> newCap, newThr = <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (oldCap &gt; <span class="number">0</span>) &#123; <span class="comment">// 如果原数组不为空，则进行扩容操作</span></span><br><span class="line">        <span class="keyword">if</span> (oldCap &gt;= MAXIMUM_CAPACITY) &#123; <span class="comment">// 判断原数组是否达到最大容量</span></span><br><span class="line">            threshold = Integer.MAX_VALUE;</span><br><span class="line">            <span class="keyword">return</span> oldTab;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">else</span> <span class="keyword">if</span> ((newCap = oldCap &lt;&lt; <span class="number">1</span>) &lt; MAXIMUM_CAPACITY &amp;&amp; oldCap &gt;= DEFAULT_INITIAL_CAPACITY)</span><br><span class="line">            newThr = oldThr &lt;&lt; <span class="number">1</span>; <span class="comment">// 扩容后新的阈值</span></span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">else</span> <span class="keyword">if</span> (oldThr &gt; <span class="number">0</span>) <span class="comment">// 如果原阈值大于0，则使用该值作为初始容量</span></span><br><span class="line">        newCap = oldThr;</span><br><span class="line">    <span class="keyword">else</span> &#123; <span class="comment">// 如果没有指定初始容量或阈值，默认使用默认值</span></span><br><span class="line">        newCap = DEFAULT_INITIAL_CAPACITY;</span><br><span class="line">        newThr = (<span class="type">int</span>)(DEFAULT_LOAD_FACTOR * DEFAULT_INITIAL_CAPACITY);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (newThr == <span class="number">0</span>) &#123; <span class="comment">// 如果 newThr 没有被初始化，则根据新的容量和负载因子计算新的阈值</span></span><br><span class="line">        <span class="type">float</span> <span class="variable">ft</span> <span class="operator">=</span> (<span class="type">float</span>)newCap * loadFactor;</span><br><span class="line">        newThr = (newCap &lt; MAXIMUM_CAPACITY &amp;&amp; ft &lt; (<span class="type">float</span>)MAXIMUM_CAPACITY ?</span><br><span class="line">                  (<span class="type">int</span>)ft : Integer.MAX_VALUE);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    threshold = newThr; <span class="comment">// 更新 HashMap 的阈值</span></span><br><span class="line"></span><br><span class="line">    <span class="meta">@SuppressWarnings(&#123;&quot;rawtypes&quot;,&quot;unchecked&quot;&#125;)</span></span><br><span class="line">        Node&lt;K,V&gt;[] newTab = (Node&lt;K,V&gt;[])<span class="keyword">new</span> <span class="title class_">Node</span>[newCap]; <span class="comment">// 创建新数组</span></span><br><span class="line">    table = newTab; <span class="comment">// 将 table 指向新数组</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (oldTab != <span class="literal">null</span>) &#123; <span class="comment">// 如果原数组不为空，则遍历原数组并将所有元素重新分配到新数组中</span></span><br><span class="line">        <span class="keyword">for</span> (<span class="type">int</span> <span class="variable">j</span> <span class="operator">=</span> <span class="number">0</span>; j &lt; oldCap; ++j) &#123;</span><br><span class="line">            Node&lt;K,V&gt; e;</span><br><span class="line">            <span class="keyword">if</span> ((e = oldTab[j]) != <span class="literal">null</span>) &#123;</span><br><span class="line">                oldTab[j] = <span class="literal">null</span>; <span class="comment">// 释放原有元素的引用</span></span><br><span class="line">                <span class="keyword">if</span> (e.next == <span class="literal">null</span>) <span class="comment">// 处理链表节点</span></span><br><span class="line">                    newTab[e.hash &amp; (newCap - <span class="number">1</span>)] = e;</span><br><span class="line">                <span class="keyword">else</span> <span class="keyword">if</span> (e <span class="keyword">instanceof</span> TreeNode) <span class="comment">// 处理红黑树节点</span></span><br><span class="line">                    ((TreeNode&lt;K,V&gt;)e).split(<span class="built_in">this</span>, newTab, j, oldCap);</span><br><span class="line">                <span class="keyword">else</span> &#123; <span class="comment">// 处理链表节点</span></span><br><span class="line">                    Node&lt;K,V&gt; loHead = <span class="literal">null</span>, loTail = <span class="literal">null</span>;</span><br><span class="line">                    Node&lt;K,V&gt; hiHead = <span class="literal">null</span>, hiTail = <span class="literal">null</span>;</span><br><span class="line">                    Node&lt;K,V&gt; next;</span><br><span class="line">                    <span class="keyword">do</span> &#123;</span><br><span class="line">                        next = e.next;</span><br><span class="line">                        <span class="keyword">if</span> ((e.hash &amp; oldCap) == <span class="number">0</span>) &#123; <span class="comment">// 判断元素是否需要放置到新数组的低位</span></span><br><span class="line">                            <span class="keyword">if</span> (loTail == <span class="literal">null</span>)</span><br><span class="line">                                loHead = e;</span><br><span class="line">                            <span class="keyword">else</span></span><br><span class="line">                                loTail.next = e;</span><br><span class="line">                            loTail = e;</span><br><span class="line">                        &#125;</span><br><span class="line">                        <span class="keyword">else</span> &#123; <span class="comment">// 放置到新数组的高位</span></span><br><span class="line">                            <span class="keyword">if</span> (hiTail == <span class="literal">null</span>)</span><br><span class="line">                                hiHead = e;</span><br><span class="line">                            <span class="keyword">else</span></span><br><span class="line">                                hiTail.next = e;</span><br><span class="line">                            hiTail = e;</span><br><span class="line">                        &#125;</span><br><span class="line">                    &#125; <span class="keyword">while</span> ((e = next) != <span class="literal">null</span>);</span><br><span class="line"></span><br><span class="line">                    <span class="keyword">if</span> (loTail != <span class="literal">null</span>) &#123; <span class="comment">// 将低位链表放到对应位置</span></span><br><span class="line">                        loTail.next = <span class="literal">null</span>;</span><br><span class="line">                        newTab[j] = loHead;</span><br><span class="line">                    &#125;</span><br><span class="line">                    <span class="keyword">if</span> (hiTail != <span class="literal">null</span>) &#123; <span class="comment">// 将高位链表放到对应位置</span></span><br><span class="line">                        hiTail.next = <span class="literal">null</span>;</span><br><span class="line">                        newTab[j + oldCap] = hiHead;</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> newTab; <span class="comment">// 返回新数组</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></div>
+<h2 id="resize-方法的时间复杂度"><a class="markdownIt-Anchor" href="#resize-方法的时间复杂度"></a> resize() 方法的时间复杂度</h2>
+<p>resize 操作需要遍历整个数组，并将元素重新分配到新数组中。因此，时间复杂度为 O(n)，其中 n 是 HashMap 中键值对的数量。</p>
+<h2 id="总结"><a class="markdownIt-Anchor" href="#总结"></a> 总结</h2>
+<p>HashMap 的 resize() 方法是用来扩容或者缩减 HashMap 容量的方法。它通过重新分配元素和调整哈希值来实现。当 HashMap 中的键值对数量超过负载因子乘以当前容量时，就需要进行 resize 操作。为了保证 HashMap 的性能和空间利用率，我们可以通过调整负载因子和初始容量来优化 HashMap 的 resize 操作。</p>
+]]></content>
+      <categories>
+        <category>Java</category>
+        <category>Java 基础</category>
+        <category>HashMap</category>
+      </categories>
+      <tags>
+        <tag>Java</tag>
+        <tag>HashMap</tag>
       </tags>
   </entry>
 </search>
