@@ -1,111 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
-    <title>Java环境配置（JDK17+）</title>
-    <url>/posts/4027a16b/</url>
-    <content><![CDATA[<p><code>Java 17</code>是一种新版本的Java开发环境，使用<code>Java 17</code>进行程序开发时需要在计算机上安装<code>Java 17</code>环境。本文将介绍如何在<code>Windows、Linux、MacOS</code>中配置<code>Java 17</code>环境。</p>
-<h2 id="安装配置"><a class="markdownIt-Anchor" href="#安装配置"></a> 安装配置</h2>
-<div class="tabs" id="tab-first-unique-name"><ul class="nav-tabs"><li class="tab active"><a class="#first-unique-name-1">Windows</a></li><li class="tab"><a class="#first-unique-name-2">Linux</a></li><li class="tab"><a class="#first-unique-name-3">Macos</a></li></ul><div class="tab-content"><div class="tab-pane active" id="first-unique-name-1"><p>在Windows系统中配置Java 17环境的步骤如下：</p>
-<ol>
-<li>
-<p>下载<code>Java 17安装包</code>。</p>
-<p>在<a class="link"   href="https://www.oracle.com/java/technologies/javase/jdk17-archive-downloads.html" >Oracle官网 <i class="fa-regular fa-arrow-up-right-from-square fa-sm"></i></a>上下载Java 17的安装包，选择与Windows系统相应的版本。</p>
-</li>
-<li>
-<p>安装Java 17。</p>
-<p>双击下载好的<code>Java 17安装包</code>，按照步骤进行安装即可（下一步…）。</p>
-</li>
-<li>
-<p>配置环境变量。</p>
-<p>(1) 右键单击“<code>计算机</code>”，选择“<code>属性</code>”，进入“<code>高级系统设置</code>”。</p>
-<p>(2) 点击“<code>环境变量</code>”，在“<code>系统变量</code>”一栏中选择“<code>Path</code>”，然后点击“<code>编辑</code>”。</p>
-<p>(3) 在弹出的窗口中，添加Java 17的<code>安装路径</code>，例如“<code>C:\Program Files\Java\jdk-17</code>”。</p>
-</li>
-<li>
-<p>验证Java 17是否配置成功。</p>
-<p>打开<i class="fa-solid fa-rectangle-terminal"></i><code>命令提示符</code>，输入“<code>java -version</code>”命令，如果显示Java 17的版本信息，则说明配置成功。</p>
-<div class="highlight-container" data-rel="Shell"><figure class="iseeu highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">java -version</span></span><br><span class="line"></span><br><span class="line">java version &quot;17.0.1&quot; 2021-01-17 LTS</span><br><span class="line">Java(TM) SE Runtime Environment (build 17.0.1+9-LTS-190)</span><br><span class="line">Java HotSpot(TM) 64-Bit Server VM (build 17.0.1+9-LTS-190, mixed mode, sharing)</span><br></pre></td></tr></table></figure></div>
-</li>
-</ol></div><div class="tab-pane" id="first-unique-name-2"><p>在Linux系统中配置Java 17环境的步骤如下：</p>
-<ol>
-<li>
-<p>下载Java 17安装包。</p>
-<p>在<a class="link"   href="https://www.oracle.com/java/technologies/javase/jdk17-archive-downloads.html" >Oracle官网 <i class="fa-regular fa-arrow-up-right-from-square fa-sm"></i></a>上下载Java 17的安装包，选择与Linux系统相应的版本。</p>
-</li>
-<li>
-<p>安装Java 17。</p>
-<p>通过<i class="fa-solid fa-rectangle-terminal"></i><code>终端</code>，进入下载好的Java 17安装包所在的目录，执行以下命令进行安装：</p>
-<div class="highlight-container" data-rel="Shell"><figure class="iseeu highlight shell"><table><tr><td class="code"><pre><span class="line">tar -zxvf jdk-17_linux-x64_bin.tar.gz</span><br></pre></td></tr></table></figure></div>
-</li>
-<li>
-<p>配置环境变量。</p>
-<p>(1) 在终端中编辑<code>/etc/profile</code>文件，添加如下内容：</p>
-<div class="highlight-container" data-rel="Shell"><figure class="iseeu highlight shell"><table><tr><td class="code"><pre><span class="line">export JAVA_HOME=/usr/local/jdk-17</span><br><span class="line">export PATH=$PATH:$JAVA_HOME/bin</span><br></pre></td></tr></table></figure></div>
-<p>(2) 然后执行以下命令使修改后的环境变量生效：</p>
-<div class="highlight-container" data-rel="Shell"><figure class="iseeu highlight shell"><table><tr><td class="code"><pre><span class="line">source /etc/profile</span><br></pre></td></tr></table></figure></div>
-</li>
-<li>
-<p>验证Java 17是否配置成功。</p>
-<p>在终端中输入“java -version”命令，如果显示Java 17的版本信息，则说明配置成功。</p>
-<div class="highlight-container" data-rel="Shell"><figure class="iseeu highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">java -version</span></span><br><span class="line"></span><br><span class="line">java version &quot;17.0.1&quot; 2021-01-17 LTS</span><br><span class="line">Java(TM) SE Runtime Environment (build 17.0.1+9-LTS-190)</span><br><span class="line">Java HotSpot(TM) 64-Bit Server VM (build 17.0.1+9-LTS-190, mixed mode, sharing)</span><br></pre></td></tr></table></figure></div>
-</li>
-</ol></div><div class="tab-pane" id="first-unique-name-3"><p>在MacOS系统中配置Java 17环境的步骤如下：</p>
-<ol>
-<li>
-<p>下载Java 17安装包。</p>
-<p>在<a class="link"   href="https://www.oracle.com/java/technologies/javase/jdk17-archive-downloads.html" >Oracle官网 <i class="fa-regular fa-arrow-up-right-from-square fa-sm"></i></a>上下载Java 17的安装包，选择与MacOS系统相应的版本。</p>
-</li>
-<li>
-<p>安装Java 17。</p>
-<p>双击下载好的Java 17安装包，按照步骤进行安装即可。</p>
-</li>
-<li>
-<p>配置环境变量。</p>
-<p>(1) 打开<i class="fa-solid fa-rectangle-terminal"></i><code>Terminal</code>（中文叫<code>终端</code>）应用程序。</p>
-<p>(2) 在命令行输入以下命令，编辑<code>~/.bash_profile</code> | <code>~/.zshrc</code>文件：<br />
-<i class="fa-solid fa-triangle-exclamation" style="color: #ffcf24;"></i> 自 macOS Catalina 10.15开始，默认的终端 shell 从<code> bash</code> 改为了 <code>zsh</code>。你没有修改过默认的设置，在用户目录下是没有<code>.bash_profile</code>文件的，环境配置文件为<code>.zshrc</code>，具体配置如下：</p>
-<p><code>macOS Catalina 10.15</code>之前的版本（<code>bash</code>）</p>
-  <div class="highlight-container" data-rel="Shell"><figure class="iseeu highlight shell"><table><tr><td class="code"><pre><span class="line">nano ~/.bash_profile</span><br></pre></td></tr></table></figure></div>
-<p><code>macOS Catalina 10.15</code>以及之后的版本（<code>zsh</code>）</p>
-  <div class="highlight-container" data-rel="Shell"><figure class="iseeu highlight shell"><table><tr><td class="code"><pre><span class="line">nano ~/.zshrc</span><br></pre></td></tr></table></figure></div>
-<p>(3) 在根据<code>(2)</code>步骤中打开的文件中，加入如下信息：</p>
-<div class="highlight-container" data-rel="Shell"><figure class="iseeu highlight shell"><table><tr><td class="code"><pre><span class="line">export PATH=&quot;/Library/Java/JavaVirtualMachines/jdk-17.jdk/Contents/Home/bin:$PATH&quot;</span><br></pre></td></tr></table></figure></div>
-<p>(4) 按下“Ctrl+X”键，选择“Y”保存文件并按“Enter”键退出编辑。</p>
-<p>(5) 执行以下命令让修改后的环境变量生效：</p>
-<p><code>macOS Catalina 10.15</code>之前的版本（<code>bash</code>）</p>
-<div class="highlight-container" data-rel="Shell"><figure class="iseeu highlight shell"><table><tr><td class="code"><pre><span class="line">source ~/.bash_profile</span><br></pre></td></tr></table></figure></div>
-<p><code>macOS Catalina 10.15</code>以及之后的版本（<code>zsh</code>）</p>
-<div class="highlight-container" data-rel="Shell"><figure class="iseeu highlight shell"><table><tr><td class="code"><pre><span class="line">source ~/.zshrc</span><br></pre></td></tr></table></figure></div>
-</li>
-<li>
-<p>验证Java 17是否配置成功。</p>
-<p>在终端中输入“<code>java -version</code>”命令，如果显示<code>Java 17的版本信息</code>，则说明配置成功。</p>
-<div class="highlight-container" data-rel="Shell"><figure class="iseeu highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">java -version</span></span><br><span class="line"></span><br><span class="line">java version &quot;17.0.1&quot; 2021-01-17 LTS</span><br><span class="line">Java(TM) SE Runtime Environment (build 17.0.1+9-LTS-190)</span><br><span class="line">Java HotSpot(TM) 64-Bit Server VM (build 17.0.1+9-LTS-190, mixed mode, sharing)</span><br></pre></td></tr></table></figure></div>
-</li>
-</ol></div></div></div>
-<h2 id="结论"><a class="markdownIt-Anchor" href="#结论"></a> 结论</h2>
-<p>在Windows、Linux、MacOS系统中都可以配置Java 17环境，只需按照上述步骤，在对应的系统中进行操作即可。配置成功后，就可以使用Java 17进行程序开发了。</p>
-]]></content>
-      <categories>
-        <category>Java</category>
-        <category>Java 基础</category>
-        <category>Java 环境</category>
-      </categories>
-      <tags>
-        <tag>Java</tag>
-        <tag>Java 环境配置</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>Java17环境配置- MacOS</title>
     <url>/posts/21377094/</url>
-    <content><![CDATA[<p><code>Java 17</code>是一种新版本的Java开发环境，使用<code>Java 17</code>进行程序开发时需要在计算机上安装<code>Java 17</code>环境。本文将介绍如何在<code>MacOS</code>中配置<code>Java 17</code>环境。</p>
+    <content><![CDATA[<p>Java 17 是一种新版本的Java开发环境，使用 Java 17 进行程序开发时需要在计算机上安装 Java 17 环境。本文将介绍如何在 MacOS 中配置 Java 17环境。</p>
 <h2 id="macos系统中配置java-17环境"><a class="markdownIt-Anchor" href="#macos系统中配置java-17环境"></a> MacOS系统中配置Java 17环境：</h2>
 <h3 id="1-下载java-17安装包"><a class="markdownIt-Anchor" href="#1-下载java-17安装包"></a> 1. 下载Java 17安装包。</h3>
-<p>在<a class="link"   href="https://www.oracle.com/java/technologies/javase/jdk17-archive-downloads.html" >Oracle官网 <i class="fa-regular fa-arrow-up-right-from-square fa-sm"></i></a>上下载<code>Java 17</code><br />
+<p>在<a class="link"   href="https://www.oracle.com/java/technologies/javase/jdk17-archive-downloads.html" >Oracle官网 <i class="fa-regular fa-arrow-up-right-from-square fa-sm"></i></a>上下载 Java 17<br />
 的安装包，选择与MacOS系统相应的版本。</p>
-<h3 id="2-安装java-17"><a class="markdownIt-Anchor" href="#2-安装java-17"></a> 2. 安装<code>Java 17</code>。</h3>
-<p>双击下载好的<code>Java 17</code>安装包，按照步骤进行安装即可。</p>
+<h3 id="2-安装-java-17"><a class="markdownIt-Anchor" href="#2-安装-java-17"></a> 2. 安装 Java 17。</h3>
+<p>双击下载好的 Java 17 安装包，按照步骤进行安装即可。</p>
 <h3 id="3-配置环境变量"><a class="markdownIt-Anchor" href="#3-配置环境变量"></a> 3. 配置环境变量。</h3>
 <div class="tabs" id="tab-first-unique-01"><ul class="nav-tabs"><li class="tab active"><a class="#first-unique-01-1">macOS 10.15+（zsh）</a></li><li class="tab"><a class="#first-unique-01-2">macOS 10.15之前（bash）</a></li></ul><div class="tab-content"><div class="tab-pane active" id="first-unique-01-1"><ol>
 <li>
@@ -168,9 +72,111 @@
       </tags>
   </entry>
   <entry>
-    <title>HashMap - Java8</title>
+    <title>函数接口</title>
+    <url>/posts/a65f2ab8/</url>
+    <content><![CDATA[<p>Java 8 中引入了函数式编程的概念，其中函数接口是重要的一部分。函数接口是指只有一个抽象方法的接口，可以使用 lambda 表达式或方法引用来实现该抽象方法。在函数式编程中，函数接口通常用于表示某个操作，例如转换、过滤或消费数据等。通过将函数接口作为参数传递到方法中，可以轻松地实现这些操作。</p>
+<h2 id="函数接口是什么"><a class="markdownIt-Anchor" href="#函数接口是什么"></a> 函数接口是什么？</h2>
+<h3 id="定义"><a class="markdownIt-Anchor" href="#定义"></a> 定义</h3>
+<div class="note note-success icon-padding"><i class="note-icon fa-solid fa-check-circle"></i><p>只有一个抽象方法的接口。</p>
+</div>
+<h3 id="典例"><a class="markdownIt-Anchor" href="#典例"></a> 典例</h3>
+<p>Java 中的 Runnable 接口，就是一个典型的函数接口，请看Code：</p>
+<div class="highlight-container" data-rel="Java"><figure class="iseeu highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@FunctionalInterface</span> <span class="comment">// 声明该接口是函数接口</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">interface</span> <span class="title class_">Runnable</span> &#123;</span><br><span class="line">  <span class="comment">// 该接口中只有一个抽象方法</span></span><br><span class="line">  <span class="keyword">public</span> <span class="keyword">abstract</span> <span class="keyword">void</span> <span class="title function_">run</span><span class="params">()</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></div>
+<h3 id="functionalinterface"><a class="markdownIt-Anchor" href="#functionalinterface"></a> @FunctionalInterface</h3>
+<p>@FunctionalInterface：标识一个接口为函数接口，必须满足函数接口的定义：只有一个抽象方法的接口，否则编译时会报错。</p>
+<p>三个接口为例说明，如下：</p>
+<div class="highlight-container" data-rel="Java"><figure class="iseeu highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">// Hello</span></span><br><span class="line"><span class="meta">@FunctionalInterface</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">interface</span> <span class="title class_">Hello</span> &#123;</span><br><span class="line">  <span class="keyword">void</span> <span class="title function_">hello</span><span class="params">()</span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// NiHao </span></span><br><span class="line"><span class="comment">// ！！！错误</span></span><br><span class="line"><span class="meta">@FunctionalInterface</span> </span><br><span class="line"><span class="keyword">public</span> <span class="keyword">interface</span> <span class="title class_">Nihao</span> &#123;</span><br><span class="line">  <span class="keyword">void</span> <span class="title function_">nihao</span><span class="params">()</span>;</span><br><span class="line">  <span class="keyword">void</span> <span class="title function_">shijie</span><span class="params">()</span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// Hi</span></span><br><span class="line"><span class="meta">@FunctionalInterface</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">interface</span> <span class="title class_">Hi</span> &#123;</span><br><span class="line">  <span class="keyword">void</span> <span class="title function_">hi</span><span class="params">()</span>;</span><br><span class="line">  <span class="keyword">default</span> <span class="keyword">void</span> <span class="title function_">shijie</span><span class="params">()</span> &#123;&#125; </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></div>
+<div class="note note-success icon-padding"><i class="note-icon fa-solid fa-check-circle"></i><p>Hello 接口和 Hi 接口都是函数接口，添加 @FunctionalInterface 注解不会报错。</p>
+</div> 
+<div class="note note-danger icon-padding"><i class="note-icon fa-solid fa-times-circle"></i><p>Nihao 接口不是函数接口，添加 @FunctionalInterface 注解会报错。</p>
+</div>
+<h3 id="自定义函数接口"><a class="markdownIt-Anchor" href="#自定义函数接口"></a> 自定义函数接口</h3>
+<p>根据函数接口的定义（<code>只有一个抽象方法的接口</code>）来自定义一个函数接口 Me ：</p>
+<div class="highlight-container" data-rel="Java"><figure class="iseeu highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">// 几行 Code 定义了一个函数接口，是不是很简单。</span></span><br><span class="line"><span class="meta">@FunctionalInterface</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">interface</span> <span class="title class_">Me</span> &#123;</span><br><span class="line">  <span class="comment">// Me 接口只有一个抽象方法 i()</span></span><br><span class="line">  <span class="keyword">void</span> <span class="title function_">i</span><span class="params">()</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></div>
+<h3 id="java-内置的函数接口"><a class="markdownIt-Anchor" href="#java-内置的函数接口"></a> Java 内置的函数接口</h3>
+<p>Java 8 中引入了函数式编程的概念，其中函数接口是重要的一部分。Java 8 也内置了一些函数接口，主要常用的有 <code>Function&lt;T, R&gt;</code>、<code>Predicate&lt;T&gt;</code>、<code>Consumer&lt;T&gt;</code>、<code>Supplier&lt;T&gt;</code> 这四个函数对象，此外还有一些相对用的少一点的，比如：<code>BiFunction&lt;T, U, R&gt;</code>、<code>BiPredicate&lt;T, U&gt;</code>、<code>BiConsumer&lt;T, U&gt;</code>、<code>UnaryOperator&lt;T&gt;</code>、<code>BinaryOperator&lt;T&gt;</code>。这些函数接口的使用，我会单独写一篇博文进行介绍的，这篇主要是了解到什么是函数接口就OK了。</p>
+<h2 id="函数接口的应用"><a class="markdownIt-Anchor" href="#函数接口的应用"></a> 函数接口的应用</h2>
+<h3 id="lambda-表达式"><a class="markdownIt-Anchor" href="#lambda-表达式"></a> Lambda 表达式</h3>
+<p><code>Lambda 表达式</code>提供了一种简洁的方式来创建函数接口的实例（实现函数接口）。Lambda 表达式可以使用函数接口来描述其参数和返回类型，并且可以通过将Lambda表达式分配给函数接口类型的变量来使用它。因此，Lambda表达式和函数接口密切相关，它们通常一起使用，以实现简洁、灵活的代码。</p>
+<p>伪代码如下：</p>
+<div class="highlight-container" data-rel="Java"><figure class="iseeu highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">// 函数接口 Hello</span></span><br><span class="line"><span class="meta">@FunctionalInterface</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">interface</span> <span class="title class_">Hello</span> &#123;</span><br><span class="line">  <span class="keyword">void</span> <span class="title function_">hello</span><span class="params">()</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">Hello</span> <span class="variable">h</span> <span class="operator">=</span> () -&gt; &#123;&#125;;</span><br><span class="line"><span class="comment">// Lambda 表达式角度：</span></span><br><span class="line"><span class="comment">//   使用 Lambda 表达式来实现 Hello 接口，并创建了一个 Hello 类型的实例</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 函数接口角度：</span></span><br><span class="line"><span class="comment">//   使用 Hello 函数接口，描述了 Lambda 表达式</span></span><br><span class="line"><span class="comment">//   返回值为 void，没有入参（其实就是 hello() 方法）</span></span><br></pre></td></tr></table></figure></div>
+<h3 id="方法引用"><a class="markdownIt-Anchor" href="#方法引用"></a> 方法引用</h3>
+<p><code>方法引用</code>提供了一种更为简洁的方式来创建函数接口的实例，通过引用现有方法而不是编写 <code>Lambda 表达式</code>的方式；直接使用现有方法的名称，从而简化代码并提高可读性。</p>
+<p>伪代码如下：</p>
+<div class="highlight-container" data-rel="Java"><figure class="iseeu highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">// 内置函数接口 Consumer</span></span><br><span class="line"><span class="meta">@FunctionalInterface</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">interface</span> <span class="title class_">Consumer</span>&lt;T&gt; &#123;</span><br><span class="line">  <span class="keyword">public</span> <span class="keyword">abstract</span> <span class="title function_">accept</span><span class="params">(T t)</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 使用 Lambda 表达式创建一个 Consumer 类型的实例</span></span><br><span class="line">Consumer&lt;String&gt; consumer = s -&gt; System.out.println(s);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 使用方法引用创建一个 Consumer 类型的实例</span></span><br><span class="line">Consumer&lt;String&gt; consumer = System.out::println;</span><br></pre></td></tr></table></figure></div>
+<h2 id="总结"><a class="markdownIt-Anchor" href="#总结"></a> 总结</h2>
+<p>函数接口是 Java 8 中引入函数式编程基础中的基础，它和 Lambda 表达式和方法引用有着密不可分的关系，把这三者的关系理清并掌握后，Java的函数编程那不是小菜一碟，Stream Api 也不是什么大问题 <i class="fa-duotone fa-face-party"></i>。</p>
+]]></content>
+      <categories>
+        <category>Java</category>
+        <category>Java 基础</category>
+        <category>函数编程</category>
+      </categories>
+      <tags>
+        <tag>Java</tag>
+        <tag>Java 8</tag>
+        <tag>函数编程</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>方法引用</title>
+    <url>/posts/4b34576e/</url>
+    <content><![CDATA[<p>阅读本篇内容默认认为你已经掌握了<code>函数接口</code>、<code>Lambda 表达式</code></p>
+<p>在Java 8中，方法引用（method reference）是一种方便的语法，可以将现有的方法作为Lambda表达式传递。这样做可以简化代码，并且使得代码更加易于理解和修改。本文将介绍Java方法引用的基本概念、语法和使用方法。</p>
+<h2 id="什么是方法引用"><a class="markdownIt-Anchor" href="#什么是方法引用"></a> 什么是方法引用？</h2>
+<p>方法引用是一种语法，用于将现有的方法作为Lambda表达式传递。通常情况下，我们需要定义一个Lambda表达式来表示一个匿名函数，然后把它传递给另一个函数。但是，如果这个Lambda表达式只是调用了一个已经存在的方法，那么就可以使用方法引用来代替Lambda表达式。方法引用的基本思想是：如果存在一个现有方法，它正好满足Lambda表达式的参数和返回类型，那么就可以使用方法引用来代替Lambda表达式。</p>
+<h2 id="方法引用的语法"><a class="markdownIt-Anchor" href="#方法引用的语法"></a> 方法引用的语法</h2>
+<p>方法引用使用<code>::</code>符号来表示。它的语法有以下几种形式：</p>
+<ul>
+<li>静态方法引用：<code>ClassName::methodName</code></li>
+<li>实例方法引用：<code>objectName::methodName</code></li>
+<li>特定类的任意对象方法引用：<code>ClassName::methodName</code></li>
+<li>构造方法引用：<code>ClassName::new</code></li>
+</ul>
+<p>其中，静态方法引用和实例方法引用是最常用的两种形式。其他两种形式通常用于特殊情况。</p>
+<h3 id="静态方法引用"><a class="markdownIt-Anchor" href="#静态方法引用"></a> 静态方法引用</h3>
+<p>静态方法引用使用<code>ClassName::methodName</code>的形式。例如，如果存在一个静态方法<code>Integer.parseInt(String)</code>，我们可以使用如下的代码来引用它：</p>
+<div class="highlight-container" data-rel="Java"><figure class="iseeu highlight java"><table><tr><td class="code"><pre><span class="line">Function&lt;String, Integer&gt; parser = Integer::parseInt;</span><br></pre></td></tr></table></figure></div>
+<p>上面的代码将<code>Integer.parseInt()</code>方法作为一个函数对象赋值给了<code>parser</code>变量。这样，在程序中就可以像使用其他函数一样使用这个函数对象了。</p>
+<h3 id="实例方法引用"><a class="markdownIt-Anchor" href="#实例方法引用"></a> 实例方法引用</h3>
+<p>实例方法引用使用<code>objectName::methodName</code>的形式。例如，如果存在一个实例方法<code>String.toUpperCase()</code>，我们可以使用如下的代码来引用它：</p>
+<div class="highlight-container" data-rel="Java"><figure class="iseeu highlight java"><table><tr><td class="code"><pre><span class="line">UnaryOperator&lt;String&gt; converter = String::toUpperCase;</span><br></pre></td></tr></table></figure></div>
+<p>上面的代码将<code>String.toUpperCase()</code>方法作为一个函数对象赋值给了<code>converter</code>变量。这样，在程序中就可以像使用其他函数一样使用这个函数对象了。注意：在这个例子中，<code>String::toUpperCase</code>是一个无参方法，因此返回值类型必须与函数接口的返回值类型相同（即<code>UnaryOperator&lt;String&gt;</code>）。</p>
+<h2 id="总结"><a class="markdownIt-Anchor" href="#总结"></a> 总结</h2>
+<p>Java方法引用是一种方便的语法，用于简化Lambda表达式并使代码更加易于理解和修改。方法引用通常可以用于函数式接口的参数或者返回值，以便将现有方法转换成函数式接口的实例。掌握方法引用的基本语法和相关技巧，可以让我们更加高效地编写Java代码。</p>
+]]></content>
+      <categories>
+        <category>Java</category>
+        <category>Java 基础</category>
+        <category>函数编程</category>
+      </categories>
+      <tags>
+        <tag>Java</tag>
+        <tag>Java 8</tag>
+        <tag>函数编程</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>HashMap - 基本原理</title>
     <url>/posts/fcb831a5/</url>
-    <content><![CDATA[<p>HashMap 是最常用的集合类之一，它实现了 Map 接口，提供了键值对存储和访问功能。Java 8 中对 HashMap 进行了优化，使其性能更好。本文将深入探讨 Java 8 HashMap 的实现原理。</p>
+    <content><![CDATA[<p>HashMap是Java中最常用的数据结构之一，它将键映射到值，允许我们通过Key来快速检索和获取Value。在Java 8中，HashMap进行了一些优化和改进，以提高性能和减少冲突。本文将介绍Java8 HashMap的基本原理和实现方式。</p>
+<div class="note note-yellow"><p>本文将介绍Java8 HashMap的基本原理，不会对 HashMap 中的方法进行解读，对于其核心的方法解读会单开炉灶</p>
+</div>
+<h2 id="基本原理"><a class="markdownIt-Anchor" href="#基本原理"></a> 基本原理</h2>
+<p>在Java8中，HashMap使用数组和链表（或红黑树）实现。当一个元素被添加到HashMap中时，它首先根据Key的hashcode计算出一个桶号，并将其放入相应的桶中。如果该桶中已经存在其他元素，则需要比较它们的Key是否相等。如果Key相等，则直接替换Value；否则，将该元素添加到链表（或红黑树）的末尾。</p>
+<p>当HashMap的大小超过某个阈值（load factor）时，它会自动扩容。扩容涉及将所有的元素重新散列到一个新的、更大的桶中。这个操作代价很高，因此应该尽可能地避免频繁地扩容HashMap。</p>
+<h2 id="实现方式"><a class="markdownIt-Anchor" href="#实现方式"></a> 实现方式</h2>
+<p>在Java8中，HashMap的内部实现有以下重要组件：</p>
+<ul>
+<li>数组：HashMap使用一个Node类型的数组来存储元素。</li>
+<li>链表：当多个元素映射到同一个桶时，它们将被链接成一个链表。链表上的节点类型是Node。</li>
+<li>红黑树：当一个桶中的元素数量超过8个时，HashMap会将链表转换为红黑树，以提高性能。此时链表上的节点类型是TreeNode。</li>
+</ul>
+<p>下面我们来看一下Java8 HashMap的核心代码：</p>
+<div class="highlight-container" data-rel="Java"><figure class="iseeu highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">HashMap</span>&lt;K,V&gt; <span class="keyword">extends</span> <span class="title class_">AbstractMap</span>&lt;K,V&gt;</span><br><span class="line">    <span class="keyword">implements</span> <span class="title class_">Map</span>&lt;K,V&gt;, Cloneable, Serializable &#123;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 初始大小 16</span></span><br><span class="line">    <span class="keyword">static</span> <span class="keyword">final</span> <span class="type">int</span> <span class="variable">DEFAULT_INITIAL_CAPACITY</span> <span class="operator">=</span> <span class="number">1</span> &lt;&lt; <span class="number">4</span>; <span class="comment">// aka 16</span></span><br><span class="line">    <span class="comment">// 扩容的加载因子 0.75</span></span><br><span class="line">    <span class="keyword">static</span> <span class="keyword">final</span> <span class="type">float</span> <span class="variable">DEFAULT_LOAD_FACTOR</span> <span class="operator">=</span> <span class="number">0.75f</span>;</span><br><span class="line">    <span class="comment">// 转化为红黑树的阈值 8</span></span><br><span class="line">    <span class="keyword">static</span> <span class="keyword">final</span> <span class="type">int</span> <span class="variable">TREEIFY_THRESHOLD</span> <span class="operator">=</span> <span class="number">8</span>;</span><br><span class="line">    <span class="comment">// 退化为链表的阈值 6</span></span><br><span class="line">    <span class="keyword">static</span> <span class="keyword">final</span> <span class="type">int</span> <span class="variable">UNTREEIFY_THRESHOLD</span> <span class="operator">=</span> <span class="number">6</span>;</span><br><span class="line">    <span class="comment">// 转化为红黑树的另一个条件，Hash表的大小阈值 64</span></span><br><span class="line">    <span class="keyword">static</span> <span class="keyword">final</span> <span class="type">int</span> <span class="variable">MIN_TREEIFY_CAPACITY</span> <span class="operator">=</span> <span class="number">64</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">transient</span> Node&lt;K,V&gt;[] table;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">transient</span> Set&lt;Map.Entry&lt;K,V&gt;&gt; entrySet;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">transient</span> <span class="type">int</span> size;</span><br><span class="line"></span><br><span class="line">    <span class="type">int</span> threshold;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">final</span> <span class="type">float</span> loadFactor;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="title function_">HashMap</span><span class="params">(<span class="type">int</span> initialCapacity, <span class="type">float</span> loadFactor)</span> &#123;</span><br><span class="line">        <span class="comment">//...</span></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> V <span class="title function_">put</span><span class="params">(K key, V value)</span> &#123;</span><br><span class="line">        <span class="comment">//...</span></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//...</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></div>
+<p>在上面的代码中，我们可以看到几个重要的组件，包括数组 <code>table</code>、阈值 <code>threshold</code>、负载因子 <code>loadFactor</code>、链表和红黑树转换的阈值等。此外，还有一些常见的方法，例如put()、get()和resize()等方法。</p>
+<h2 id="总结"><a class="markdownIt-Anchor" href="#总结"></a> 总结</h2>
+<p>Java8的HashMap是一种高效的数据结构，它使用数组和链表（或红黑树）实现，并具有自动扩容和哈希冲突解决等功能。HashMap的内部实现涉及到许多细节和优化，需要理解其基本原理和实现方式才能更好地使用它。掌握Java8 HashMap的基本原理和使用方法，可以使我们更加高效和便捷地处理键值对数据。</p>
 ]]></content>
       <categories>
         <category>Java</category>
@@ -183,204 +189,36 @@
       </tags>
   </entry>
   <entry>
-    <title>Java环境配置（JDK1.8）</title>
-    <url>/posts/4c8e8e1b/</url>
-    <content><![CDATA[<p>Java是一种广泛使用的编程语言，在进行 Java 程序编写之前，需要在本地计算机上安装 Java 环境。不同的操作系统下 Java的安装与配置方法略有不同。本篇博客将介绍 Java 环境在 Windows、Linux、MacOS 中的配置方法。</p>
-<h2 id="1-windows中的-java-配置方法"><a class="markdownIt-Anchor" href="#1-windows中的-java-配置方法"></a> 1. Windows中的 Java 配置方法</h2>
-<h3 id="11-下载-java-开发包"><a class="markdownIt-Anchor" href="#11-下载-java-开发包"></a> 1.1 下载 Java 开发包</h3>
-<p>在 Windows 中配置 Java 开发环境，首先需要从 Oracle 官方网站下载 Java 开发包。根据个人需求选择合适的版本，并下载安装。</p>
-<h3 id="12-配置环境变量"><a class="markdownIt-Anchor" href="#12-配置环境变量"></a> 1.2 配置环境变量</h3>
-<p>配置环境变量是为了方便直接使用 Java 命令行工具。以下是 Windows 中配置环境变量的步骤：</p>
-<ol>
-<li>在 Windows 工具栏中，右键“计算机”，选择“属性”；</li>
-<li>点击“高级系统设置” &gt; “环境变量”；</li>
-<li>在“系统变量”中新增Java变量，包括JAVA_HOME，及将Java\bin的绝对路径添加到PATH变量中。</li>
-</ol>
-<h3 id="13-验证环境变量设置是否生效"><a class="markdownIt-Anchor" href="#13-验证环境变量设置是否生效"></a> 1.3 验证环境变量设置是否生效</h3>
-<p>在命令行输入 java –version，若显示安装版本，则说明环境变量设置成功。</p>
-<h2 id="2-linux-中的-java-配置方法"><a class="markdownIt-Anchor" href="#2-linux-中的-java-配置方法"></a> 2. Linux 中的 Java 配置方法</h2>
-<p>在 Linux 系统中配置 Java，可以通过包管理器安装，或者从 Oracle 官网下载安装包进行安装。</p>
-<h3 id="21-下载安装"><a class="markdownIt-Anchor" href="#21-下载安装"></a> 2.1 下载安装</h3>
-<p>以下是从 Oracle 官网下载安装的步骤：</p>
-<ol>
-<li>从 Oracle 官网下载合适的 Java 开发包，例如 jdk-8u191-linux-x64.tar.gz；</li>
-<li>解压下载的压缩包：tar -zxvf jdk-8u191-linux-x64.tar.gz；</li>
-<li>移动解压文件至指定目录，例如 /usr/local/java/jdk1.8.0_191。</li>
-</ol>
-<h3 id="22-配置环境变量"><a class="markdownIt-Anchor" href="#22-配置环境变量"></a> 2.2 配置环境变量</h3>
-<p>在 Linux 中配置 Java 环境变量的步骤如下：</p>
-<ol>
-<li>修改 /etc/profile 配置文件，并将下述配置文件加入文件末尾： <div class="highlight-container" data-rel="Plaintext"><figure class="iseeu highlight plaintext"><table><tr><td class="code"><pre><span class="line">JAVA_HOME=/usr/local/java/jdk1.8.0_191</span><br><span class="line">CLASSPATH=$JAVA_HOME/lib/</span><br><span class="line">PATH=$PATH:$JAVA_HOME/bin</span><br><span class="line">export JAVA_HOME CLASSPATH PATH</span><br></pre></td></tr></table></figure></div>
-</li>
-<li>让配置文件立即生效，运行 source /etc/profile 命令。</li>
-</ol>
-<h3 id="23-验证环境变量设置是否生效"><a class="markdownIt-Anchor" href="#23-验证环境变量设置是否生效"></a> 2.3 验证环境变量设置是否生效</h3>
-<p>在命令行输入 java -version，若输出相应的版本号，则说明环境变量设置成功。</p>
-<h2 id="3-macos-中的-java-配置方法"><a class="markdownIt-Anchor" href="#3-macos-中的-java-配置方法"></a> 3. MacOS 中的 Java 配置方法</h2>
-<p>在 MacOS 中安装 Java 开发环境，可以通过 Oracle 官网下载 dmg 安装包进行安装。</p>
-<h3 id="31-下载安装"><a class="markdownIt-Anchor" href="#31-下载安装"></a> 3.1 下载安装</h3>
-<p>从 Oracle 官网下载 dmg 安装包，双击 dmg 文件，并按照提示安装即可。</p>
-<h3 id="32-配置环境变量"><a class="markdownIt-Anchor" href="#32-配置环境变量"></a> 3.2 配置环境变量</h3>
-<p>在 MacOS 中配置环境变量的方法与 Linux 系统类似，可以通过编辑 .bash_profile 文件来设置 JAVA_HOME，CLASSPATH，PATH 等环境变量。具体步骤如下：</p>
-<ol>
-<li>
-<p>打开一个终端窗口，输入以下命令，新建 .bash_profile 文件：</p>
-<div class="highlight-container" data-rel="Shell"><figure class="iseeu highlight shell"><table><tr><td class="code"><pre><span class="line">vi ~/.bash_profile</span><br></pre></td></tr></table></figure></div>
-</li>
-<li>
-<p>编辑 .bash_profile 文件，添加以下环境变量配置：</p>
-<div class="highlight-container" data-rel="Plaintext"><figure class="iseeu highlight plaintext"><table><tr><td class="code"><pre><span class="line">export JAVA_HOME=/Library/Java/JavaVirtualMachines/jdk1.8.0_191.jdk/Contents/Home</span><br><span class="line">export PATH=$JAVA_HOME/bin:$PATH</span><br></pre></td></tr></table></figure></div>
-</li>
-<li>
-<p>保存文件，退出终端。</p>
-</li>
-</ol>
-<h3 id="33-验证环境变量设置是否生效"><a class="markdownIt-Anchor" href="#33-验证环境变量设置是否生效"></a> 3.3 验证环境变量设置是否生效</h3>
-<p>在命令行输入 java -version，若输出相应的版本号，则说明环境变量设置成功。</p>
-<h2 id="结论"><a class="markdownIt-Anchor" href="#结论"></a> 结论</h2>
-<p>本篇博客介绍了 Windows、Linux、MacOS 系统下 Java 环境的配置方法。通过这些配置，我们可以在本地计算机上开始进行 Java 程序的开发工作。</p>
+    <title>Lambda 表达式</title>
+    <url>/posts/9fa75fc1/</url>
+    <content><![CDATA[<p>Lambda表达式是Java 8中新增的一种编程语法，它允许我们将一个函数作为参数传给另一个函数。Lambda表达式可以简化代码，使其更加易读和简洁。本文将介绍Java Lambda表达式的语法。</p>
+<h2 id="基本语法"><a class="markdownIt-Anchor" href="#基本语法"></a> 基本语法</h2>
+<p>Lambda表达式的基本语法如下：</p>
+<div class="highlight-container" data-rel="Java"><figure class="iseeu highlight java"><table><tr><td class="code"><pre><span class="line">(parameter list) -&gt; &#123; lambda body &#125;</span><br></pre></td></tr></table></figure></div>
+<p>其中，<code>parameter list</code>是参数列表，可以是空的，也可以包含一个或多个参数；<code>lambda body</code>是Lambda表达式的执行体，可以是一个表达式或代码块。</p>
+<p>例如，以下Lambda表达式没有任何参数，执行体只有一个输出语句：</p>
+<div class="highlight-container" data-rel="Java"><figure class="iseeu highlight java"><table><tr><td class="code"><pre><span class="line">() -&gt; System.out.println(<span class="string">&quot;Hello, Lambda!&quot;</span>);</span><br></pre></td></tr></table></figure></div>
+<p>以下Lambda表达式有一个参数，执行体是一个表达式：</p>
+<div class="highlight-container" data-rel="Java"><figure class="iseeu highlight java"><table><tr><td class="code"><pre><span class="line">x -&gt; x * x</span><br></pre></td></tr></table></figure></div>
+<p>以下Lambda表达式有两个参数，执行体是一个代码块：</p>
+<div class="highlight-container" data-rel="Java"><figure class="iseeu highlight java"><table><tr><td class="code"><pre><span class="line">(x, y) -&gt; &#123;</span><br><span class="line">    <span class="type">int</span> <span class="variable">sum</span> <span class="operator">=</span> x + y;</span><br><span class="line">    <span class="keyword">return</span> sum;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></div>
+<h2 id="类型推断"><a class="markdownIt-Anchor" href="#类型推断"></a> 类型推断</h2>
+<p>在Java 8之前，需要显式地指定Lambda表达式的函数接口类型。但是，在Java 8中引入了类型推断机制，可以根据上下文自动推断Lambda表达式的函数接口类型。例如：</p>
+<div class="highlight-container" data-rel="Java"><figure class="iseeu highlight java"><table><tr><td class="code"><pre><span class="line">List&lt;String&gt; list = Arrays.asList(<span class="string">&quot;foo&quot;</span>, <span class="string">&quot;bar&quot;</span>);</span><br><span class="line">list.forEach((String s) -&gt; System.out.println(s));</span><br></pre></td></tr></table></figure></div>
+<p>由于<code>list</code>是一个<code>List&lt;String&gt;</code>类型的集合，因此Lambda表达式<code>(String s) -&gt; System.out.println(s)</code>的函数接口类型也可以自动推断出来。因此，我们可以省略函数接口类型的显式声明：</p>
+<div class="highlight-container" data-rel="Java"><figure class="iseeu highlight java"><table><tr><td class="code"><pre><span class="line">list.forEach(s -&gt; System.out.println(s));</span><br></pre></td></tr></table></figure></div>
+<h2 id="总结"><a class="markdownIt-Anchor" href="#总结"></a> 总结</h2>
+<p>Java Lambda表达式是一种简洁、易读且功能强大的编程语法。它可以使代码更加简单、清晰，并可用于各种场合。掌握Lambda表达式的基本语法和相关技巧，可以让我们更加高效地编写Java代码。</p>
 ]]></content>
       <categories>
         <category>Java</category>
         <category>Java 基础</category>
-        <category>Java 环境</category>
+        <category>函数编程</category>
       </categories>
       <tags>
         <tag>Java</tag>
-        <tag>Java 环境配置</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>整型int | Integer类</title>
-    <url>/posts/861b070c/</url>
-    <content><![CDATA[]]></content>
-      <categories>
-        <category>Java</category>
-        <category>Java 基础</category>
-      </categories>
-      <tags>
-        <tag>Java</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>JVM 内存区域</title>
-    <url>/posts/74b8cfc8/</url>
-    <content><![CDATA[]]></content>
-      <categories>
-        <category>Java</category>
-        <category>JVM</category>
-        <category>内存区域</category>
-      </categories>
-      <tags>
-        <tag>Java</tag>
-        <tag>Java 内存区域</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>Java对象之从到哪里去？</title>
-    <url>/posts/af193f8f/</url>
-    <content><![CDATA[]]></content>
-      <categories>
-        <category>Java</category>
-        <category>JVM</category>
-        <category>Java 对象</category>
-      </categories>
-      <tags>
-        <tag>Java</tag>
-        <tag>Java 对象</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>字符串String 类</title>
-    <url>/posts/95fd8e29/</url>
-    <content><![CDATA[]]></content>
-      <categories>
-        <category>Java</category>
-        <category>Java 基础</category>
-      </categories>
-      <tags>
-        <tag>Java</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>Redis数据类型之字符串</title>
-    <url>/posts/6ff312cc/</url>
-    <content><![CDATA[]]></content>
-      <categories>
-        <category>Redis</category>
-        <category>基础知识</category>
-        <category>数据类型</category>
-      </categories>
-      <tags>
-        <tag>Redis</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>链表</title>
-    <url>/posts/2362a8ea/</url>
-    <content><![CDATA[]]></content>
-      <categories>
-        <category>Redis</category>
-        <category>设计实现</category>
-        <category>数据结构</category>
-      </categories>
-      <tags>
-        <tag>Redis</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>简单字符串（SDS）</title>
-    <url>/posts/4d8a9737/</url>
-    <content><![CDATA[]]></content>
-      <categories>
-        <category>Redis</category>
-        <category>设计实现</category>
-        <category>数据结构</category>
-      </categories>
-      <tags>
-        <tag>Redis</tag>
-        <tag>SDS</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>Redis数据类型之列表</title>
-    <url>/posts/7eaf8552/</url>
-    <content><![CDATA[]]></content>
-      <categories>
-        <category>Redis</category>
-        <category>基础知识</category>
-        <category>数据类型</category>
-      </categories>
-      <tags>
-        <tag>Redis</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>Java对象之从哪里来？</title>
-    <url>/posts/60ac4ccf/</url>
-    <content><![CDATA[]]></content>
-      <categories>
-        <category>Java</category>
-        <category>JVM</category>
-        <category>Java 对象</category>
-      </categories>
-      <tags>
-        <tag>Java</tag>
-        <tag>Java 对象</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>Java对象之没用就捐了！</title>
-    <url>/posts/11efc367/</url>
-    <content><![CDATA[]]></content>
-      <categories>
-        <category>Java</category>
-        <category>JVM</category>
-        <category>Java 对象</category>
-      </categories>
-      <tags>
-        <tag>Java</tag>
-        <tag>Java 对象</tag>
+        <tag>Java 8</tag>
+        <tag>函数编程</tag>
       </tags>
   </entry>
 </search>
