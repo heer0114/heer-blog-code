@@ -72,193 +72,8 @@
       </tags>
   </entry>
   <entry>
-    <title>HashMap - 基本原理</title>
-    <url>/posts/fcb831a5/</url>
-    <content><![CDATA[<p>HashMap是Java中最常用的数据结构之一，它将键映射到值，允许我们通过Key来快速检索和获取Value。在Java 8中，HashMap进行了一些优化和改进，以提高性能和减少冲突。本文将介绍Java8 HashMap的基本原理和实现方式。</p>
-<div class="note note-yellow"><p>本文将介绍Java8 HashMap的基本原理，不会对 HashMap 中的方法进行解读，对于其核心的方法解读会单开炉灶</p>
-</div>
-<h2 id="基本原理"><a class="markdownIt-Anchor" href="#基本原理"></a> 基本原理</h2>
-<p>在Java8中，HashMap使用数组和链表（或红黑树）实现。当一个元素被添加到HashMap中时，它首先根据Key的hashcode计算出一个桶号，并将其放入相应的桶中。如果该桶中已经存在其他元素，则需要比较它们的Key是否相等。如果Key相等，则直接替换Value；否则，将该元素添加到链表（或红黑树）的末尾。</p>
-<p>当HashMap的大小超过某个阈值（load factor）时，它会自动扩容。扩容涉及将所有的元素重新散列到一个新的、更大的桶中。这个操作代价很高，因此应该尽可能地避免频繁地扩容HashMap。</p>
-<h2 id="实现方式"><a class="markdownIt-Anchor" href="#实现方式"></a> 实现方式</h2>
-<p>在Java8中，HashMap的内部实现有以下重要组件：</p>
-<ul>
-<li>数组：HashMap使用一个Node类型的数组来存储元素。</li>
-<li>链表：当多个元素映射到同一个桶时，它们将被链接成一个链表。链表上的节点类型是Node。</li>
-<li>红黑树：当一个桶中的元素数量超过8个时，HashMap会将链表转换为红黑树，以提高性能。此时链表上的节点类型是TreeNode。</li>
-</ul>
-<p>下面我们来看一下Java8 HashMap的核心代码：</p>
-<div class="highlight-container" data-rel="Java"><figure class="iseeu highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">HashMap</span>&lt;K,V&gt; <span class="keyword">extends</span> <span class="title class_">AbstractMap</span>&lt;K,V&gt;</span><br><span class="line">    <span class="keyword">implements</span> <span class="title class_">Map</span>&lt;K,V&gt;, Cloneable, Serializable &#123;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 初始大小 16</span></span><br><span class="line">    <span class="keyword">static</span> <span class="keyword">final</span> <span class="type">int</span> <span class="variable">DEFAULT_INITIAL_CAPACITY</span> <span class="operator">=</span> <span class="number">1</span> &lt;&lt; <span class="number">4</span>; <span class="comment">// aka 16</span></span><br><span class="line">    <span class="comment">// 扩容的加载因子 0.75</span></span><br><span class="line">    <span class="keyword">static</span> <span class="keyword">final</span> <span class="type">float</span> <span class="variable">DEFAULT_LOAD_FACTOR</span> <span class="operator">=</span> <span class="number">0.75f</span>;</span><br><span class="line">    <span class="comment">// 转化为红黑树的阈值 8</span></span><br><span class="line">    <span class="keyword">static</span> <span class="keyword">final</span> <span class="type">int</span> <span class="variable">TREEIFY_THRESHOLD</span> <span class="operator">=</span> <span class="number">8</span>;</span><br><span class="line">    <span class="comment">// 退化为链表的阈值 6</span></span><br><span class="line">    <span class="keyword">static</span> <span class="keyword">final</span> <span class="type">int</span> <span class="variable">UNTREEIFY_THRESHOLD</span> <span class="operator">=</span> <span class="number">6</span>;</span><br><span class="line">    <span class="comment">// 转化为红黑树的另一个条件，Hash表的大小阈值 64</span></span><br><span class="line">    <span class="keyword">static</span> <span class="keyword">final</span> <span class="type">int</span> <span class="variable">MIN_TREEIFY_CAPACITY</span> <span class="operator">=</span> <span class="number">64</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">transient</span> Node&lt;K,V&gt;[] table;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">transient</span> Set&lt;Map.Entry&lt;K,V&gt;&gt; entrySet;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">transient</span> <span class="type">int</span> size;</span><br><span class="line"></span><br><span class="line">    <span class="type">int</span> threshold;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">final</span> <span class="type">float</span> loadFactor;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="title function_">HashMap</span><span class="params">(<span class="type">int</span> initialCapacity, <span class="type">float</span> loadFactor)</span> &#123;</span><br><span class="line">        <span class="comment">//...</span></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> V <span class="title function_">put</span><span class="params">(K key, V value)</span> &#123;</span><br><span class="line">        <span class="comment">//...</span></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//...</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></div>
-<p>在上面的代码中，我们可以看到几个重要的组件，包括数组 <code>table</code>、阈值 <code>threshold</code>、负载因子 <code>loadFactor</code>、链表和红黑树转换的阈值等。此外，还有一些常见的方法，例如put()、get()和resize()等方法。</p>
-<h2 id="总结"><a class="markdownIt-Anchor" href="#总结"></a> 总结</h2>
-<p>Java8的HashMap是一种高效的数据结构，它使用数组和链表（或红黑树）实现，并具有自动扩容和哈希冲突解决等功能。HashMap的内部实现涉及到许多细节和优化，需要理解其基本原理和实现方式才能更好地使用它。掌握Java8 HashMap的基本原理和使用方法，可以使我们更加高效和便捷地处理键值对数据。</p>
-]]></content>
-      <categories>
-        <category>Java</category>
-        <category>Java 基础</category>
-        <category>HashMap</category>
-      </categories>
-      <tags>
-        <tag>Java</tag>
-        <tag>HashMap</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>HashMap - get()</title>
-    <url>/posts/e59e566/</url>
-    <content><![CDATA[<p>在Java编程中，HashMap是一个重要的数据结构，它可以方便地存储和访问键值对。其中，get()方法是HashMap实现中的关键部分之一。在本篇博文中，我们将对Java8中的HashMap get()方法进行详细解析，并探讨其实现原理。</p>
-<h2 id="实现原理"><a class="markdownIt-Anchor" href="#实现原理"></a> 实现原理</h2>
-<p>在Java8中，HashMap的核心代码位于java.util.HashMap类中，其中get()方法被定义为：</p>
-<div class="highlight-container" data-rel="Java"><figure class="iseeu highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> V <span class="title function_">get</span><span class="params">(Object key)</span> &#123;</span><br><span class="line">    Node&lt;K,V&gt; e;</span><br><span class="line">    <span class="comment">// 计算键的哈希码，查找并返回与指定键关联的值。</span></span><br><span class="line">    <span class="keyword">return</span> (e = getNode(hash(key), key)) == <span class="literal">null</span> ? <span class="literal">null</span> : e.value;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></div>
-<p>从上面的代码可以看出，get()方法主要完成两个操作：</p>
-<ol>
-<li>计算键的哈希码（通过调用hash(key)方法）。</li>
-<li>查找并返回与指定键关联的值。</li>
-</ol>
-<p>接下来，我们将逐个分析这些操作。</p>
-<h3 id="哈希码的计算"><a class="markdownIt-Anchor" href="#哈希码的计算"></a> 哈希码的计算</h3>
-<p>在Java中，Object类包含hashCode()方法，该方法返回对象的哈希码。因此，在HashMap中，我们可以轻松地使用key.hashCode()方法计算键的哈希码。<a href="https://blog.heer.love/posts/c0f9b6a9/">hash()</a>方法点击跳转到隔壁。</p>
-<div class="highlight-container" data-rel="Java"><figure class="iseeu highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">// 计算hash</span></span><br><span class="line"><span class="keyword">final</span> <span class="type">int</span> <span class="title function_">hash</span><span class="params">(Object key)</span> &#123;</span><br><span class="line">    <span class="type">int</span> h;</span><br><span class="line">    <span class="keyword">return</span> (key == <span class="literal">null</span>) ? <span class="number">0</span> : (h = key.hashCode()) ^ (h &gt;&gt;&gt; <span class="number">16</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></div>
-<h3 id="查找并返回值"><a class="markdownIt-Anchor" href="#查找并返回值"></a> 查找并返回值</h3>
-<p>在HashMap中，键值对存储在Node&lt;K,V&gt;类型的节点中。因此，查找指定键的值需要执行以下操作：</p>
-<ol>
-<li>根据键的哈希值找到对应的桶。</li>
-<li>遍历桶中的链表，查找具有相同键的节点。</li>
-<li>如果找到这样的节点，则返回其值。否则，返回null。</li>
-</ol>
-<p>具体而言，getNode()方法完成了上述操作：</p>
-<div class="highlight-container" data-rel="Java"><figure class="iseeu highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">final</span> Node&lt;K,V&gt; <span class="title function_">getNode</span><span class="params">(<span class="type">int</span> hash, Object key)</span> &#123;</span><br><span class="line">    <span class="comment">// 声明一个Node数组tab</span></span><br><span class="line">    Node&lt;K,V&gt;[] tab;</span><br><span class="line">    <span class="comment">// 声明两个Node节点first和e</span></span><br><span class="line">    Node&lt;K,V&gt; first, e; </span><br><span class="line">    <span class="comment">// 声明一个int类型变量n，代表桶的数量</span></span><br><span class="line">    <span class="type">int</span> n; </span><br><span class="line">    <span class="comment">// 声明一个泛型K类型变量k，代表key</span></span><br><span class="line">    K k; </span><br><span class="line"></span><br><span class="line">    <span class="comment">// 判断table不为空，n大于0，并且hash对应的桶不为空</span></span><br><span class="line">    <span class="keyword">if</span> ((tab = table) != <span class="literal">null</span> &amp;&amp; (n = tab.length) &gt; <span class="number">0</span> &amp;&amp;</span><br><span class="line">        (first = tab[(n - <span class="number">1</span>) &amp; hash]) != <span class="literal">null</span>) &#123; </span><br><span class="line">        <span class="keyword">if</span> (first.hash == hash &amp;&amp; <span class="comment">// 判断第一个节点的hash值是否等于指定hash值</span></span><br><span class="line">            ((k = first.key) == key || (key != <span class="literal">null</span> &amp;&amp; key.equals(k)))) <span class="comment">// 判断第一个节点的key是否等于指定key</span></span><br><span class="line">            <span class="comment">// 如果第一个节点就是要查找的节点，则直接返回该节点</span></span><br><span class="line">            <span class="keyword">return</span> first;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> ((e = first.next) != <span class="literal">null</span>) &#123; <span class="comment">// 如果第一个节点的下一个节点不为空</span></span><br><span class="line">            <span class="keyword">if</span> (first <span class="keyword">instanceof</span> TreeNode) <span class="comment">// 判断该链表是否已经树化</span></span><br><span class="line">                <span class="comment">// 如果已经树化，则调用getTreeNode方法继续查找</span></span><br><span class="line">                <span class="keyword">return</span> ((TreeNode&lt;K,V&gt;)first).getTreeNode(hash, key); </span><br><span class="line">            <span class="keyword">do</span> &#123; <span class="comment">// 否则遍历链表</span></span><br><span class="line">                <span class="keyword">if</span> (e.hash == hash &amp;&amp;</span><br><span class="line">                    ((k = e.key) == key || (key != <span class="literal">null</span> &amp;&amp; key.equals(k))))</span><br><span class="line">                    <span class="comment">// 如果找到了指定的节点，则直接返回</span></span><br><span class="line">                    <span class="keyword">return</span> e; </span><br><span class="line">            &#125; <span class="keyword">while</span> ((e = e.next) != <span class="literal">null</span>); <span class="comment">// 遍历链表</span></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// 如果没有找到对应的节点，则返回null</span></span><br><span class="line">    <span class="keyword">return</span> <span class="literal">null</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure></div>
-<p>从上面的代码可以看出，getNode()方法首先通过哈希值找到对应的桶，然后遍历桶中的链表，查找与指定键关联的节点。如果找到了这样的节点，则返回其值；否则返回null。</p>
-<h2 id="性能分析"><a class="markdownIt-Anchor" href="#性能分析"></a> 性能分析</h2>
-<p>在HashMap中，get()方法是最常用的操作之一，它可以高效地访问键值对并提供快速的响应时间。具体而言，get()方法的时间复杂度为O(1)，即与HashMap中存储的元素数量无关。然而，在实际编程中，get()方法的性能可能会受到以下因素的影响：</p>
-<h3 id="哈希冲突"><a class="markdownIt-Anchor" href="#哈希冲突"></a> 哈希冲突</h3>
-<p>由于哈希表的大小是有限的，所以在不同的键上生成的哈希码可能会相同。这种情况称为哈希冲突（Hash Collision）。当发生哈希冲突时，HashMap将使用链表或红黑树等数据结构来存储具有相同哈希码的节点。因此，如果HashMap中存在大量哈希冲突，那么查找键值对的效率将会降低。</p>
-<h3 id="初始容量和加载因子"><a class="markdownIt-Anchor" href="#初始容量和加载因子"></a> 初始容量和加载因子</h3>
-<p>HashMap的初始容量和加载因子也会影响get()方法的性能。在创建HashMap对象时，我们需要指定其初始容量和加载因子。如果初始容量较小或加载因子较大，那么HashMap就需要频繁调整自身的大小，从而使get()方法的性能下降。</p>
-<h2 id="总结"><a class="markdownIt-Anchor" href="#总结"></a> 总结</h2>
-<p>get()方法是HashMap中最常用的方法之一。它通过计算键的哈希值和查找与指定键关联的节点来实现访问键值对。具体而言，get()方法首先调用hash(key)方法计算键的哈希码，然后使用getNode()方法在桶中查找相应的节点。如果找到了这样的节点，则返回其值；否则返回null。</p>
-<p>在实际编程中，我们需要注意哈希冲突、初始容量和加载因子等因素，以提高get()方法的性能。同时，我们也可以考虑使用其他数据结构，例如TreeMap，来代替HashMap，从而满足不同的需求。</p>
-]]></content>
-      <categories>
-        <category>Java</category>
-        <category>Java 基础</category>
-        <category>HashMap</category>
-      </categories>
-      <tags>
-        <tag>Java</tag>
-        <tag>HashMap</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>HashMap - hash()</title>
-    <url>/posts/c0f9b6a9/</url>
-    <content><![CDATA[<p>在Java编程中，HashMap是一个重要的数据结构，它可以方便地存储和访问键值对。其中，hash()方法是HashMap实现中的关键部分之一。在本篇博文中，我们将对Java8中的HashMap hash()方法进行解析。</p>
-<h2 id="hash方法概述"><a class="markdownIt-Anchor" href="#hash方法概述"></a> Hash()方法概述</h2>
-<p>在Java8中，HashMap的核心代码位于java.util.HashMap类中，其中hash()方法被定义为：</p>
-<div class="highlight-container" data-rel="Java"><figure class="iseeu highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">final</span> <span class="type">int</span> <span class="title function_">hash</span><span class="params">(Object key)</span> &#123;</span><br><span class="line">    <span class="type">int</span> h;</span><br><span class="line">    <span class="keyword">return</span> (key == <span class="literal">null</span>) ? <span class="number">0</span> : (h = key.hashCode()) ^ (h &gt;&gt;&gt; <span class="number">16</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></div>
-<p>从上面的代码可以看出，hash()方法主要完成两个操作：</p>
-<ol>
-<li>计算键的哈希码（通过调用key.hashCode()方法）。</li>
-<li>对哈希码进行微调，以保证分布均匀。</li>
-</ol>
-<p>接下来，我们将逐个分析这些操作。</p>
-<h3 id="计算键的哈希码"><a class="markdownIt-Anchor" href="#计算键的哈希码"></a> 计算键的哈希码</h3>
-<p>在Java中，Object类包含hashCode()方法，该方法返回对象的哈希码。因此，在HashMap中，我们可以轻松地使用key.hashCode()方法计算键的哈希码。</p>
-<p>然而，如果键是null，则需要特殊处理。在这种情况下，HashMap会将哈希码设置为0。</p>
-<div class="highlight-container" data-rel="Java"><figure class="iseeu highlight java"><table><tr><td class="code"><pre><span class="line">(key == <span class="literal">null</span>) ? <span class="number">0</span> : (h = key.hashCode())</span><br></pre></td></tr></table></figure></div>
-<h3 id="微调哈希码"><a class="markdownIt-Anchor" href="#微调哈希码"></a> 微调哈希码</h3>
-<p>第二个操作是对哈希码进行微调。 虽然key.hashCode()方法产生的哈希值很好，但它可能不适合HashMap中的所有情况。例如，在哈希表中使用的桶数为2的幂时，最低位可能会被过于频繁地使用，这可能会导致性能问题。</p>
-<p>因此，HashMap使用了以下技巧对哈希码进行微调：</p>
-<div class="highlight-container" data-rel="Java"><figure class="iseeu highlight java"><table><tr><td class="code"><pre><span class="line">(h = key.hashCode()) ^ (h &gt;&gt;&gt; <span class="number">16</span>);</span><br></pre></td></tr></table></figure></div>
-<p>其中，&quot;^&quot;运算符表示按位异或操作。这个操作将哈希码的高16位与低16位混合在一起。这有助于减少哈希码中的碰撞，并增加桶的数量。</p>
-<div class="note-large notel-green"><div class="notel-title"><p>”^“相较于”&amp;“、”|“计算Hash值的优点</p>
-</div><div class="notel-content"><ol>
-<li>高效性：异或操作比位与或位或操作更快，因为它不需要检查每个位的值。</li>
-<li>混淆性：通过将哈希码的高位和低位进行异或，可以使得哈希码的各个部分都对最终的哈希值产生影响。这有助于减少哈希冲突，提高HashMap的性能。</li>
-<li>均匀性：异或操作可以保持哈希码的均匀性，这是在HashMap中实现高效散列的关键。</li>
-</ol>
- </div></div>
-<h2 id="总结"><a class="markdownIt-Anchor" href="#总结"></a> 总结</h2>
-<p>HashMap是Java编程中重要的数据结构之一。其核心代码包括hash()方法，它通过计算键的哈希码并对其进行微调来保证分布均匀。具体而言，hash()方法首先调用key.hashCode()方法计算哈希码，然后使用异或运算符对其进行微调。使用这些技术，HashMap可以高效地存储和快速访问键值对。</p>
-]]></content>
-      <categories>
-        <category>Java</category>
-        <category>Java 基础</category>
-        <category>HashMap</category>
-      </categories>
-      <tags>
-        <tag>Java</tag>
-        <tag>HashMap</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>HashMap - put()</title>
-    <url>/posts/80dd519a/</url>
-    <content><![CDATA[<p>在 Java 8 中，HashMap 是一种常见的数据结构，用于存储键值对。put() 方法是其中最常用且最重要的方法之一。本文将详细介绍 Java 8 HashMap 的 put() 方法。</p>
-<h2 id="hashmap-概述"><a class="markdownIt-Anchor" href="#hashmap-概述"></a> HashMap 概述</h2>
-<p>HashMap 是一种基于哈希表实现的 Map 接口，使用键值对（key-value）的方式进行存储。HashMap 的 key 和 value 都可以为 null，但是同一个 key 只能映射到一个 value 上。HashMap 是非线程安全的，不支持并发访问，需要进行同步处理。</p>
-<h2 id="put-方法"><a class="markdownIt-Anchor" href="#put-方法"></a> put() 方法</h2>
-<p>put() 方法用于将指定的键值对添加到 HashMap 中。语法如下：</p>
-<div class="highlight-container" data-rel="Java"><figure class="iseeu highlight java"><table><tr><td class="code"><pre><span class="line">V <span class="title function_">put</span><span class="params">(K key, V value)</span></span><br></pre></td></tr></table></figure></div>
-<p>其中，K 表示 key 的类型，V 表示 value 的类型。</p>
-<h3 id="实现原理"><a class="markdownIt-Anchor" href="#实现原理"></a> 实现原理</h3>
-<p>Java 8 中的 HashMap 底层实现采用数组 + 链表/红黑树的方式实现。当向 HashMap 中添加元素时，会首先根据 key 的 hash 值确定该元素在数组中的位置，并将其添加到对应位置上。如果该位置已经有元素了，则会以链表或红黑树的形式将其连接起来。</p>
-<p>在 HashMap 中，每个位置上存储的是一个 Node 对象，包含 key、value 和指向下一个 Node 对象的指针。如果某个位置上的元素过多，就会将其转化成红黑树，以提高查询效率。</p>
-<h3 id="put-方法的实现"><a class="markdownIt-Anchor" href="#put-方法的实现"></a> put() 方法的实现</h3>
-<p>下面是 HashMap 中 put() 方法的源代码：</p>
-<div class="highlight-container" data-rel="Java"><figure class="iseeu highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">final</span> V <span class="title function_">putVal</span><span class="params">(<span class="type">int</span> hash, K key, V value, <span class="type">boolean</span> onlyIfAbsent, <span class="type">boolean</span> evict)</span> &#123;</span><br><span class="line">    Node&lt;K,V&gt;[] tab;          <span class="comment">// 定义 Node 数组</span></span><br><span class="line">    Node&lt;K,V&gt; p;              <span class="comment">// 定义 Node 变量</span></span><br><span class="line">    <span class="type">int</span> n, i;                 <span class="comment">// 定义 table 长度变量及索引变量</span></span><br><span class="line">    <span class="comment">// 如果 table 数组为空，则调用 resize() 方法进行数组初始化</span></span><br><span class="line">    <span class="keyword">if</span> ((tab = table) == <span class="literal">null</span> || (n = tab.length) == <span class="number">0</span>)</span><br><span class="line">        n = (tab = resize()).length;</span><br><span class="line">    <span class="comment">// 计算当前键值对的哈希值在 table 数组中的索引位置</span></span><br><span class="line">    <span class="keyword">if</span> ((p = tab[i = (n - <span class="number">1</span>) &amp; hash]) == <span class="literal">null</span>)</span><br><span class="line">        <span class="comment">// 如果计算得到的索引位置为 null，则新建节点并插入该位置</span></span><br><span class="line">        tab[i] = newNode(hash, key, value, <span class="literal">null</span>);</span><br><span class="line">    <span class="keyword">else</span> &#123;</span><br><span class="line">        Node&lt;K,V&gt; e; K k;</span><br><span class="line">        <span class="comment">// 如果当前索引位置存在元素，则判断元素类型是否为树节点类型</span></span><br><span class="line">        <span class="keyword">if</span> (p.hash == hash &amp;&amp;</span><br><span class="line">            ((k = p.key) == key || (key != <span class="literal">null</span> &amp;&amp; key.equals(k))))</span><br><span class="line">            e = p;</span><br><span class="line">        <span class="keyword">else</span> <span class="keyword">if</span> (p <span class="keyword">instanceof</span> TreeNode)</span><br><span class="line">            <span class="comment">// 如果当前节点类型为树节点，则在树节点上执行插入操作</span></span><br><span class="line">            e = ((TreeNode&lt;K,V&gt;)p).putTreeVal(<span class="built_in">this</span>, tab, hash, key, value);</span><br><span class="line">        <span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="comment">// 否则按链表方式进行插入操作</span></span><br><span class="line">            <span class="keyword">for</span> (<span class="type">int</span> <span class="variable">binCount</span> <span class="operator">=</span> <span class="number">0</span>; ; ++binCount) &#123;</span><br><span class="line">                <span class="keyword">if</span> ((e = p.next) == <span class="literal">null</span>) &#123;</span><br><span class="line">                    <span class="comment">// 如果当前节点的下一个节点为 null，则新建节点并插入到链表尾部</span></span><br><span class="line">                    p.next = newNode(hash, key, value, <span class="literal">null</span>);</span><br><span class="line">                    <span class="comment">// 如果链表长度大于等于树化阈值，则执行树化操作</span></span><br><span class="line">                    <span class="keyword">if</span> (binCount &gt;= TREEIFY_THRESHOLD - <span class="number">1</span>)</span><br><span class="line">                        treeifyBin(tab, hash);</span><br><span class="line">                    <span class="keyword">break</span>;</span><br><span class="line">                &#125;</span><br><span class="line">                <span class="comment">// 否则继续遍历链表查找是否存在相同键的节点</span></span><br><span class="line">                <span class="keyword">if</span> (e.hash == hash &amp;&amp;</span><br><span class="line">                    ((k = e.key) == key || (key != <span class="literal">null</span> &amp;&amp; key.equals(k))))</span><br><span class="line">                    <span class="keyword">break</span>;</span><br><span class="line">                p = e;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">// 如果找到了相同键的节点，则更新该节点的值</span></span><br><span class="line">        <span class="keyword">if</span> (e != <span class="literal">null</span>) &#123; </span><br><span class="line">            <span class="type">V</span> <span class="variable">oldValue</span> <span class="operator">=</span> e.value;</span><br><span class="line">            <span class="keyword">if</span> (!onlyIfAbsent || oldValue == <span class="literal">null</span>)</span><br><span class="line">                e.value = value;</span><br><span class="line">            afterNodeAccess(e);</span><br><span class="line">            <span class="keyword">return</span> oldValue;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// 更新 modCount 并检查是否需要扩容</span></span><br><span class="line">    ++modCount;</span><br><span class="line">    <span class="keyword">if</span> (++size &gt; threshold)</span><br><span class="line">        resize();</span><br><span class="line">    afterNodeInsertion(evict);</span><br><span class="line">    <span class="keyword">return</span> <span class="literal">null</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></div>
-<p>该方法的实现非常复杂，但是可以大致分为三个步骤：</p>
-<ol>
-<li>首先根据 key 的 hash 值确定该元素在数组中的位置。</li>
-<li>如果该位置为空，则直接将其添加到对应位置上；如果该位置已经有元素了，则需要进行链表或红黑树的操作。</li>
-<li>最后更新 HashMap 的 size 和 modCount 属性，并调用 afterNodeInsertion() 方法完成插入操作。</li>
-</ol>
-<h2 id="总结"><a class="markdownIt-Anchor" href="#总结"></a> 总结</h2>
-<p>总体来说，Java 8 中 HashMap 的 <code>put()</code> 方法依然采用了 拉链法 解决哈希冲突的问题，但是通过提高阈值和优化树化过程，它有着更好的性能表现。</p>
-]]></content>
-      <categories>
-        <category>Java</category>
-        <category>Java 基础</category>
-        <category>HashMap</category>
-      </categories>
-      <tags>
-        <tag>Java</tag>
-        <tag>HashMap</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>HashMap - resize()</title>
-    <url>/posts/80dd519a/</url>
-    <content><![CDATA[<p>在 Java 中，HashMap 是一个非常重要的集合类，它采用哈希表来存储键值对。当数据量变大时，需要调整哈希表的大小，以保证更好的性能和空间使用。resize() 方法就是 HashMap 进行扩容或缩减容量的方法。</p>
-<h2 id="什么情况下需要-resize-方法"><a class="markdownIt-Anchor" href="#什么情况下需要-resize-方法"></a> 什么情况下需要 resize() 方法</h2>
-<p>当 HashMap 存储的数据超过了负载因子乘以当前容量时（即元素个数 &gt; 负载因子 * 容量），就需要进行 resize 操作。负载因子通常为 0.75，在之前的 JDK 版本中是默认值为 0.75，JDK 1.8 开始可以自定义负载因子。</p>
-<p>resize 操作的目的是为了让 HashMap 在扩容或缩减容量后仍然能保持较低的查找和插入成本。如果 HashMap 中的键值对数量过多，则会导致哈希冲突概率增加，从而影响 HashMap 的性能。如果数量太少，则会造成空间浪费。</p>
-<h2 id="实现原理"><a class="markdownIt-Anchor" href="#实现原理"></a> 实现原理</h2>
-<p>HashMap 的 resize() 方法的实现原理涉及到两个主要步骤：</p>
-<ol>
-<li>创建新的数组并重新分配元素：首先根据新的容量创建一个新的数组，然后遍历原来的数组，并将所有元素重新分配到新数组中。</li>
-<li>调整哈希值：重新分配元素时，需要调整每个键值对的哈希值。这是因为在 Java 中，哈希值是由对象的 hashCode() 方法计算出来的。而当数组大小改变时，hashCode() 值需要重新计算。</li>
-</ol>
-<p>具体实现过程可以通过以下源码逐行解释：</p>
-<div class="highlight-container" data-rel="Java"><figure class="iseeu highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">final</span> Node&lt;K,V&gt;[] resize() &#123;</span><br><span class="line">    Node&lt;K,V&gt;[] oldTab = table; <span class="comment">// 保存原数组</span></span><br><span class="line"></span><br><span class="line">    <span class="type">int</span> <span class="variable">oldCap</span> <span class="operator">=</span> (oldTab == <span class="literal">null</span>) ? <span class="number">0</span> : oldTab.length; <span class="comment">// 计算原数组长度</span></span><br><span class="line">    <span class="type">int</span> <span class="variable">oldThr</span> <span class="operator">=</span> threshold; <span class="comment">// 计算原阈值</span></span><br><span class="line">    <span class="type">int</span> newCap, newThr = <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (oldCap &gt; <span class="number">0</span>) &#123; <span class="comment">// 如果原数组不为空，则进行扩容操作</span></span><br><span class="line">        <span class="keyword">if</span> (oldCap &gt;= MAXIMUM_CAPACITY) &#123; <span class="comment">// 判断原数组是否达到最大容量</span></span><br><span class="line">            threshold = Integer.MAX_VALUE;</span><br><span class="line">            <span class="keyword">return</span> oldTab;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">else</span> <span class="keyword">if</span> ((newCap = oldCap &lt;&lt; <span class="number">1</span>) &lt; MAXIMUM_CAPACITY &amp;&amp; oldCap &gt;= DEFAULT_INITIAL_CAPACITY)</span><br><span class="line">            newThr = oldThr &lt;&lt; <span class="number">1</span>; <span class="comment">// 扩容后新的阈值</span></span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">else</span> <span class="keyword">if</span> (oldThr &gt; <span class="number">0</span>) <span class="comment">// 如果原阈值大于0，则使用该值作为初始容量</span></span><br><span class="line">        newCap = oldThr;</span><br><span class="line">    <span class="keyword">else</span> &#123; <span class="comment">// 如果没有指定初始容量或阈值，默认使用默认值</span></span><br><span class="line">        newCap = DEFAULT_INITIAL_CAPACITY;</span><br><span class="line">        newThr = (<span class="type">int</span>)(DEFAULT_LOAD_FACTOR * DEFAULT_INITIAL_CAPACITY);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (newThr == <span class="number">0</span>) &#123; <span class="comment">// 如果 newThr 没有被初始化，则根据新的容量和负载因子计算新的阈值</span></span><br><span class="line">        <span class="type">float</span> <span class="variable">ft</span> <span class="operator">=</span> (<span class="type">float</span>)newCap * loadFactor;</span><br><span class="line">        newThr = (newCap &lt; MAXIMUM_CAPACITY &amp;&amp; ft &lt; (<span class="type">float</span>)MAXIMUM_CAPACITY ?</span><br><span class="line">                  (<span class="type">int</span>)ft : Integer.MAX_VALUE);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    threshold = newThr; <span class="comment">// 更新 HashMap 的阈值</span></span><br><span class="line"></span><br><span class="line">    <span class="meta">@SuppressWarnings(&#123;&quot;rawtypes&quot;,&quot;unchecked&quot;&#125;)</span></span><br><span class="line">        Node&lt;K,V&gt;[] newTab = (Node&lt;K,V&gt;[])<span class="keyword">new</span> <span class="title class_">Node</span>[newCap]; <span class="comment">// 创建新数组</span></span><br><span class="line">    table = newTab; <span class="comment">// 将 table 指向新数组</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (oldTab != <span class="literal">null</span>) &#123; <span class="comment">// 如果原数组不为空，则遍历原数组并将所有元素重新分配到新数组中</span></span><br><span class="line">        <span class="keyword">for</span> (<span class="type">int</span> <span class="variable">j</span> <span class="operator">=</span> <span class="number">0</span>; j &lt; oldCap; ++j) &#123;</span><br><span class="line">            Node&lt;K,V&gt; e;</span><br><span class="line">            <span class="keyword">if</span> ((e = oldTab[j]) != <span class="literal">null</span>) &#123;</span><br><span class="line">                oldTab[j] = <span class="literal">null</span>; <span class="comment">// 释放原有元素的引用</span></span><br><span class="line">                <span class="keyword">if</span> (e.next == <span class="literal">null</span>) <span class="comment">// 处理链表节点</span></span><br><span class="line">                    newTab[e.hash &amp; (newCap - <span class="number">1</span>)] = e;</span><br><span class="line">                <span class="keyword">else</span> <span class="keyword">if</span> (e <span class="keyword">instanceof</span> TreeNode) <span class="comment">// 处理红黑树节点</span></span><br><span class="line">                    ((TreeNode&lt;K,V&gt;)e).split(<span class="built_in">this</span>, newTab, j, oldCap);</span><br><span class="line">                <span class="keyword">else</span> &#123; <span class="comment">// 处理链表节点</span></span><br><span class="line">                    Node&lt;K,V&gt; loHead = <span class="literal">null</span>, loTail = <span class="literal">null</span>;</span><br><span class="line">                    Node&lt;K,V&gt; hiHead = <span class="literal">null</span>, hiTail = <span class="literal">null</span>;</span><br><span class="line">                    Node&lt;K,V&gt; next;</span><br><span class="line">                    <span class="keyword">do</span> &#123;</span><br><span class="line">                        next = e.next;</span><br><span class="line">                        <span class="keyword">if</span> ((e.hash &amp; oldCap) == <span class="number">0</span>) &#123; <span class="comment">// 判断元素是否需要放置到新数组的低位</span></span><br><span class="line">                            <span class="keyword">if</span> (loTail == <span class="literal">null</span>)</span><br><span class="line">                                loHead = e;</span><br><span class="line">                            <span class="keyword">else</span></span><br><span class="line">                                loTail.next = e;</span><br><span class="line">                            loTail = e;</span><br><span class="line">                        &#125;</span><br><span class="line">                        <span class="keyword">else</span> &#123; <span class="comment">// 放置到新数组的高位</span></span><br><span class="line">                            <span class="keyword">if</span> (hiTail == <span class="literal">null</span>)</span><br><span class="line">                                hiHead = e;</span><br><span class="line">                            <span class="keyword">else</span></span><br><span class="line">                                hiTail.next = e;</span><br><span class="line">                            hiTail = e;</span><br><span class="line">                        &#125;</span><br><span class="line">                    &#125; <span class="keyword">while</span> ((e = next) != <span class="literal">null</span>);</span><br><span class="line"></span><br><span class="line">                    <span class="keyword">if</span> (loTail != <span class="literal">null</span>) &#123; <span class="comment">// 将低位链表放到对应位置</span></span><br><span class="line">                        loTail.next = <span class="literal">null</span>;</span><br><span class="line">                        newTab[j] = loHead;</span><br><span class="line">                    &#125;</span><br><span class="line">                    <span class="keyword">if</span> (hiTail != <span class="literal">null</span>) &#123; <span class="comment">// 将高位链表放到对应位置</span></span><br><span class="line">                        hiTail.next = <span class="literal">null</span>;</span><br><span class="line">                        newTab[j + oldCap] = hiHead;</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> newTab; <span class="comment">// 返回新数组</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></div>
-<h2 id="resize-方法的时间复杂度"><a class="markdownIt-Anchor" href="#resize-方法的时间复杂度"></a> resize() 方法的时间复杂度</h2>
-<p>resize 操作需要遍历整个数组，并将元素重新分配到新数组中。因此，时间复杂度为 O(n)，其中 n 是 HashMap 中键值对的数量。</p>
-<h2 id="总结"><a class="markdownIt-Anchor" href="#总结"></a> 总结</h2>
-<p>HashMap 的 resize() 方法是用来扩容或者缩减 HashMap 容量的方法。它通过重新分配元素和调整哈希值来实现。当 HashMap 中的键值对数量超过负载因子乘以当前容量时，就需要进行 resize 操作。为了保证 HashMap 的性能和空间利用率，我们可以通过调整负载因子和初始容量来优化 HashMap 的 resize 操作。</p>
-]]></content>
-      <categories>
-        <category>Java</category>
-        <category>Java 基础</category>
-        <category>HashMap</category>
-      </categories>
-      <tags>
-        <tag>Java</tag>
-        <tag>HashMap</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>ThreadLocal</title>
-    <url>/posts/6a10d920/</url>
+    <url>/posts/151f44ae/</url>
     <content><![CDATA[<p>在Java多线程编程中，<code>ThreadLocal</code>类是一个非常有用的工具，它能够帮助我们轻松地实现线程本地存储。在本文中，我们将深入探讨<code>ThreadLocal</code>的实现原理和如何正确使用它。</p>
 <h2 id="threadlocal"><a class="markdownIt-Anchor" href="#threadlocal"></a> ThreadLocal</h2>
 <p>首先，我们来了解一下什么是ThreadLocal。简单来说，<code>ThreadLocal</code>是一种线程本地存储机制，它为每个线程提供了一个独立的变量副本，使得每个线程都可以独立地改变自己的副本，而不会影响其他线程的副本。</p>
@@ -284,115 +99,6 @@
       <tags>
         <tag>Java</tag>
         <tag>ThreadLocal</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>JVM - 运行时数据区</title>
-    <url>/posts/243280dc/</url>
-    <content><![CDATA[<p>JVM（Java Virtual Machine）是一个虚拟机，它是 Java 语言能够运行的关键所在。JVM 的结构包含了多个不同的组件，其中最重要的就是它的运行时数据区。</p>
-<h2 id="jvm-运行时数据区的概述"><a class="markdownIt-Anchor" href="#jvm-运行时数据区的概述"></a> JVM 运行时数据区的概述</h2>
-<p><img  
-                     lazyload
-                     src="/images/loading.svg"
-                     data-src="https://mydlq-club.oss-cn-beijing.aliyuncs.com/images/my-jvm-constitute-concept.svg"
-                      alt="jvm 运行时数据区" 
-                ></p>
-<div class="note-large notel-green"><div class="notel-title"><p>运行时数据区可以分为以下几个部分</p>
-</div><div class="notel-content"><ol>
-<li><code>程序计数器：</code>程序计数器是一块较小的内存空间，它保存了当前线程正在执行的字节码指令的地址。当执行方法时，程序计数器会记录下一条将要执行的指令。由于每个线程都需要有自己的程序计数器，因此它是线程私有的。</li>
-<li><code>Java 虚拟机栈：</code>每个线程在运行时都会有一个对应的虚拟机栈，它用于存储方法调用的信息，包括局部变量、操作数栈、返回值等。每次方法调用时，JVM 都会创建一个对应的栈帧，并把它压入栈顶。当方法返回时，对应的栈帧会被弹出。由于每个线程都需要有自己的虚拟机栈，因此它也是线程私有的。</li>
-<li><code>堆：</code>堆是 JVM 中最大的一块内存空间，它用于存储对象实例。当使用 new 关键字创建一个对象时，JVM 会在堆上分配一块内存来存储该对象的实例。由于所有线程都需要共享堆空间，因此堆是线程共享的。</li>
-<li><code>方法区：</code>方法区也被称为永久代（PermGen），它用于存储类信息、常量、静态变量等数据。与堆一样，方法区也是线程共享的。</li>
-</ol>
- </div></div>
-<h2 id="jvm-运行时数据区的特点"><a class="markdownIt-Anchor" href="#jvm-运行时数据区的特点"></a> JVM 运行时数据区的特点</h2>
-<ol>
-<li><code>线程私有和线程共享：</code>如上所述，程序计数器和虚拟机栈是线程私有的，而堆和方法区是线程共享的。</li>
-<li><code>自动内存管理：</code>JVM 的运行时数据区采用了自动内存管理的方式，即 Java 垃圾回收机制。当对象不再被引用时，JVM 会将其标记为垃圾，并进行回收。</li>
-<li><code>动态扩展和收缩：</code>JVM 的运行时数据区可以根据应用程序的需求动态地进行扩展或收缩。当内存不足时，JVM 会自动触发垃圾回收机制，清理掉无用的对象释放内存。当内存达到一定阈值时，JVM 可以通过调整堆大小来扩展内存空间。</li>
-</ol>
-<h2 id="总结"><a class="markdownIt-Anchor" href="#总结"></a> 总结</h2>
-<p>JVM 运行时数据区是 Java 虚拟机中最重要的组成部分之一，它用于存储程序执行时所需的数据。JVM 运行时数据区分为程序计数器、虚拟机栈、堆和方法区四个部分，其中程序计数器和虚拟机栈是线程私有的，堆和方法区是线程共享的。JVM 的运行时数据区采用了自动内存管理的方式，并且可以根据应用程序的需求动态地进行扩展或收缩。</p>
-]]></content>
-      <categories>
-        <category>Java</category>
-        <category>JVM</category>
-        <category>数据区</category>
-      </categories>
-      <tags>
-        <tag>JVM</tag>
-        <tag>运行时数据区</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>JVM 垃圾回收算法</title>
-    <url>/posts/94863c7b/</url>
-    <content><![CDATA[<p>与其他语言相比，Java有着自动内存管理的优势，即由JVM自动进行内存分配和垃圾回收处理。本篇博客将介绍JVM中的垃圾回收算法。</p>
-<h2 id="垃圾回收的基本概念"><a class="markdownIt-Anchor" href="#垃圾回收的基本概念"></a> 垃圾回收的基本概念</h2>
-<p>垃圾回收的目的是释放无用的内存空间以供后续的内存分配使用。JVM中使用垃圾回收器（Garbage Collector）来自动实现这个过程。垃圾回收器会在发现内存中存在无用的对象时，将其所占用的内存空间回收。</p>
-<p>为了实现垃圾回收，需要定义什么是“无用对象”。在JVM中，一个对象被判定为无用对象，当且仅当它满足下列条件：</p>
-<ul>
-<li>该对象没有被引用</li>
-<li>该对象的所有引用均已断开</li>
-</ul>
-<p>垃圾回收算法的目标是尽可能快地识别和回收无用对象，同时保持系统性能的稳定。</p>
-<h2 id="常见垃圾回收算法"><a class="markdownIt-Anchor" href="#常见垃圾回收算法"></a> 常见垃圾回收算法</h2>
-<h3 id="标记-清除算法"><a class="markdownIt-Anchor" href="#标记-清除算法"></a> 标记-清除算法</h3>
-<p><img  
-                     lazyload
-                     src="/images/loading.svg"
-                     data-src="https://luolanmeet.github.io/jvm-note/content/part2/%E5%9E%83%E5%9C%BE%E6%94%B6%E9%9B%86%E5%99%A8/%E5%9E%83%E5%9C%BE%E6%94%B6%E9%9B%86%E7%AE%97%E6%B3%95/img/%E6%A0%87%E8%AE%B0-%E6%B8%85%E9%99%A4%E7%AE%97%E6%B3%95.png"
-                      alt="标记清楚" 
-                ></p>
-<p><code>标记-清除算法</code>是最基本的垃圾回收算法。它分为两个阶段：标记和清除。</p>
-<p>在标记阶段，垃圾回收器遍历堆中的所有对象，并标记出所有被引用的对象。在清除阶段，垃圾回收器将未被标记的对象所占用的内存空间全部回收。</p>
-<p>这个算法的缺点是会产生碎片，因为回收后的内存空间是不连续的。如果始终使用标记-清除算法，那么随着时间的推移，内存空间中的空洞（即碎片）将越来越多，导致内存分配效率降低。</p>
-<h3 id="复制算法"><a class="markdownIt-Anchor" href="#复制算法"></a> 复制算法</h3>
-<p><img  
-                     lazyload
-                     src="/images/loading.svg"
-                     data-src="https://luolanmeet.github.io/jvm-note/content/part2/%E5%9E%83%E5%9C%BE%E6%94%B6%E9%9B%86%E5%99%A8/%E5%9E%83%E5%9C%BE%E6%94%B6%E9%9B%86%E7%AE%97%E6%B3%95/img/%E6%A0%87%E8%AE%B0-%E5%A4%8D%E5%88%B6%E7%AE%97%E6%B3%95.png"
-                      alt="复制算法" 
-                ></p>
-<p><code>复制算法</code>是一种高效的垃圾回收算法。它将堆空间划分为大小相等的两块，每次只使用其中一块。当这一块内存空间用完时，垃圾回收器将已经标记了的存活对象复制到另一块未使用的空间中，然后清除已使用的那一块空间并交换它们的角色。</p>
-<p>复制算法的缺点是需要消耗一半的空间。同时，如果存活对象很多，每次都要进行复制操作，也会带来不小的性能开销。</p>
-<h3 id="标记-整理算法"><a class="markdownIt-Anchor" href="#标记-整理算法"></a> 标记-整理算法</h3>
-<p><img  
-                     lazyload
-                     src="/images/loading.svg"
-                     data-src="https://luolanmeet.github.io/jvm-note/content/part2/%E5%9E%83%E5%9C%BE%E6%94%B6%E9%9B%86%E5%99%A8/%E5%9E%83%E5%9C%BE%E6%94%B6%E9%9B%86%E7%AE%97%E6%B3%95/img/%E6%A0%87%E8%AE%B0-%E6%95%B4%E7%90%86%E7%AE%97%E6%B3%95.png"
-                      alt="整理算法" 
-                ></p>
-<p><code>标记-整理算法</code>是对标记-清除算法的改进。它同样分为两个阶段：标记和整理。</p>
-<p>在标记阶段，垃圾回收器遍历堆中的所有对象，并标记出所有被引用的对象。在整理阶段，垃圾回收器将所有存活对象移到堆的一端，然后清除堆的另外一端上的所有无用对象。</p>
-<p>标记-整理算法通过整理过程来解决标记-清除算法产生的碎片问题，使得内存空间变得连续起来。</p>
-<h3 id="三色标记"><a class="markdownIt-Anchor" href="#三色标记"></a> 三色标记</h3>
-<p><code>三色标记</code>是一种用于 Java 虚拟机（JVM）垃圾回收算法的技术，配合<a href="/posts/6a10d920">可达性分析算法</a>实现垃圾的高效、准确的收集。</p>
-<p>在三色标记中，JVM将内存对象分为三个不同的颜色：白色、灰色和黑色。</p>
-<ul>
-<li><code>白色</code>：表示对象尚未被扫描和标记。</li>
-<li><code>灰色</code>：表示对象已经被扫描，但是它引用的其他对象尚未被扫描和标记。</li>
-<li><code>黑色</code>：表示对象已经被扫描和标记，并且它引用的其他对象也已经被扫描和标记。</li>
-</ul>
-<p>JVM 使用三色标记来跟踪哪些对象可以被安全地回收。当 JVM 进行垃圾回收时，它会从根对象开始遍历所有对象，并将它们标记为灰色或黑色。然后，JVM 会清除所有白色对象，因为这些对象没有任何引用。</p>
-<p>在三色标记算法中，灰色的对象表示悬挂的对象，即其引用的对象尚未被处理。如果某个对象的所有引用都已经被扫描和标记，那么它就会被标记为黑色。</p>
-<p>通过使用三色标记算法，JVM 可以更快地确定哪些对象可以被安全地回收，从而提高了应用程序的性能和可靠性。</p>
-<h3 id="分代收集算法"><a class="markdownIt-Anchor" href="#分代收集算法"></a> 分代收集算法</h3>
-<p><code>分代收集算法</code>是目前主流的垃圾回收算法。它根据对象的存活周期把堆区域分为新生代和老年代两个区域。新生代中的对象通常存活时间较短，而老年代中的对象则存活时间较长。不同区域采用不同的垃圾回收算法。</p>
-<p>新生代通常使用复制算法。它把新生代分为Eden区和两个Survivor区，每次只使用Eden区和其中一个Survivor区，将已经标记了的存活对象复制到另一块未使用的Survivor区中，然后清除Eden区和已使用的Survivor区中的无用对象。</p>
-<p>老年代通常使用标记-整理算法。因为老年代中的对象存活时间较长，所以会产生大量的内存碎片。标记-整理算法通过整理过程来解决这个问题。</p>
-<h2 id="总结"><a class="markdownIt-Anchor" href="#总结"></a> 总结</h2>
-<p>JVM垃圾回收算法包括标记-清除算法、复制算法、标记-整理算法和分代收集算法等。不同的垃圾回收算法适用于不同的场景，需要根据具体情况进行选择。对于Java程序开发人员来说，理解JVM垃圾回收算法对于优化程序性能至关重要。</p>
-]]></content>
-      <categories>
-        <category>Java</category>
-        <category>JVM</category>
-        <category>GC</category>
-      </categories>
-      <tags>
-        <tag>Java</tag>
-        <tag>JVM</tag>
-        <tag>GC</tag>
       </tags>
   </entry>
   <entry>
@@ -450,39 +156,6 @@
 </ol>
 <h2 id="结论"><a class="markdownIt-Anchor" href="#结论"></a> 结论</h2>
 <p>G1（Garbage First）垃圾收集器是一种用于管理Java虚拟机内存的垃圾回收器，它将堆内存分成大小相等的区域，并根据实际情况自适应调整垃圾回收策略，从而避免全局暂停，提高了响应时间和吞吐量。G1垃圾收集器具有分代收集、并发收集、可预测性和空间利用率等优点，但同时也存在初始标记和最终标记需要STW、物理内存占用等缺点。</p>
-]]></content>
-      <categories>
-        <category>Java</category>
-        <category>JVM</category>
-        <category>GC</category>
-      </categories>
-      <tags>
-        <tag>Java</tag>
-        <tag>JVM</tag>
-        <tag>GC</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>JVM 安全点</title>
-    <url>/posts/5a9ba959/</url>
-    <content><![CDATA[<p>JVM的安全点（Safepoint）是JVM执行垃圾回收时的一个重要概念。<span style="border-bottom:2px solid green;">在JVM进行垃圾回收操作时，需要保证堆的一致性，因此需要挂起所有运行Java代码的线程并记录它们的状态。这些特定位置就被称为 <em><strong><code>安全点</code></strong></em>。</span>&gt;</p>
-<h2 id="安全点的作用"><a class="markdownIt-Anchor" href="#安全点的作用"></a> 安全点的作用</h2>
-<p>当一个线程处于安全点时，JVM可以确保该线程不会同时访问堆内存中的对象。如果不挂起所有线程，那么这些线程可能正在访问堆内存中的对象。如果同时执行垃圾回收，则这些线程可能同时修改这些对象，导致数据错误或不一致。因此，在进行垃圾回收操作时，必须等待所有线程到达安全点，并将它们挂起，然后才能继续执行垃圾回收操作。</p>
-<h2 id="安全点的触发条件"><a class="markdownIt-Anchor" href="#安全点的触发条件"></a> 安全点的触发条件</h2>
-<div class="note-large notel-yellow"><div class="notel-title"><p>当一个线程处于安全点时，它必须满足以下条件之一</p>
-</div><div class="notel-content"><ol>
-<li>执行Java方法的字节码指令结束或异常抛出；</li>
-<li>执行JNI（Java Native Interface）方法的字节码指令结束或异常抛出；</li>
-<li>执行VM操作（如Thread.sleep）的字节码指令结束或异常抛出。</li>
-</ol>
- </div></div>
-<p>这意味着当一个线程处于安全点时，它一定是上述情况之一。只有在这些情况下，线程才被挂起进行垃圾回收操作。</p>
-<h2 id="安全点的影响"><a class="markdownIt-Anchor" href="#安全点的影响"></a> 安全点的影响</h2>
-<p>当JVM进行垃圾回收操作时，必须等待所有线程到达安全点，并将它们挂起，然后才能继续执行垃圾回收操作。这种等待时间可能会导致一些线程长时间等待，从而导致应用程序响应时间变慢。</p>
-<p>为了减少这种情况的发生，JVM提供了多种垃圾回收算法和垃圾回收器，以便在特定的场景中选择最佳的垃圾回收策略。例如CMS（Concurrent Mark Sweep）垃圾回收器就是在并发标记阶段尽可能减少安全点的数量的一种垃圾回收器。</p>
-<p>此外，我们也可以通过调整线程数、线程优先级、堆内存大小等措施来减少安全点的影响。</p>
-<h2 id="总结"><a class="markdownIt-Anchor" href="#总结"></a> 总结</h2>
-<p>安全点是一个重要的概念，在JVM进行垃圾回收操作时扮演着至关重要的角色。了解安全点的作用、触发条件和影响，对于Java开发者来说是非常重要的。在实际开发中，我们需要根据应用场景选择合适的垃圾回收算法和垃圾回收器，并采取相应的措施来减少安全点的影响，以使应用程序能够达到更好的性能和响应速度。</p>
 ]]></content>
       <categories>
         <category>Java</category>
@@ -569,6 +242,333 @@
         <tag>Java</tag>
         <tag>JVM</tag>
         <tag>GC</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>JVM 垃圾回收算法</title>
+    <url>/posts/94863c7b/</url>
+    <content><![CDATA[<p>与其他语言相比，Java有着自动内存管理的优势，即由JVM自动进行内存分配和垃圾回收处理。本篇博客将介绍JVM中的垃圾回收算法。</p>
+<h2 id="垃圾回收的基本概念"><a class="markdownIt-Anchor" href="#垃圾回收的基本概念"></a> 垃圾回收的基本概念</h2>
+<p>垃圾回收的目的是释放无用的内存空间以供后续的内存分配使用。JVM中使用垃圾回收器（Garbage Collector）来自动实现这个过程。垃圾回收器会在发现内存中存在无用的对象时，将其所占用的内存空间回收。</p>
+<p>为了实现垃圾回收，需要定义什么是“无用对象”。在JVM中，一个对象被判定为无用对象，当且仅当它满足下列条件：</p>
+<ul>
+<li>该对象没有被引用</li>
+<li>该对象的所有引用均已断开</li>
+</ul>
+<p>垃圾回收算法的目标是尽可能快地识别和回收无用对象，同时保持系统性能的稳定。</p>
+<h2 id="常见垃圾回收算法"><a class="markdownIt-Anchor" href="#常见垃圾回收算法"></a> 常见垃圾回收算法</h2>
+<h3 id="标记-清除算法"><a class="markdownIt-Anchor" href="#标记-清除算法"></a> 标记-清除算法</h3>
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://luolanmeet.github.io/jvm-note/content/part2/%E5%9E%83%E5%9C%BE%E6%94%B6%E9%9B%86%E5%99%A8/%E5%9E%83%E5%9C%BE%E6%94%B6%E9%9B%86%E7%AE%97%E6%B3%95/img/%E6%A0%87%E8%AE%B0-%E6%B8%85%E9%99%A4%E7%AE%97%E6%B3%95.png"
+                      alt="标记清楚" 
+                ></p>
+<p><code>标记-清除算法</code>是最基本的垃圾回收算法。它分为两个阶段：标记和清除。</p>
+<p>在标记阶段，垃圾回收器遍历堆中的所有对象，并标记出所有被引用的对象。在清除阶段，垃圾回收器将未被标记的对象所占用的内存空间全部回收。</p>
+<p>这个算法的缺点是会产生碎片，因为回收后的内存空间是不连续的。如果始终使用标记-清除算法，那么随着时间的推移，内存空间中的空洞（即碎片）将越来越多，导致内存分配效率降低。</p>
+<h3 id="复制算法"><a class="markdownIt-Anchor" href="#复制算法"></a> 复制算法</h3>
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://luolanmeet.github.io/jvm-note/content/part2/%E5%9E%83%E5%9C%BE%E6%94%B6%E9%9B%86%E5%99%A8/%E5%9E%83%E5%9C%BE%E6%94%B6%E9%9B%86%E7%AE%97%E6%B3%95/img/%E6%A0%87%E8%AE%B0-%E5%A4%8D%E5%88%B6%E7%AE%97%E6%B3%95.png"
+                      alt="复制算法" 
+                ></p>
+<p><code>复制算法</code>是一种高效的垃圾回收算法。它将堆空间划分为大小相等的两块，每次只使用其中一块。当这一块内存空间用完时，垃圾回收器将已经标记了的存活对象复制到另一块未使用的空间中，然后清除已使用的那一块空间并交换它们的角色。</p>
+<p>复制算法的缺点是需要消耗一半的空间。同时，如果存活对象很多，每次都要进行复制操作，也会带来不小的性能开销。</p>
+<h3 id="标记-整理算法"><a class="markdownIt-Anchor" href="#标记-整理算法"></a> 标记-整理算法</h3>
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://luolanmeet.github.io/jvm-note/content/part2/%E5%9E%83%E5%9C%BE%E6%94%B6%E9%9B%86%E5%99%A8/%E5%9E%83%E5%9C%BE%E6%94%B6%E9%9B%86%E7%AE%97%E6%B3%95/img/%E6%A0%87%E8%AE%B0-%E6%95%B4%E7%90%86%E7%AE%97%E6%B3%95.png"
+                      alt="整理算法" 
+                ></p>
+<p><code>标记-整理算法</code>是对标记-清除算法的改进。它同样分为两个阶段：标记和整理。</p>
+<p>在标记阶段，垃圾回收器遍历堆中的所有对象，并标记出所有被引用的对象。在整理阶段，垃圾回收器将所有存活对象移到堆的一端，然后清除堆的另外一端上的所有无用对象。</p>
+<p>标记-整理算法通过整理过程来解决标记-清除算法产生的碎片问题，使得内存空间变得连续起来。</p>
+<h3 id="三色标记"><a class="markdownIt-Anchor" href="#三色标记"></a> 三色标记</h3>
+<p><code>三色标记</code>是一种用于 Java 虚拟机（JVM）垃圾回收算法的技术，配合<a href="/posts/6a10d920">可达性分析算法</a>实现垃圾的高效、准确的收集。</p>
+<p>在三色标记中，JVM将内存对象分为三个不同的颜色：白色、灰色和黑色。</p>
+<ul>
+<li><code>白色</code>：表示对象尚未被扫描和标记。</li>
+<li><code>灰色</code>：表示对象已经被扫描，但是它引用的其他对象尚未被扫描和标记。</li>
+<li><code>黑色</code>：表示对象已经被扫描和标记，并且它引用的其他对象也已经被扫描和标记。</li>
+</ul>
+<p>JVM 使用三色标记来跟踪哪些对象可以被安全地回收。当 JVM 进行垃圾回收时，它会从根对象开始遍历所有对象，并将它们标记为灰色或黑色。然后，JVM 会清除所有白色对象，因为这些对象没有任何引用。</p>
+<p>在三色标记算法中，灰色的对象表示悬挂的对象，即其引用的对象尚未被处理。如果某个对象的所有引用都已经被扫描和标记，那么它就会被标记为黑色。</p>
+<p>通过使用三色标记算法，JVM 可以更快地确定哪些对象可以被安全地回收，从而提高了应用程序的性能和可靠性。</p>
+<h3 id="分代收集算法"><a class="markdownIt-Anchor" href="#分代收集算法"></a> 分代收集算法</h3>
+<p><code>分代收集算法</code>是目前主流的垃圾回收算法。它根据对象的存活周期把堆区域分为新生代和老年代两个区域。新生代中的对象通常存活时间较短，而老年代中的对象则存活时间较长。不同区域采用不同的垃圾回收算法。</p>
+<p>新生代通常使用复制算法。它把新生代分为Eden区和两个Survivor区，每次只使用Eden区和其中一个Survivor区，将已经标记了的存活对象复制到另一块未使用的Survivor区中，然后清除Eden区和已使用的Survivor区中的无用对象。</p>
+<p>老年代通常使用标记-整理算法。因为老年代中的对象存活时间较长，所以会产生大量的内存碎片。标记-整理算法通过整理过程来解决这个问题。</p>
+<h2 id="总结"><a class="markdownIt-Anchor" href="#总结"></a> 总结</h2>
+<p>JVM垃圾回收算法包括标记-清除算法、复制算法、标记-整理算法和分代收集算法等。不同的垃圾回收算法适用于不同的场景，需要根据具体情况进行选择。对于Java程序开发人员来说，理解JVM垃圾回收算法对于优化程序性能至关重要。</p>
+]]></content>
+      <categories>
+        <category>Java</category>
+        <category>JVM</category>
+        <category>GC</category>
+      </categories>
+      <tags>
+        <tag>Java</tag>
+        <tag>JVM</tag>
+        <tag>GC</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>JVM 安全点</title>
+    <url>/posts/5a9ba959/</url>
+    <content><![CDATA[<p>JVM的安全点（Safepoint）是JVM执行垃圾回收时的一个重要概念。<span style="border-bottom:2px solid green;">在JVM进行垃圾回收操作时，需要保证堆的一致性，因此需要挂起所有运行Java代码的线程并记录它们的状态。这些特定位置就被称为 <em><strong><code>安全点</code></strong></em>。</span>&gt;</p>
+<h2 id="安全点的作用"><a class="markdownIt-Anchor" href="#安全点的作用"></a> 安全点的作用</h2>
+<p>当一个线程处于安全点时，JVM可以确保该线程不会同时访问堆内存中的对象。如果不挂起所有线程，那么这些线程可能正在访问堆内存中的对象。如果同时执行垃圾回收，则这些线程可能同时修改这些对象，导致数据错误或不一致。因此，在进行垃圾回收操作时，必须等待所有线程到达安全点，并将它们挂起，然后才能继续执行垃圾回收操作。</p>
+<h2 id="安全点的触发条件"><a class="markdownIt-Anchor" href="#安全点的触发条件"></a> 安全点的触发条件</h2>
+<div class="note-large notel-yellow"><div class="notel-title"><p>当一个线程处于安全点时，它必须满足以下条件之一</p>
+</div><div class="notel-content"><ol>
+<li>执行Java方法的字节码指令结束或异常抛出；</li>
+<li>执行JNI（Java Native Interface）方法的字节码指令结束或异常抛出；</li>
+<li>执行VM操作（如Thread.sleep）的字节码指令结束或异常抛出。</li>
+</ol>
+ </div></div>
+<p>这意味着当一个线程处于安全点时，它一定是上述情况之一。只有在这些情况下，线程才被挂起进行垃圾回收操作。</p>
+<h2 id="安全点的影响"><a class="markdownIt-Anchor" href="#安全点的影响"></a> 安全点的影响</h2>
+<p>当JVM进行垃圾回收操作时，必须等待所有线程到达安全点，并将它们挂起，然后才能继续执行垃圾回收操作。这种等待时间可能会导致一些线程长时间等待，从而导致应用程序响应时间变慢。</p>
+<p>为了减少这种情况的发生，JVM提供了多种垃圾回收算法和垃圾回收器，以便在特定的场景中选择最佳的垃圾回收策略。例如CMS（Concurrent Mark Sweep）垃圾回收器就是在并发标记阶段尽可能减少安全点的数量的一种垃圾回收器。</p>
+<p>此外，我们也可以通过调整线程数、线程优先级、堆内存大小等措施来减少安全点的影响。</p>
+<h2 id="总结"><a class="markdownIt-Anchor" href="#总结"></a> 总结</h2>
+<p>安全点是一个重要的概念，在JVM进行垃圾回收操作时扮演着至关重要的角色。了解安全点的作用、触发条件和影响，对于Java开发者来说是非常重要的。在实际开发中，我们需要根据应用场景选择合适的垃圾回收算法和垃圾回收器，并采取相应的措施来减少安全点的影响，以使应用程序能够达到更好的性能和响应速度。</p>
+]]></content>
+      <categories>
+        <category>Java</category>
+        <category>JVM</category>
+        <category>GC</category>
+      </categories>
+      <tags>
+        <tag>Java</tag>
+        <tag>JVM</tag>
+        <tag>GC</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>HashMap - hash()</title>
+    <url>/posts/c0f9b6a9/</url>
+    <content><![CDATA[<p>在Java编程中，HashMap是一个重要的数据结构，它可以方便地存储和访问键值对。其中，hash()方法是HashMap实现中的关键部分之一。在本篇博文中，我们将对Java8中的HashMap hash()方法进行解析。</p>
+<h2 id="hash方法概述"><a class="markdownIt-Anchor" href="#hash方法概述"></a> Hash()方法概述</h2>
+<p>在Java8中，HashMap的核心代码位于java.util.HashMap类中，其中hash()方法被定义为：</p>
+<div class="highlight-container" data-rel="Java"><figure class="iseeu highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">final</span> <span class="type">int</span> <span class="title function_">hash</span><span class="params">(Object key)</span> &#123;</span><br><span class="line">    <span class="type">int</span> h;</span><br><span class="line">    <span class="keyword">return</span> (key == <span class="literal">null</span>) ? <span class="number">0</span> : (h = key.hashCode()) ^ (h &gt;&gt;&gt; <span class="number">16</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></div>
+<p>从上面的代码可以看出，hash()方法主要完成两个操作：</p>
+<ol>
+<li>计算键的哈希码（通过调用key.hashCode()方法）。</li>
+<li>对哈希码进行微调，以保证分布均匀。</li>
+</ol>
+<p>接下来，我们将逐个分析这些操作。</p>
+<h3 id="计算键的哈希码"><a class="markdownIt-Anchor" href="#计算键的哈希码"></a> 计算键的哈希码</h3>
+<p>在Java中，Object类包含hashCode()方法，该方法返回对象的哈希码。因此，在HashMap中，我们可以轻松地使用key.hashCode()方法计算键的哈希码。</p>
+<p>然而，如果键是null，则需要特殊处理。在这种情况下，HashMap会将哈希码设置为0。</p>
+<div class="highlight-container" data-rel="Java"><figure class="iseeu highlight java"><table><tr><td class="code"><pre><span class="line">(key == <span class="literal">null</span>) ? <span class="number">0</span> : (h = key.hashCode())</span><br></pre></td></tr></table></figure></div>
+<h3 id="微调哈希码"><a class="markdownIt-Anchor" href="#微调哈希码"></a> 微调哈希码</h3>
+<p>第二个操作是对哈希码进行微调。 虽然key.hashCode()方法产生的哈希值很好，但它可能不适合HashMap中的所有情况。例如，在哈希表中使用的桶数为2的幂时，最低位可能会被过于频繁地使用，这可能会导致性能问题。</p>
+<p>因此，HashMap使用了以下技巧对哈希码进行微调：</p>
+<div class="highlight-container" data-rel="Java"><figure class="iseeu highlight java"><table><tr><td class="code"><pre><span class="line">(h = key.hashCode()) ^ (h &gt;&gt;&gt; <span class="number">16</span>);</span><br></pre></td></tr></table></figure></div>
+<p>其中，&quot;^&quot;运算符表示按位异或操作。这个操作将哈希码的高16位与低16位混合在一起。这有助于减少哈希码中的碰撞，并增加桶的数量。</p>
+<div class="note-large notel-green"><div class="notel-title"><p>”^“相较于”&amp;“、”|“计算Hash值的优点</p>
+</div><div class="notel-content"><ol>
+<li>高效性：异或操作比位与或位或操作更快，因为它不需要检查每个位的值。</li>
+<li>混淆性：通过将哈希码的高位和低位进行异或，可以使得哈希码的各个部分都对最终的哈希值产生影响。这有助于减少哈希冲突，提高HashMap的性能。</li>
+<li>均匀性：异或操作可以保持哈希码的均匀性，这是在HashMap中实现高效散列的关键。</li>
+</ol>
+ </div></div>
+<h2 id="总结"><a class="markdownIt-Anchor" href="#总结"></a> 总结</h2>
+<p>HashMap是Java编程中重要的数据结构之一。其核心代码包括hash()方法，它通过计算键的哈希码并对其进行微调来保证分布均匀。具体而言，hash()方法首先调用key.hashCode()方法计算哈希码，然后使用异或运算符对其进行微调。使用这些技术，HashMap可以高效地存储和快速访问键值对。</p>
+]]></content>
+      <categories>
+        <category>Java</category>
+        <category>Java 基础</category>
+        <category>HashMap</category>
+      </categories>
+      <tags>
+        <tag>Java</tag>
+        <tag>HashMap</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>HashMap - 基本原理</title>
+    <url>/posts/fcb831a5/</url>
+    <content><![CDATA[<p>HashMap是Java中最常用的数据结构之一，它将键映射到值，允许我们通过Key来快速检索和获取Value。在Java 8中，HashMap进行了一些优化和改进，以提高性能和减少冲突。本文将介绍Java8 HashMap的基本原理和实现方式。</p>
+<div class="note note-yellow"><p>本文将介绍Java8 HashMap的基本原理，不会对 HashMap 中的方法进行解读，对于其核心的方法解读会单开炉灶</p>
+</div>
+<h2 id="基本原理"><a class="markdownIt-Anchor" href="#基本原理"></a> 基本原理</h2>
+<p>在Java8中，HashMap使用数组和链表（或红黑树）实现。当一个元素被添加到HashMap中时，它首先根据Key的hashcode计算出一个桶号，并将其放入相应的桶中。如果该桶中已经存在其他元素，则需要比较它们的Key是否相等。如果Key相等，则直接替换Value；否则，将该元素添加到链表（或红黑树）的末尾。</p>
+<p>当HashMap的大小超过某个阈值（load factor）时，它会自动扩容。扩容涉及将所有的元素重新散列到一个新的、更大的桶中。这个操作代价很高，因此应该尽可能地避免频繁地扩容HashMap。</p>
+<h2 id="实现方式"><a class="markdownIt-Anchor" href="#实现方式"></a> 实现方式</h2>
+<p>在Java8中，HashMap的内部实现有以下重要组件：</p>
+<ul>
+<li>数组：HashMap使用一个Node类型的数组来存储元素。</li>
+<li>链表：当多个元素映射到同一个桶时，它们将被链接成一个链表。链表上的节点类型是Node。</li>
+<li>红黑树：当一个桶中的元素数量超过8个时，HashMap会将链表转换为红黑树，以提高性能。此时链表上的节点类型是TreeNode。</li>
+</ul>
+<p>下面我们来看一下Java8 HashMap的核心代码：</p>
+<div class="highlight-container" data-rel="Java"><figure class="iseeu highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">HashMap</span>&lt;K,V&gt; <span class="keyword">extends</span> <span class="title class_">AbstractMap</span>&lt;K,V&gt;</span><br><span class="line">    <span class="keyword">implements</span> <span class="title class_">Map</span>&lt;K,V&gt;, Cloneable, Serializable &#123;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 初始大小 16</span></span><br><span class="line">    <span class="keyword">static</span> <span class="keyword">final</span> <span class="type">int</span> <span class="variable">DEFAULT_INITIAL_CAPACITY</span> <span class="operator">=</span> <span class="number">1</span> &lt;&lt; <span class="number">4</span>; <span class="comment">// aka 16</span></span><br><span class="line">    <span class="comment">// 扩容的加载因子 0.75</span></span><br><span class="line">    <span class="keyword">static</span> <span class="keyword">final</span> <span class="type">float</span> <span class="variable">DEFAULT_LOAD_FACTOR</span> <span class="operator">=</span> <span class="number">0.75f</span>;</span><br><span class="line">    <span class="comment">// 转化为红黑树的阈值 8</span></span><br><span class="line">    <span class="keyword">static</span> <span class="keyword">final</span> <span class="type">int</span> <span class="variable">TREEIFY_THRESHOLD</span> <span class="operator">=</span> <span class="number">8</span>;</span><br><span class="line">    <span class="comment">// 退化为链表的阈值 6</span></span><br><span class="line">    <span class="keyword">static</span> <span class="keyword">final</span> <span class="type">int</span> <span class="variable">UNTREEIFY_THRESHOLD</span> <span class="operator">=</span> <span class="number">6</span>;</span><br><span class="line">    <span class="comment">// 转化为红黑树的另一个条件，Hash表的大小阈值 64</span></span><br><span class="line">    <span class="keyword">static</span> <span class="keyword">final</span> <span class="type">int</span> <span class="variable">MIN_TREEIFY_CAPACITY</span> <span class="operator">=</span> <span class="number">64</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">transient</span> Node&lt;K,V&gt;[] table;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">transient</span> Set&lt;Map.Entry&lt;K,V&gt;&gt; entrySet;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">transient</span> <span class="type">int</span> size;</span><br><span class="line"></span><br><span class="line">    <span class="type">int</span> threshold;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">final</span> <span class="type">float</span> loadFactor;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="title function_">HashMap</span><span class="params">(<span class="type">int</span> initialCapacity, <span class="type">float</span> loadFactor)</span> &#123;</span><br><span class="line">        <span class="comment">//...</span></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> V <span class="title function_">put</span><span class="params">(K key, V value)</span> &#123;</span><br><span class="line">        <span class="comment">//...</span></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//...</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></div>
+<p>在上面的代码中，我们可以看到几个重要的组件，包括数组 <code>table</code>、阈值 <code>threshold</code>、负载因子 <code>loadFactor</code>、链表和红黑树转换的阈值等。此外，还有一些常见的方法，例如put()、get()和resize()等方法。</p>
+<h2 id="总结"><a class="markdownIt-Anchor" href="#总结"></a> 总结</h2>
+<p>Java8的HashMap是一种高效的数据结构，它使用数组和链表（或红黑树）实现，并具有自动扩容和哈希冲突解决等功能。HashMap的内部实现涉及到许多细节和优化，需要理解其基本原理和实现方式才能更好地使用它。掌握Java8 HashMap的基本原理和使用方法，可以使我们更加高效和便捷地处理键值对数据。</p>
+]]></content>
+      <categories>
+        <category>Java</category>
+        <category>Java 基础</category>
+        <category>HashMap</category>
+      </categories>
+      <tags>
+        <tag>Java</tag>
+        <tag>HashMap</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>HashMap - get()</title>
+    <url>/posts/e59e566/</url>
+    <content><![CDATA[<p>在Java编程中，HashMap是一个重要的数据结构，它可以方便地存储和访问键值对。其中，get()方法是HashMap实现中的关键部分之一。在本篇博文中，我们将对Java8中的HashMap get()方法进行详细解析，并探讨其实现原理。</p>
+<h2 id="实现原理"><a class="markdownIt-Anchor" href="#实现原理"></a> 实现原理</h2>
+<p>在Java8中，HashMap的核心代码位于java.util.HashMap类中，其中get()方法被定义为：</p>
+<div class="highlight-container" data-rel="Java"><figure class="iseeu highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> V <span class="title function_">get</span><span class="params">(Object key)</span> &#123;</span><br><span class="line">    Node&lt;K,V&gt; e;</span><br><span class="line">    <span class="comment">// 计算键的哈希码，查找并返回与指定键关联的值。</span></span><br><span class="line">    <span class="keyword">return</span> (e = getNode(hash(key), key)) == <span class="literal">null</span> ? <span class="literal">null</span> : e.value;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></div>
+<p>从上面的代码可以看出，get()方法主要完成两个操作：</p>
+<ol>
+<li>计算键的哈希码（通过调用hash(key)方法）。</li>
+<li>查找并返回与指定键关联的值。</li>
+</ol>
+<p>接下来，我们将逐个分析这些操作。</p>
+<h3 id="哈希码的计算"><a class="markdownIt-Anchor" href="#哈希码的计算"></a> 哈希码的计算</h3>
+<p>在Java中，Object类包含hashCode()方法，该方法返回对象的哈希码。因此，在HashMap中，我们可以轻松地使用key.hashCode()方法计算键的哈希码。<a href="https://blog.heer.love/posts/c0f9b6a9/">hash()</a>方法点击跳转到隔壁。</p>
+<div class="highlight-container" data-rel="Java"><figure class="iseeu highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">// 计算hash</span></span><br><span class="line"><span class="keyword">final</span> <span class="type">int</span> <span class="title function_">hash</span><span class="params">(Object key)</span> &#123;</span><br><span class="line">    <span class="type">int</span> h;</span><br><span class="line">    <span class="keyword">return</span> (key == <span class="literal">null</span>) ? <span class="number">0</span> : (h = key.hashCode()) ^ (h &gt;&gt;&gt; <span class="number">16</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></div>
+<h3 id="查找并返回值"><a class="markdownIt-Anchor" href="#查找并返回值"></a> 查找并返回值</h3>
+<p>在HashMap中，键值对存储在Node&lt;K,V&gt;类型的节点中。因此，查找指定键的值需要执行以下操作：</p>
+<ol>
+<li>根据键的哈希值找到对应的桶。</li>
+<li>遍历桶中的链表，查找具有相同键的节点。</li>
+<li>如果找到这样的节点，则返回其值。否则，返回null。</li>
+</ol>
+<p>具体而言，getNode()方法完成了上述操作：</p>
+<div class="highlight-container" data-rel="Java"><figure class="iseeu highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">final</span> Node&lt;K,V&gt; <span class="title function_">getNode</span><span class="params">(<span class="type">int</span> hash, Object key)</span> &#123;</span><br><span class="line">    <span class="comment">// 声明一个Node数组tab</span></span><br><span class="line">    Node&lt;K,V&gt;[] tab;</span><br><span class="line">    <span class="comment">// 声明两个Node节点first和e</span></span><br><span class="line">    Node&lt;K,V&gt; first, e; </span><br><span class="line">    <span class="comment">// 声明一个int类型变量n，代表桶的数量</span></span><br><span class="line">    <span class="type">int</span> n; </span><br><span class="line">    <span class="comment">// 声明一个泛型K类型变量k，代表key</span></span><br><span class="line">    K k; </span><br><span class="line"></span><br><span class="line">    <span class="comment">// 判断table不为空，n大于0，并且hash对应的桶不为空</span></span><br><span class="line">    <span class="keyword">if</span> ((tab = table) != <span class="literal">null</span> &amp;&amp; (n = tab.length) &gt; <span class="number">0</span> &amp;&amp;</span><br><span class="line">        (first = tab[(n - <span class="number">1</span>) &amp; hash]) != <span class="literal">null</span>) &#123; </span><br><span class="line">        <span class="keyword">if</span> (first.hash == hash &amp;&amp; <span class="comment">// 判断第一个节点的hash值是否等于指定hash值</span></span><br><span class="line">            ((k = first.key) == key || (key != <span class="literal">null</span> &amp;&amp; key.equals(k)))) <span class="comment">// 判断第一个节点的key是否等于指定key</span></span><br><span class="line">            <span class="comment">// 如果第一个节点就是要查找的节点，则直接返回该节点</span></span><br><span class="line">            <span class="keyword">return</span> first;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> ((e = first.next) != <span class="literal">null</span>) &#123; <span class="comment">// 如果第一个节点的下一个节点不为空</span></span><br><span class="line">            <span class="keyword">if</span> (first <span class="keyword">instanceof</span> TreeNode) <span class="comment">// 判断该链表是否已经树化</span></span><br><span class="line">                <span class="comment">// 如果已经树化，则调用getTreeNode方法继续查找</span></span><br><span class="line">                <span class="keyword">return</span> ((TreeNode&lt;K,V&gt;)first).getTreeNode(hash, key); </span><br><span class="line">            <span class="keyword">do</span> &#123; <span class="comment">// 否则遍历链表</span></span><br><span class="line">                <span class="keyword">if</span> (e.hash == hash &amp;&amp;</span><br><span class="line">                    ((k = e.key) == key || (key != <span class="literal">null</span> &amp;&amp; key.equals(k))))</span><br><span class="line">                    <span class="comment">// 如果找到了指定的节点，则直接返回</span></span><br><span class="line">                    <span class="keyword">return</span> e; </span><br><span class="line">            &#125; <span class="keyword">while</span> ((e = e.next) != <span class="literal">null</span>); <span class="comment">// 遍历链表</span></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// 如果没有找到对应的节点，则返回null</span></span><br><span class="line">    <span class="keyword">return</span> <span class="literal">null</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure></div>
+<p>从上面的代码可以看出，getNode()方法首先通过哈希值找到对应的桶，然后遍历桶中的链表，查找与指定键关联的节点。如果找到了这样的节点，则返回其值；否则返回null。</p>
+<h2 id="性能分析"><a class="markdownIt-Anchor" href="#性能分析"></a> 性能分析</h2>
+<p>在HashMap中，get()方法是最常用的操作之一，它可以高效地访问键值对并提供快速的响应时间。具体而言，get()方法的时间复杂度为O(1)，即与HashMap中存储的元素数量无关。然而，在实际编程中，get()方法的性能可能会受到以下因素的影响：</p>
+<h3 id="哈希冲突"><a class="markdownIt-Anchor" href="#哈希冲突"></a> 哈希冲突</h3>
+<p>由于哈希表的大小是有限的，所以在不同的键上生成的哈希码可能会相同。这种情况称为哈希冲突（Hash Collision）。当发生哈希冲突时，HashMap将使用链表或红黑树等数据结构来存储具有相同哈希码的节点。因此，如果HashMap中存在大量哈希冲突，那么查找键值对的效率将会降低。</p>
+<h3 id="初始容量和加载因子"><a class="markdownIt-Anchor" href="#初始容量和加载因子"></a> 初始容量和加载因子</h3>
+<p>HashMap的初始容量和加载因子也会影响get()方法的性能。在创建HashMap对象时，我们需要指定其初始容量和加载因子。如果初始容量较小或加载因子较大，那么HashMap就需要频繁调整自身的大小，从而使get()方法的性能下降。</p>
+<h2 id="总结"><a class="markdownIt-Anchor" href="#总结"></a> 总结</h2>
+<p>get()方法是HashMap中最常用的方法之一。它通过计算键的哈希值和查找与指定键关联的节点来实现访问键值对。具体而言，get()方法首先调用hash(key)方法计算键的哈希码，然后使用getNode()方法在桶中查找相应的节点。如果找到了这样的节点，则返回其值；否则返回null。</p>
+<p>在实际编程中，我们需要注意哈希冲突、初始容量和加载因子等因素，以提高get()方法的性能。同时，我们也可以考虑使用其他数据结构，例如TreeMap，来代替HashMap，从而满足不同的需求。</p>
+]]></content>
+      <categories>
+        <category>Java</category>
+        <category>Java 基础</category>
+        <category>HashMap</category>
+      </categories>
+      <tags>
+        <tag>Java</tag>
+        <tag>HashMap</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>HashMap - resize()</title>
+    <url>/posts/80dd519a/</url>
+    <content><![CDATA[<p>在 Java 中，HashMap 是一个非常重要的集合类，它采用哈希表来存储键值对。当数据量变大时，需要调整哈希表的大小，以保证更好的性能和空间使用。resize() 方法就是 HashMap 进行扩容或缩减容量的方法。</p>
+<h2 id="什么情况下需要-resize-方法"><a class="markdownIt-Anchor" href="#什么情况下需要-resize-方法"></a> 什么情况下需要 resize() 方法</h2>
+<p>当 HashMap 存储的数据超过了负载因子乘以当前容量时（即元素个数 &gt; 负载因子 * 容量），就需要进行 resize 操作。负载因子通常为 0.75，在之前的 JDK 版本中是默认值为 0.75，JDK 1.8 开始可以自定义负载因子。</p>
+<p>resize 操作的目的是为了让 HashMap 在扩容或缩减容量后仍然能保持较低的查找和插入成本。如果 HashMap 中的键值对数量过多，则会导致哈希冲突概率增加，从而影响 HashMap 的性能。如果数量太少，则会造成空间浪费。</p>
+<h2 id="实现原理"><a class="markdownIt-Anchor" href="#实现原理"></a> 实现原理</h2>
+<p>HashMap 的 resize() 方法的实现原理涉及到两个主要步骤：</p>
+<ol>
+<li>创建新的数组并重新分配元素：首先根据新的容量创建一个新的数组，然后遍历原来的数组，并将所有元素重新分配到新数组中。</li>
+<li>调整哈希值：重新分配元素时，需要调整每个键值对的哈希值。这是因为在 Java 中，哈希值是由对象的 hashCode() 方法计算出来的。而当数组大小改变时，hashCode() 值需要重新计算。</li>
+</ol>
+<p>具体实现过程可以通过以下源码逐行解释：</p>
+<div class="highlight-container" data-rel="Java"><figure class="iseeu highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">final</span> Node&lt;K,V&gt;[] resize() &#123;</span><br><span class="line">    Node&lt;K,V&gt;[] oldTab = table; <span class="comment">// 保存原数组</span></span><br><span class="line"></span><br><span class="line">    <span class="type">int</span> <span class="variable">oldCap</span> <span class="operator">=</span> (oldTab == <span class="literal">null</span>) ? <span class="number">0</span> : oldTab.length; <span class="comment">// 计算原数组长度</span></span><br><span class="line">    <span class="type">int</span> <span class="variable">oldThr</span> <span class="operator">=</span> threshold; <span class="comment">// 计算原阈值</span></span><br><span class="line">    <span class="type">int</span> newCap, newThr = <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (oldCap &gt; <span class="number">0</span>) &#123; <span class="comment">// 如果原数组不为空，则进行扩容操作</span></span><br><span class="line">        <span class="keyword">if</span> (oldCap &gt;= MAXIMUM_CAPACITY) &#123; <span class="comment">// 判断原数组是否达到最大容量</span></span><br><span class="line">            threshold = Integer.MAX_VALUE;</span><br><span class="line">            <span class="keyword">return</span> oldTab;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">else</span> <span class="keyword">if</span> ((newCap = oldCap &lt;&lt; <span class="number">1</span>) &lt; MAXIMUM_CAPACITY &amp;&amp; oldCap &gt;= DEFAULT_INITIAL_CAPACITY)</span><br><span class="line">            newThr = oldThr &lt;&lt; <span class="number">1</span>; <span class="comment">// 扩容后新的阈值</span></span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">else</span> <span class="keyword">if</span> (oldThr &gt; <span class="number">0</span>) <span class="comment">// 如果原阈值大于0，则使用该值作为初始容量</span></span><br><span class="line">        newCap = oldThr;</span><br><span class="line">    <span class="keyword">else</span> &#123; <span class="comment">// 如果没有指定初始容量或阈值，默认使用默认值</span></span><br><span class="line">        newCap = DEFAULT_INITIAL_CAPACITY;</span><br><span class="line">        newThr = (<span class="type">int</span>)(DEFAULT_LOAD_FACTOR * DEFAULT_INITIAL_CAPACITY);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (newThr == <span class="number">0</span>) &#123; <span class="comment">// 如果 newThr 没有被初始化，则根据新的容量和负载因子计算新的阈值</span></span><br><span class="line">        <span class="type">float</span> <span class="variable">ft</span> <span class="operator">=</span> (<span class="type">float</span>)newCap * loadFactor;</span><br><span class="line">        newThr = (newCap &lt; MAXIMUM_CAPACITY &amp;&amp; ft &lt; (<span class="type">float</span>)MAXIMUM_CAPACITY ?</span><br><span class="line">                  (<span class="type">int</span>)ft : Integer.MAX_VALUE);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    threshold = newThr; <span class="comment">// 更新 HashMap 的阈值</span></span><br><span class="line"></span><br><span class="line">    <span class="meta">@SuppressWarnings(&#123;&quot;rawtypes&quot;,&quot;unchecked&quot;&#125;)</span></span><br><span class="line">        Node&lt;K,V&gt;[] newTab = (Node&lt;K,V&gt;[])<span class="keyword">new</span> <span class="title class_">Node</span>[newCap]; <span class="comment">// 创建新数组</span></span><br><span class="line">    table = newTab; <span class="comment">// 将 table 指向新数组</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (oldTab != <span class="literal">null</span>) &#123; <span class="comment">// 如果原数组不为空，则遍历原数组并将所有元素重新分配到新数组中</span></span><br><span class="line">        <span class="keyword">for</span> (<span class="type">int</span> <span class="variable">j</span> <span class="operator">=</span> <span class="number">0</span>; j &lt; oldCap; ++j) &#123;</span><br><span class="line">            Node&lt;K,V&gt; e;</span><br><span class="line">            <span class="keyword">if</span> ((e = oldTab[j]) != <span class="literal">null</span>) &#123;</span><br><span class="line">                oldTab[j] = <span class="literal">null</span>; <span class="comment">// 释放原有元素的引用</span></span><br><span class="line">                <span class="keyword">if</span> (e.next == <span class="literal">null</span>) <span class="comment">// 处理链表节点</span></span><br><span class="line">                    newTab[e.hash &amp; (newCap - <span class="number">1</span>)] = e;</span><br><span class="line">                <span class="keyword">else</span> <span class="keyword">if</span> (e <span class="keyword">instanceof</span> TreeNode) <span class="comment">// 处理红黑树节点</span></span><br><span class="line">                    ((TreeNode&lt;K,V&gt;)e).split(<span class="built_in">this</span>, newTab, j, oldCap);</span><br><span class="line">                <span class="keyword">else</span> &#123; <span class="comment">// 处理链表节点</span></span><br><span class="line">                    Node&lt;K,V&gt; loHead = <span class="literal">null</span>, loTail = <span class="literal">null</span>;</span><br><span class="line">                    Node&lt;K,V&gt; hiHead = <span class="literal">null</span>, hiTail = <span class="literal">null</span>;</span><br><span class="line">                    Node&lt;K,V&gt; next;</span><br><span class="line">                    <span class="keyword">do</span> &#123;</span><br><span class="line">                        next = e.next;</span><br><span class="line">                        <span class="keyword">if</span> ((e.hash &amp; oldCap) == <span class="number">0</span>) &#123; <span class="comment">// 判断元素是否需要放置到新数组的低位</span></span><br><span class="line">                            <span class="keyword">if</span> (loTail == <span class="literal">null</span>)</span><br><span class="line">                                loHead = e;</span><br><span class="line">                            <span class="keyword">else</span></span><br><span class="line">                                loTail.next = e;</span><br><span class="line">                            loTail = e;</span><br><span class="line">                        &#125;</span><br><span class="line">                        <span class="keyword">else</span> &#123; <span class="comment">// 放置到新数组的高位</span></span><br><span class="line">                            <span class="keyword">if</span> (hiTail == <span class="literal">null</span>)</span><br><span class="line">                                hiHead = e;</span><br><span class="line">                            <span class="keyword">else</span></span><br><span class="line">                                hiTail.next = e;</span><br><span class="line">                            hiTail = e;</span><br><span class="line">                        &#125;</span><br><span class="line">                    &#125; <span class="keyword">while</span> ((e = next) != <span class="literal">null</span>);</span><br><span class="line"></span><br><span class="line">                    <span class="keyword">if</span> (loTail != <span class="literal">null</span>) &#123; <span class="comment">// 将低位链表放到对应位置</span></span><br><span class="line">                        loTail.next = <span class="literal">null</span>;</span><br><span class="line">                        newTab[j] = loHead;</span><br><span class="line">                    &#125;</span><br><span class="line">                    <span class="keyword">if</span> (hiTail != <span class="literal">null</span>) &#123; <span class="comment">// 将高位链表放到对应位置</span></span><br><span class="line">                        hiTail.next = <span class="literal">null</span>;</span><br><span class="line">                        newTab[j + oldCap] = hiHead;</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> newTab; <span class="comment">// 返回新数组</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></div>
+<h2 id="resize-方法的时间复杂度"><a class="markdownIt-Anchor" href="#resize-方法的时间复杂度"></a> resize() 方法的时间复杂度</h2>
+<p>resize 操作需要遍历整个数组，并将元素重新分配到新数组中。因此，时间复杂度为 O(n)，其中 n 是 HashMap 中键值对的数量。</p>
+<h2 id="总结"><a class="markdownIt-Anchor" href="#总结"></a> 总结</h2>
+<p>HashMap 的 resize() 方法是用来扩容或者缩减 HashMap 容量的方法。它通过重新分配元素和调整哈希值来实现。当 HashMap 中的键值对数量超过负载因子乘以当前容量时，就需要进行 resize 操作。为了保证 HashMap 的性能和空间利用率，我们可以通过调整负载因子和初始容量来优化 HashMap 的 resize 操作。</p>
+]]></content>
+      <categories>
+        <category>Java</category>
+        <category>Java 基础</category>
+        <category>HashMap</category>
+      </categories>
+      <tags>
+        <tag>Java</tag>
+        <tag>HashMap</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>HashMap - put()</title>
+    <url>/posts/80dd519a/</url>
+    <content><![CDATA[<p>在 Java 8 中，HashMap 是一种常见的数据结构，用于存储键值对。put() 方法是其中最常用且最重要的方法之一。本文将详细介绍 Java 8 HashMap 的 put() 方法。</p>
+<h2 id="hashmap-概述"><a class="markdownIt-Anchor" href="#hashmap-概述"></a> HashMap 概述</h2>
+<p>HashMap 是一种基于哈希表实现的 Map 接口，使用键值对（key-value）的方式进行存储。HashMap 的 key 和 value 都可以为 null，但是同一个 key 只能映射到一个 value 上。HashMap 是非线程安全的，不支持并发访问，需要进行同步处理。</p>
+<h2 id="put-方法"><a class="markdownIt-Anchor" href="#put-方法"></a> put() 方法</h2>
+<p>put() 方法用于将指定的键值对添加到 HashMap 中。语法如下：</p>
+<div class="highlight-container" data-rel="Java"><figure class="iseeu highlight java"><table><tr><td class="code"><pre><span class="line">V <span class="title function_">put</span><span class="params">(K key, V value)</span></span><br></pre></td></tr></table></figure></div>
+<p>其中，K 表示 key 的类型，V 表示 value 的类型。</p>
+<h3 id="实现原理"><a class="markdownIt-Anchor" href="#实现原理"></a> 实现原理</h3>
+<p>Java 8 中的 HashMap 底层实现采用数组 + 链表/红黑树的方式实现。当向 HashMap 中添加元素时，会首先根据 key 的 hash 值确定该元素在数组中的位置，并将其添加到对应位置上。如果该位置已经有元素了，则会以链表或红黑树的形式将其连接起来。</p>
+<p>在 HashMap 中，每个位置上存储的是一个 Node 对象，包含 key、value 和指向下一个 Node 对象的指针。如果某个位置上的元素过多，就会将其转化成红黑树，以提高查询效率。</p>
+<h3 id="put-方法的实现"><a class="markdownIt-Anchor" href="#put-方法的实现"></a> put() 方法的实现</h3>
+<p>下面是 HashMap 中 put() 方法的源代码：</p>
+<div class="highlight-container" data-rel="Java"><figure class="iseeu highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">final</span> V <span class="title function_">putVal</span><span class="params">(<span class="type">int</span> hash, K key, V value, <span class="type">boolean</span> onlyIfAbsent, <span class="type">boolean</span> evict)</span> &#123;</span><br><span class="line">    Node&lt;K,V&gt;[] tab;          <span class="comment">// 定义 Node 数组</span></span><br><span class="line">    Node&lt;K,V&gt; p;              <span class="comment">// 定义 Node 变量</span></span><br><span class="line">    <span class="type">int</span> n, i;                 <span class="comment">// 定义 table 长度变量及索引变量</span></span><br><span class="line">    <span class="comment">// 如果 table 数组为空，则调用 resize() 方法进行数组初始化</span></span><br><span class="line">    <span class="keyword">if</span> ((tab = table) == <span class="literal">null</span> || (n = tab.length) == <span class="number">0</span>)</span><br><span class="line">        n = (tab = resize()).length;</span><br><span class="line">    <span class="comment">// 计算当前键值对的哈希值在 table 数组中的索引位置</span></span><br><span class="line">    <span class="keyword">if</span> ((p = tab[i = (n - <span class="number">1</span>) &amp; hash]) == <span class="literal">null</span>)</span><br><span class="line">        <span class="comment">// 如果计算得到的索引位置为 null，则新建节点并插入该位置</span></span><br><span class="line">        tab[i] = newNode(hash, key, value, <span class="literal">null</span>);</span><br><span class="line">    <span class="keyword">else</span> &#123;</span><br><span class="line">        Node&lt;K,V&gt; e; K k;</span><br><span class="line">        <span class="comment">// 如果当前索引位置存在元素，则判断元素类型是否为树节点类型</span></span><br><span class="line">        <span class="keyword">if</span> (p.hash == hash &amp;&amp;</span><br><span class="line">            ((k = p.key) == key || (key != <span class="literal">null</span> &amp;&amp; key.equals(k))))</span><br><span class="line">            e = p;</span><br><span class="line">        <span class="keyword">else</span> <span class="keyword">if</span> (p <span class="keyword">instanceof</span> TreeNode)</span><br><span class="line">            <span class="comment">// 如果当前节点类型为树节点，则在树节点上执行插入操作</span></span><br><span class="line">            e = ((TreeNode&lt;K,V&gt;)p).putTreeVal(<span class="built_in">this</span>, tab, hash, key, value);</span><br><span class="line">        <span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="comment">// 否则按链表方式进行插入操作</span></span><br><span class="line">            <span class="keyword">for</span> (<span class="type">int</span> <span class="variable">binCount</span> <span class="operator">=</span> <span class="number">0</span>; ; ++binCount) &#123;</span><br><span class="line">                <span class="keyword">if</span> ((e = p.next) == <span class="literal">null</span>) &#123;</span><br><span class="line">                    <span class="comment">// 如果当前节点的下一个节点为 null，则新建节点并插入到链表尾部</span></span><br><span class="line">                    p.next = newNode(hash, key, value, <span class="literal">null</span>);</span><br><span class="line">                    <span class="comment">// 如果链表长度大于等于树化阈值，则执行树化操作</span></span><br><span class="line">                    <span class="keyword">if</span> (binCount &gt;= TREEIFY_THRESHOLD - <span class="number">1</span>)</span><br><span class="line">                        treeifyBin(tab, hash);</span><br><span class="line">                    <span class="keyword">break</span>;</span><br><span class="line">                &#125;</span><br><span class="line">                <span class="comment">// 否则继续遍历链表查找是否存在相同键的节点</span></span><br><span class="line">                <span class="keyword">if</span> (e.hash == hash &amp;&amp;</span><br><span class="line">                    ((k = e.key) == key || (key != <span class="literal">null</span> &amp;&amp; key.equals(k))))</span><br><span class="line">                    <span class="keyword">break</span>;</span><br><span class="line">                p = e;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">// 如果找到了相同键的节点，则更新该节点的值</span></span><br><span class="line">        <span class="keyword">if</span> (e != <span class="literal">null</span>) &#123; </span><br><span class="line">            <span class="type">V</span> <span class="variable">oldValue</span> <span class="operator">=</span> e.value;</span><br><span class="line">            <span class="keyword">if</span> (!onlyIfAbsent || oldValue == <span class="literal">null</span>)</span><br><span class="line">                e.value = value;</span><br><span class="line">            afterNodeAccess(e);</span><br><span class="line">            <span class="keyword">return</span> oldValue;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// 更新 modCount 并检查是否需要扩容</span></span><br><span class="line">    ++modCount;</span><br><span class="line">    <span class="keyword">if</span> (++size &gt; threshold)</span><br><span class="line">        resize();</span><br><span class="line">    afterNodeInsertion(evict);</span><br><span class="line">    <span class="keyword">return</span> <span class="literal">null</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></div>
+<p>该方法的实现非常复杂，但是可以大致分为三个步骤：</p>
+<ol>
+<li>首先根据 key 的 hash 值确定该元素在数组中的位置。</li>
+<li>如果该位置为空，则直接将其添加到对应位置上；如果该位置已经有元素了，则需要进行链表或红黑树的操作。</li>
+<li>最后更新 HashMap 的 size 和 modCount 属性，并调用 afterNodeInsertion() 方法完成插入操作。</li>
+</ol>
+<h2 id="总结"><a class="markdownIt-Anchor" href="#总结"></a> 总结</h2>
+<p>总体来说，Java 8 中 HashMap 的 <code>put()</code> 方法依然采用了 拉链法 解决哈希冲突的问题，但是通过提高阈值和优化树化过程，它有着更好的性能表现。</p>
+]]></content>
+      <categories>
+        <category>Java</category>
+        <category>Java 基础</category>
+        <category>HashMap</category>
+      </categories>
+      <tags>
+        <tag>Java</tag>
+        <tag>HashMap</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>JVM - 运行时数据区</title>
+    <url>/posts/243280dc/</url>
+    <content><![CDATA[<p>JVM（Java Virtual Machine）是一个虚拟机，它是 Java 语言能够运行的关键所在。JVM 的结构包含了多个不同的组件，其中最重要的就是它的运行时数据区。</p>
+<h2 id="jvm-运行时数据区的概述"><a class="markdownIt-Anchor" href="#jvm-运行时数据区的概述"></a> JVM 运行时数据区的概述</h2>
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://mydlq-club.oss-cn-beijing.aliyuncs.com/images/my-jvm-constitute-concept.svg"
+                      alt="jvm 运行时数据区" 
+                ></p>
+<div class="note-large notel-green"><div class="notel-title"><p>运行时数据区可以分为以下几个部分</p>
+</div><div class="notel-content"><ol>
+<li><code>程序计数器：</code>程序计数器是一块较小的内存空间，它保存了当前线程正在执行的字节码指令的地址。当执行方法时，程序计数器会记录下一条将要执行的指令。由于每个线程都需要有自己的程序计数器，因此它是线程私有的。</li>
+<li><code>Java 虚拟机栈：</code>每个线程在运行时都会有一个对应的虚拟机栈，它用于存储方法调用的信息，包括局部变量、操作数栈、返回值等。每次方法调用时，JVM 都会创建一个对应的栈帧，并把它压入栈顶。当方法返回时，对应的栈帧会被弹出。由于每个线程都需要有自己的虚拟机栈，因此它也是线程私有的。</li>
+<li><code>堆：</code>堆是 JVM 中最大的一块内存空间，它用于存储对象实例。当使用 new 关键字创建一个对象时，JVM 会在堆上分配一块内存来存储该对象的实例。由于所有线程都需要共享堆空间，因此堆是线程共享的。</li>
+<li><code>方法区：</code>方法区也被称为永久代（PermGen），它用于存储类信息、常量、静态变量等数据。与堆一样，方法区也是线程共享的。</li>
+</ol>
+ </div></div>
+<h2 id="jvm-运行时数据区的特点"><a class="markdownIt-Anchor" href="#jvm-运行时数据区的特点"></a> JVM 运行时数据区的特点</h2>
+<ol>
+<li><code>线程私有和线程共享：</code>如上所述，程序计数器和虚拟机栈是线程私有的，而堆和方法区是线程共享的。</li>
+<li><code>自动内存管理：</code>JVM 的运行时数据区采用了自动内存管理的方式，即 Java 垃圾回收机制。当对象不再被引用时，JVM 会将其标记为垃圾，并进行回收。</li>
+<li><code>动态扩展和收缩：</code>JVM 的运行时数据区可以根据应用程序的需求动态地进行扩展或收缩。当内存不足时，JVM 会自动触发垃圾回收机制，清理掉无用的对象释放内存。当内存达到一定阈值时，JVM 可以通过调整堆大小来扩展内存空间。</li>
+</ol>
+<h2 id="总结"><a class="markdownIt-Anchor" href="#总结"></a> 总结</h2>
+<p>JVM 运行时数据区是 Java 虚拟机中最重要的组成部分之一，它用于存储程序执行时所需的数据。JVM 运行时数据区分为程序计数器、虚拟机栈、堆和方法区四个部分，其中程序计数器和虚拟机栈是线程私有的，堆和方法区是线程共享的。JVM 的运行时数据区采用了自动内存管理的方式，并且可以根据应用程序的需求动态地进行扩展或收缩。</p>
+]]></content>
+      <categories>
+        <category>Java</category>
+        <category>JVM</category>
+        <category>数据区</category>
+      </categories>
+      <tags>
+        <tag>JVM</tag>
+        <tag>运行时数据区</tag>
       </tags>
   </entry>
   <entry>
@@ -660,40 +660,6 @@
       </tags>
   </entry>
   <entry>
-    <title>Java 对象的生命周期</title>
-    <url>/posts/dcb2c325/</url>
-    <content><![CDATA[<p>Java虚拟机（JVM）是一种能够在不同平台上运行Java程序的虚拟机。在JVM中，每个对象都有其自己的生命周期。本篇博客将介绍JVM对象的生命周期。</p>
-<h2 id="生命周期阶段"><a class="markdownIt-Anchor" href="#生命周期阶段"></a> 生命周期阶段</h2>
-<div class="note note-green"><p>Java 对象的生命周期的几个阶段，分别为：对象的创建、使用、回收、销毁，下边逐个来进行介绍；</p>
-</div>
-<h3 id="对象的创建"><a class="markdownIt-Anchor" href="#对象的创建"></a> 对象的创建</h3>
-<p>当使用<code>new</code>关键字创建一个对象时，JVM会先检查类是否已经被加载和链接过。如果没有加载，则先进行类的加载和连接操作。然后为该对象分配内存空间，并对分配到的内存空间进行清零赋值，即初始化对象的所有实例变量为默认值。</p>
-<p>接着，JVM会调用对象的构造函数（Constructor），初始化对象的实例变量。如果该类没有显式地定义构造函数，则JVM会提供一个默认的无参构造函数。</p>
-<p>最后，JVM会把对象的引用返回给程序员，以便程序员可以通过该引用来操作该对象。</p>
-<h3 id="对象的使用"><a class="markdownIt-Anchor" href="#对象的使用"></a> 对象的使用</h3>
-<p>在对象创建后，程序员可以通过对象的引用对它进行操作。对象在内存中的位置由对象的引用来确定。当一个对象被使用时，它可能会被传递给其他方法或者被保存在某些数据结构中。</p>
-<h3 id="对象的回收"><a class="markdownIt-Anchor" href="#对象的回收"></a> 对象的回收</h3>
-<p>当一个对象不再被程序员所引用时，该对象就成了垃圾（Garbage）。JVM需要将这些无用的对象从内存中清除，以便后面的内存分配可以使用这些空间。</p>
-<p>JVM中的垃圾回收（Garbage Collection）机制负责回收这些无用对象。当JVM检测到一个对象已经成为垃圾时，它就会自动地将该对象所占用的内存空间释放出来，以便程序后续的内存分配可以使用这些空间。</p>
-<p>在JVM中，垃圾回收是由垃圾回收器（Garbage Collector）来完成的。不同的垃圾回收器采用不同的算法来实现垃圾回收。常见的垃圾回收算法包括标记-清除算法、复制算法、标记-整理算法和分代收集算法等。</p>
-<h3 id="对象的销毁"><a class="markdownIt-Anchor" href="#对象的销毁"></a> 对象的销毁</h3>
-<p>当一个对象被回收后，JVM并不会立即销毁它。相反，JVM会等待垃圾回收器对内存进行整理后，再对垃圾对象进行销毁。销毁一个对象的最终步骤是调用其<code>finalize()</code>方法。该方法是Object类中定义的一个方法，在GC进行回收之前会先调用该方法。</p>
-<p>在Java 9之后，<code>finalize()</code>方法已经被废弃，取而代之的是使用Cleaner API进行资源管理。</p>
-<h2 id="总结"><a class="markdownIt-Anchor" href="#总结"></a> 总结</h2>
-<p>JVM对象的生命周期包括对象的创建、使用、回收和销毁等阶段。理解JVM对象的生命周期对于Java程序开发人员来说是非常重要的，可以帮助他们更好地管理内存资源，提高程序性能。</p>
-]]></content>
-      <categories>
-        <category>Java</category>
-        <category>JVM</category>
-        <category>Java 对象</category>
-      </categories>
-      <tags>
-        <tag>Java</tag>
-        <tag>JVM</tag>
-        <tag>Java 对象</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>函数接口</title>
     <url>/posts/a65f2ab8/</url>
     <content><![CDATA[<p>Java 8 中引入了函数式编程的概念，其中函数接口是重要的一部分。函数接口是指只有一个抽象方法的接口，可以使用 lambda 表达式或方法引用来实现该抽象方法。在函数式编程中，函数接口通常用于表示某个操作，例如转换、过滤或消费数据等。通过将函数接口作为参数传递到方法中，可以轻松地实现这些操作。</p>
@@ -738,6 +704,40 @@
         <tag>Java</tag>
         <tag>Java 8</tag>
         <tag>函数编程</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Java 对象的生命周期</title>
+    <url>/posts/dcb2c325/</url>
+    <content><![CDATA[<p>Java虚拟机（JVM）是一种能够在不同平台上运行Java程序的虚拟机。在JVM中，每个对象都有其自己的生命周期。本篇博客将介绍JVM对象的生命周期。</p>
+<h2 id="生命周期阶段"><a class="markdownIt-Anchor" href="#生命周期阶段"></a> 生命周期阶段</h2>
+<div class="note note-green"><p>Java 对象的生命周期的几个阶段，分别为：对象的创建、使用、回收、销毁，下边逐个来进行介绍；</p>
+</div>
+<h3 id="对象的创建"><a class="markdownIt-Anchor" href="#对象的创建"></a> 对象的创建</h3>
+<p>当使用<code>new</code>关键字创建一个对象时，JVM会先检查类是否已经被加载和链接过。如果没有加载，则先进行类的加载和连接操作。然后为该对象分配内存空间，并对分配到的内存空间进行清零赋值，即初始化对象的所有实例变量为默认值。</p>
+<p>接着，JVM会调用对象的构造函数（Constructor），初始化对象的实例变量。如果该类没有显式地定义构造函数，则JVM会提供一个默认的无参构造函数。</p>
+<p>最后，JVM会把对象的引用返回给程序员，以便程序员可以通过该引用来操作该对象。</p>
+<h3 id="对象的使用"><a class="markdownIt-Anchor" href="#对象的使用"></a> 对象的使用</h3>
+<p>在对象创建后，程序员可以通过对象的引用对它进行操作。对象在内存中的位置由对象的引用来确定。当一个对象被使用时，它可能会被传递给其他方法或者被保存在某些数据结构中。</p>
+<h3 id="对象的回收"><a class="markdownIt-Anchor" href="#对象的回收"></a> 对象的回收</h3>
+<p>当一个对象不再被程序员所引用时，该对象就成了垃圾（Garbage）。JVM需要将这些无用的对象从内存中清除，以便后面的内存分配可以使用这些空间。</p>
+<p>JVM中的垃圾回收（Garbage Collection）机制负责回收这些无用对象。当JVM检测到一个对象已经成为垃圾时，它就会自动地将该对象所占用的内存空间释放出来，以便程序后续的内存分配可以使用这些空间。</p>
+<p>在JVM中，垃圾回收是由垃圾回收器（Garbage Collector）来完成的。不同的垃圾回收器采用不同的算法来实现垃圾回收。常见的垃圾回收算法包括标记-清除算法、复制算法、标记-整理算法和分代收集算法等。</p>
+<h3 id="对象的销毁"><a class="markdownIt-Anchor" href="#对象的销毁"></a> 对象的销毁</h3>
+<p>当一个对象被回收后，JVM并不会立即销毁它。相反，JVM会等待垃圾回收器对内存进行整理后，再对垃圾对象进行销毁。销毁一个对象的最终步骤是调用其<code>finalize()</code>方法。该方法是Object类中定义的一个方法，在GC进行回收之前会先调用该方法。</p>
+<p>在Java 9之后，<code>finalize()</code>方法已经被废弃，取而代之的是使用Cleaner API进行资源管理。</p>
+<h2 id="总结"><a class="markdownIt-Anchor" href="#总结"></a> 总结</h2>
+<p>JVM对象的生命周期包括对象的创建、使用、回收和销毁等阶段。理解JVM对象的生命周期对于Java程序开发人员来说是非常重要的，可以帮助他们更好地管理内存资源，提高程序性能。</p>
+]]></content>
+      <categories>
+        <category>Java</category>
+        <category>JVM</category>
+        <category>Java 对象</category>
+      </categories>
+      <tags>
+        <tag>Java</tag>
+        <tag>JVM</tag>
+        <tag>Java 对象</tag>
       </tags>
   </entry>
   <entry>
