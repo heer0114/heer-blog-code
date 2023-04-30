@@ -1,6 +1,139 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
+    <title>DDD 分层架构</title>
+    <url>/posts/29d01c/</url>
+    <content><![CDATA[<p>DDD 分层架构是一种以领域驱动设计（DDD）为基础的软件架构设计方法，通过将系统按照职责进行分层，将业务逻辑从技术细节中解耦出来，实现了代码的易维护、易测试和易扩展。</p>
+<h2 id="ddd-分层架构"><a class="markdownIt-Anchor" href="#ddd-分层架构"></a> DDD 分层架构</h2>
+<p><code>DDD 分层架构</code>是一种组织代码的方式，通过将代码分为不同的层次来实现解耦合。一般而言，分层架构包括以下几个层次：</p>
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="ddd-ach.png"
+                      alt="DDD 分层架构" 
+                ></p>
+<div class="note-large notel-green"><div class="notel-title"><p>DDD分层架构</p>
+</div><div class="notel-content"><ul>
+<li>表示层：负责与用户进行交互，并将请求转发给下一层</li>
+<li>应用层：负责协调各个领域对象完成具体的业务功能</li>
+<li>领域层：负责定义业务领域中的概念和规则，是整个应用程序的核心</li>
+<li>基础设施层：提供访问外部资源（数据库、网络等）的能力，同时也负责存储领域对象</li>
+</ul>
+ </div></div>
+<h2 id="ddd-分层架构的优势"><a class="markdownIt-Anchor" href="#ddd-分层架构的优势"></a> DDD 分层架构的优势</h2>
+<h3 id="易于维护"><a class="markdownIt-Anchor" href="#易于维护"></a> 易于维护</h3>
+<p>DDD 分层架构将系统按照职责进行分层，每一层都有自己的职责，这样就使得系统易于维护。因为每一层都是独立的，所以修改其中一个层次不会对其他层次造成影响。</p>
+<h3 id="易于测试"><a class="markdownIt-Anchor" href="#易于测试"></a> 易于测试</h3>
+<p>由于每一层职责的清晰划分，测试也相对容易实现。例如，在领域层中实现业务逻辑，并编写单元测试来验证其正确性。</p>
+<h3 id="易于扩展"><a class="markdownIt-Anchor" href="#易于扩展"></a> 易于扩展</h3>
+<p>由于 DDD 分层架构的松耦合特性，增加新功能或者更改已有功能时，只需要修改相关的层次即可，而不会对整个系统造成影响。这也为系统未来的扩展提供了便利。</p>
+<h2 id="ddd-分层架构的实现"><a class="markdownIt-Anchor" href="#ddd-分层架构的实现"></a> DDD 分层架构的实现</h2>
+<h3 id="一级代码目录"><a class="markdownIt-Anchor" href="#一级代码目录"></a> 一级代码目录</h3>
+<p>微服务一级目录是按照<span style="border-bottom: 2px solid green">DDD分层架构的分层职责</span>来定义的。</p>
+<p>在微服务代码模型里，我们分别定义了用户接口层、应用层、领域层和基础层四层，并分别为它们建立了interfaces、application、domain和infrastructure四个一级代码目录，如图所示。</p>
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="ddd-java-ach01.webp"
+                      alt="DDD 分层01" 
+                ></p>
+<div class="note-large notel-green"><div class="notel-title"><p>这些代码目录的职能</p>
+</div><div class="notel-content"><ul>
+<li><code>interfaces（用户接口层）</code>：它主要存放用户接口层与前端应用交互、数据转换和交互相关的代码。前端应用通过这一层的接口，从应用服务获取前端展现所需的数据。处理前端用户发送的REStful请求，解析用户输入的配置文件，并将数据传递给application层。数据的组装、数据传输格式转换以及facade接口封装等代码都会放在这一层目录里。</li>
+<li><code>application（应用层）</code>：它主要存放与应用层服务组合和编排相关的代码。应用服务向下基于微服务内的领域服务或外部微服务的应用服务，完成服务的组合和编排，向上为用户接口层提供各种应用数据支持服务。应用服务和事件等代码会放在这一层目录里。</li>
+<li><code>domain（领域层）</code>：它主要存放与领域层核心业务逻辑相关的代码。领域层可以包含多个聚合代码包，它们共同实现领域模型的核心业务逻辑。聚合内的聚合根以及实体、方法、值对象、领域服务和事件等相关代码会放在这一层目录里。</li>
+<li><code>infrastructure（基础层）</code>：它主要存放与基础资源服务相关的代码。为其他各层提供的通用技术能力、三方软件包、数据库服务、配置和基础资源服务的代码都会放在这一层目录里。</li>
+</ul>
+ </div></div>
+<h3 id="各层代码目录"><a class="markdownIt-Anchor" href="#各层代码目录"></a> 各层代码目录</h3>
+<p>下面我们一起来看一下用户接口层、应用层、领域层以及基础层各自的二级代码目录结构。</p>
+<h4 id="用户接口层"><a class="markdownIt-Anchor" href="#用户接口层"></a> 用户接口层</h4>
+<p><code>interfaces</code> 目录下的代码目录结构有assembler、dto和facade三类，如图所示。</p>
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="ddd-java-ach02.webp"
+                      alt="interface" 
+                ></p>
+<ul>
+<li><code>assembler</code>：实现DTO与DO领域对象之间的相互转换和数据交换。一般来说，assembler与dto总是同时出现。</li>
+<li><code>dto</code>：它是前端应用数据传输的载体，不实现任何业务逻辑。我们可以面向前端应用将应用层或领域层的DO对象转换为前端需要的DTO对象，从而隐藏领域模型内部领域对象DO；也可以将前端传入的DTO对象转换为应用服务或领域服务所需要的DO对象。</li>
+<li><code>facade</code>：封装应用服务，提供较粗粒度的调用接口，或者将用户请求委派给一个或多个应用服务进行处理。</li>
+</ul>
+<h4 id="应用层"><a class="markdownIt-Anchor" href="#应用层"></a> 应用层</h4>
+<p><code>application</code> 的代码目录结构有 event 和 service 以及 dto，如图所示。</p>
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="ddd-java-ach03.webp"
+                      alt="application" 
+                ></p>
+<ul>
+<li><code>event（事件）</code>：这层目录主要存放事件相关的代码。它包括两个子目录：publish和subscribe。前者主要存放事件发布相关代码，后者主要存放事件订阅相关代码。事件处理相关的核心业务逻辑在领域层实现。<br />
+应用层和领域层都可以进行事件发布。为了实现事件订阅的统一管理，建议你将微服务内所有事件订阅的相关代码都统一放到应用层。事件处理相关的核心业务逻辑实现可以放在领域层。通过应用层调用领域层服务，来实现完整的事件订阅处理流程。</li>
+<li><code>service（应用服务）</code>：这层的服务是应用服务。应用服务会对多个领域服务或其他微服务的应用服务进行封装、编排和组合，对外提供粗粒度的服务。你可以为每个聚合的应用服务设计一个应用服务类。</li>
+<li>另外，在进行跨微服务调用时，部分 DO 对象需要转换成 DTO，所以应用层可能也会有用户接口层的 assembler 和 dto 对象。这时，你可以根据需要增加 assembler 和 dto 代码目录结构。</li>
+</ul>
+<div class="note-large notel-yellow"><div class="notel-title"><p>注意</p>
+</div><div class="notel-content"><p><i class="fa-duotone fa-triangle-exclamation"></i> 对于多表关联的复杂查询，由于这种复杂查询不需要有领域逻辑和业务规则约束，因此不建议将这类复杂查询放在领域层的领域模型中。你可以通过应用层的应用服务采用传统多表关联的SQL查询方式，也可以采用CQRS读写分离的方式完成数据查询操作。</p>
+ </div></div>
+<h4 id="领域层"><a class="markdownIt-Anchor" href="#领域层"></a> 领域层</h4>
+<p><code>domain</code> 下的目录结构是由一个或多个独立的聚合目录构成，每一个聚合是一个独立的业务功能单元，多个聚合共同实现领域模型的核心业务逻辑。</p>
+<p>聚合内的代码模型是标准且统一的，它一般包括entity、event、repository和service四个子目录，如图所示。</p>
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="ddd-java-ach04.webp"
+                      alt="domain" 
+                ></p>
+<ul>
+<li>
+<p><code>aggr（聚合）</code>：它是聚合目录的根目录，你可以根据实际项目的聚合名称来命名，比如将聚合命名为“Person”。</p>
+<p>聚合内实现高内聚的核心领域逻辑，聚合可以独立拆分为微服务，也可以根据领域模型的演变，在不同的微服务之间进行聚合代码重组。</p>
+<p>将聚合所有的代码放在一个目录里的主要目的，不仅是为了业务的高内聚，也是为了未来微服务之间聚合代码重组的便利性。有了清晰的聚合代码边界，你就可以轻松地实现以聚合为单位的微服务拆分和重组。</p>
+<p>聚合之间的松耦合设计和清晰的代码边界，在微服务架构演进中具有非常重要的价值。</p>
+<p>聚合内可以定义聚合根、实体和值对象以及领域服务等领域对象，一般包括以下目录结构。</p>
+</li>
+<li>
+<p><code>entity（实体）</code>：它存放聚合根、实体和值对象等相关代码。实体类中除了业务属性，还有业务行为，也就是实体类中的方法。如果聚合内部实体或值对象比较多，你还可以再增加一级子目录加以区分。</p>
+</li>
+<li>
+<p><code>event（事件）</code>：它存放事件实体以及与事件活动相关的业务逻辑代码。</p>
+</li>
+<li>
+<p><code>service（领域服务）</code>：它存放领域服务、工厂服务等相关代码。一个领域服务是由多个实体组合出来的一段业务逻辑。你可以将聚合内所有领域服务都放在一个领域服务类中。如果有些领域服务的业务逻辑相对复杂，你也可以将一个领域服务设计为一个领域服务类，避免将所有领域服务代码都放在一个领域服务类中而出现代码臃肿的问题。领域服务可以封装多个实体或方法供上层应用服务调用。</p>
+</li>
+<li>
+<p><code>repository（仓储）</code>：它存放仓储服务相关的代码。仓储模式通常包括仓储接口和仓储实现服务。它们一起完成聚合内DO领域对象的持久化，或基于聚合根ID查询，完成聚合内实体和值对象等DO领域对象的数据初始化。另外，仓储目录还会有持久化对象PO，以及持久化实现逻辑相关代码，如DAO等。在仓储设计时有一个重要原则，就是一个聚合只能有一个仓储。</p>
+</li>
+</ul>
+<h4 id="基础层"><a class="markdownIt-Anchor" href="#基础层"></a> 基础层</h4>
+<p><code>infrastructure</code> 的代码目录结构有config和util两个子目录，如图所示。</p>
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="ddd-java-ach05.webp"
+                      alt="infrastructure" 
+                ></p>
+<ul>
+<li><code>config</code>：主要存放配置相关代码。</li>
+<li><code>util</code>：主要存放平台、开发框架、消息、数据库、缓存、文件、总线、网关、第三方类库和通用算法等基础代码。</li>
+</ul>
+<div class="note-large notel-green"><div class="notel-title"><p>说明</p>
+</div><div class="notel-content"><p>可以为不同的资源类别建立不同的子目录。如 Redis、MySQL、MQ 等。</p>
+ </div></div>
+<h2 id="总结"><a class="markdownIt-Anchor" href="#总结"></a> 总结</h2>
+<p>DDD 分层架构是一种以 DDD 为基础的软件架构设计，将系统按照职责进行分层，以实现易于维护、易于测试和易于扩展的特性。其实现需要对领域模型进行设计、编写应用服务、实现基础设施，并采用松散耦合的方式进行分层架构之间的通信。DDD 分层架构是一种优秀的软件架构设计方法，可以帮助开发者更好地处理业务逻辑，提高代码的可维护性和可扩展性。</p>
+]]></content>
+      <categories>
+        <category>DDD</category>
+        <category>基础原理</category>
+      </categories>
+      <tags>
+        <tag>DDD</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>DDD 重要概念</title>
     <url>/posts/e22804d6/</url>
     <content><![CDATA[<p>DDD（Domain Driven Design）是一种软件开发方法论，旨在将业务领域和实现方式相互融合。其核心思想是将复杂的业务领域划分成多个子域，并围绕这些子域进行系统设计和开发。采用DDD能够让开发者更好地理解业务需求，提高软件系统的可靠性和扩展性。</p>
@@ -164,6 +297,77 @@
       </tags>
   </entry>
   <entry>
+    <title>Java17环境配置- MacOS</title>
+    <url>/posts/21377094/</url>
+    <content><![CDATA[<p>Java 17 是一种新版本的Java开发环境，使用 Java 17 进行程序开发时需要在计算机上安装 Java 17 环境。本文将介绍如何在 MacOS 中配置 Java 17环境。</p>
+<h2 id="macos系统中配置java-17环境"><a class="markdownIt-Anchor" href="#macos系统中配置java-17环境"></a> MacOS系统中配置Java 17环境：</h2>
+<h3 id="1-下载java-17安装包"><a class="markdownIt-Anchor" href="#1-下载java-17安装包"></a> 1. 下载Java 17安装包。</h3>
+<p>在<a class="link"   href="https://www.oracle.com/java/technologies/javase/jdk17-archive-downloads.html" >Oracle官网 <i class="fa-regular fa-arrow-up-right-from-square fa-sm"></i></a>上下载 Java 17<br />
+的安装包，选择与MacOS系统相应的版本。</p>
+<h3 id="2-安装-java-17"><a class="markdownIt-Anchor" href="#2-安装-java-17"></a> 2. 安装 Java 17。</h3>
+<p>双击下载好的 Java 17 安装包，按照步骤进行安装即可。</p>
+<h3 id="3-配置环境变量"><a class="markdownIt-Anchor" href="#3-配置环境变量"></a> 3. 配置环境变量。</h3>
+<div class="tabs" id="tab-first-unique-01"><ul class="nav-tabs"><li class="tab active"><a class="#first-unique-01-1">macOS 10.15+（zsh）</a></li><li class="tab"><a class="#first-unique-01-2">macOS 10.15之前（bash）</a></li></ul><div class="tab-content"><div class="tab-pane active" id="first-unique-01-1"><ol>
+<li>
+<p>打开<i class="fa-solid fa-rectangle-terminal"></i><code>Terminal</code>（中文叫<code>终端</code>）应用程序。</p>
+</li>
+<li>
+<p>在命令行输入以下命令，编辑<code>~/.zshrc</code>文件：</p>
+<div class="highlight-container" data-rel="Shell"><figure class="iseeu highlight shell"><table><tr><td class="code"><pre><span class="line">nano ~/.zshrc </span><br></pre></td></tr></table></figure></div>
+</li>
+<li>
+<p>在文件的最后，加入如下信息</p>
+<div class="highlight-container" data-rel="Shell"><figure class="iseeu highlight shell"><table><tr><td class="code"><pre><span class="line">export PATH=&quot;/Library/Java/JavaVirtualMachines/jdk-17.jdk/Contents/Home/bin:$PATH&quot;</span><br></pre></td></tr></table></figure></div>
+</li>
+<li>
+<p>按下“Ctrl+X”键，选择“Y”保存文件并按“Enter”键退出编辑。</p>
+</li>
+<li>
+<p>执行以下命令让修改后的环境变量生效：</p>
+<div class="highlight-container" data-rel="Shell"><figure class="iseeu highlight shell"><table><tr><td class="code"><pre><span class="line">source ~/.zshrc</span><br></pre></td></tr></table></figure></div>
+</li>
+<li>
+<p>验证Java 17是否配置成功。</p>
+<div class="highlight-container" data-rel="Shell"><figure class="iseeu highlight shell"><table><tr><td class="code"><pre><span class="line">java -version</span><br><span class="line"></span><br><span class="line">java version &quot;17.0.1&quot; 2021-01-17 LTS</span><br><span class="line">Java(TM) SE Runtime Environment (build 17.0.1+9-LTS-190)</span><br><span class="line">Java HotSpot(TM) 64-Bit Server VM (build 17.0.1+9-LTS-190, mixed mode, sharing)</span><br></pre></td></tr></table></figure></div>
+</li>
+</ol></div><div class="tab-pane" id="first-unique-01-2"><ol>
+<li>
+<p>打开<i class="fa-solid fa-rectangle-terminal"></i><code>Terminal</code>（中文叫<code>终端</code>）应用程序。</p>
+</li>
+<li>
+<p>在命令行输入以下命令，编辑<code>~/.bash_profile</code>文件：</p>
+<div class="highlight-container" data-rel="Shell"><figure class="iseeu highlight shell"><table><tr><td class="code"><pre><span class="line">nano ~/.bash_profile</span><br></pre></td></tr></table></figure></div>
+</li>
+<li>
+<p>在文件的最后，加入如下信息</p>
+<div class="highlight-container" data-rel="Shell"><figure class="iseeu highlight shell"><table><tr><td class="code"><pre><span class="line">export PATH=&quot;/Library/Java/JavaVirtualMachines/jdk-17.jdk/Contents/Home/bin:$PATH&quot;</span><br></pre></td></tr></table></figure></div>
+</li>
+<li>
+<p>按下“Ctrl+X”键，选择“Y”保存文件并按“Enter”键退出编辑。</p>
+</li>
+<li>
+<p>执行以下命令让修改后的环境变量生效：</p>
+<div class="highlight-container" data-rel="Shell"><figure class="iseeu highlight shell"><table><tr><td class="code"><pre><span class="line">source ~/.bash_profile</span><br></pre></td></tr></table></figure></div>
+</li>
+<li>
+<p>验证Java 17是否配置成功。</p>
+<div class="highlight-container" data-rel="Shell"><figure class="iseeu highlight shell"><table><tr><td class="code"><pre><span class="line">java -version</span><br><span class="line"></span><br><span class="line">java version &quot;17.0.1&quot; 2021-01-17 LTS</span><br><span class="line">Java(TM) SE Runtime Environment (build 17.0.1+9-LTS-190)</span><br><span class="line">Java HotSpot(TM) 64-Bit Server VM (build 17.0.1+9-LTS-190, mixed mode, sharing)</span><br></pre></td></tr></table></figure></div>
+</li>
+</ol></div></div></div>
+<h3 id="4-配置完成"><a class="markdownIt-Anchor" href="#4-配置完成"></a> 4. 配置完成</h3>
+<p>经过上诉步骤操作完成后，我们就可以子啊本地计算机进行Java程序的开发了。</p>
+]]></content>
+      <categories>
+        <category>Java</category>
+        <category>Java 基础</category>
+        <category>Java 环境</category>
+      </categories>
+      <tags>
+        <tag>Java</tag>
+        <tag>Java 环境配置</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>ThreadLocal</title>
     <url>/posts/151f44ae/</url>
     <content><![CDATA[<p>在Java多线程编程中，<code>ThreadLocal</code>类是一个非常有用的工具，它能够帮助我们轻松地实现线程本地存储。在本文中，我们将深入探讨<code>ThreadLocal</code>的实现原理和如何正确使用它。</p>
@@ -229,6 +433,262 @@
       <tags>
         <tag>JVM</tag>
         <tag>运行时数据区</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>JVM 垃圾回收算法</title>
+    <url>/posts/94863c7b/</url>
+    <content><![CDATA[<p>与其他语言相比，Java有着自动内存管理的优势，即由JVM自动进行内存分配和垃圾回收处理。本篇博客将介绍JVM中的垃圾回收算法。</p>
+<h2 id="垃圾回收的基本概念"><a class="markdownIt-Anchor" href="#垃圾回收的基本概念"></a> 垃圾回收的基本概念</h2>
+<p>垃圾回收的目的是释放无用的内存空间以供后续的内存分配使用。JVM中使用垃圾回收器（Garbage Collector）来自动实现这个过程。垃圾回收器会在发现内存中存在无用的对象时，将其所占用的内存空间回收。</p>
+<p>为了实现垃圾回收，需要定义什么是“无用对象”。在JVM中，一个对象被判定为无用对象，当且仅当它满足下列条件：</p>
+<ul>
+<li>该对象没有被引用</li>
+<li>该对象的所有引用均已断开</li>
+</ul>
+<p>垃圾回收算法的目标是尽可能快地识别和回收无用对象，同时保持系统性能的稳定。</p>
+<h2 id="常见垃圾回收算法"><a class="markdownIt-Anchor" href="#常见垃圾回收算法"></a> 常见垃圾回收算法</h2>
+<h3 id="标记-清除算法"><a class="markdownIt-Anchor" href="#标记-清除算法"></a> 标记-清除算法</h3>
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://luolanmeet.github.io/jvm-note/content/part2/%E5%9E%83%E5%9C%BE%E6%94%B6%E9%9B%86%E5%99%A8/%E5%9E%83%E5%9C%BE%E6%94%B6%E9%9B%86%E7%AE%97%E6%B3%95/img/%E6%A0%87%E8%AE%B0-%E6%B8%85%E9%99%A4%E7%AE%97%E6%B3%95.png"
+                      alt="标记清楚" 
+                ></p>
+<p><code>标记-清除算法</code>是最基本的垃圾回收算法。它分为两个阶段：标记和清除。</p>
+<p>在标记阶段，垃圾回收器遍历堆中的所有对象，并标记出所有被引用的对象。在清除阶段，垃圾回收器将未被标记的对象所占用的内存空间全部回收。</p>
+<p>这个算法的缺点是会产生碎片，因为回收后的内存空间是不连续的。如果始终使用标记-清除算法，那么随着时间的推移，内存空间中的空洞（即碎片）将越来越多，导致内存分配效率降低。</p>
+<h3 id="复制算法"><a class="markdownIt-Anchor" href="#复制算法"></a> 复制算法</h3>
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://luolanmeet.github.io/jvm-note/content/part2/%E5%9E%83%E5%9C%BE%E6%94%B6%E9%9B%86%E5%99%A8/%E5%9E%83%E5%9C%BE%E6%94%B6%E9%9B%86%E7%AE%97%E6%B3%95/img/%E6%A0%87%E8%AE%B0-%E5%A4%8D%E5%88%B6%E7%AE%97%E6%B3%95.png"
+                      alt="复制算法" 
+                ></p>
+<p><code>复制算法</code>是一种高效的垃圾回收算法。它将堆空间划分为大小相等的两块，每次只使用其中一块。当这一块内存空间用完时，垃圾回收器将已经标记了的存活对象复制到另一块未使用的空间中，然后清除已使用的那一块空间并交换它们的角色。</p>
+<p>复制算法的缺点是需要消耗一半的空间。同时，如果存活对象很多，每次都要进行复制操作，也会带来不小的性能开销。</p>
+<h3 id="标记-整理算法"><a class="markdownIt-Anchor" href="#标记-整理算法"></a> 标记-整理算法</h3>
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://luolanmeet.github.io/jvm-note/content/part2/%E5%9E%83%E5%9C%BE%E6%94%B6%E9%9B%86%E5%99%A8/%E5%9E%83%E5%9C%BE%E6%94%B6%E9%9B%86%E7%AE%97%E6%B3%95/img/%E6%A0%87%E8%AE%B0-%E6%95%B4%E7%90%86%E7%AE%97%E6%B3%95.png"
+                      alt="整理算法" 
+                ></p>
+<p><code>标记-整理算法</code>是对标记-清除算法的改进。它同样分为两个阶段：标记和整理。</p>
+<p>在标记阶段，垃圾回收器遍历堆中的所有对象，并标记出所有被引用的对象。在整理阶段，垃圾回收器将所有存活对象移到堆的一端，然后清除堆的另外一端上的所有无用对象。</p>
+<p>标记-整理算法通过整理过程来解决标记-清除算法产生的碎片问题，使得内存空间变得连续起来。</p>
+<h3 id="三色标记"><a class="markdownIt-Anchor" href="#三色标记"></a> 三色标记</h3>
+<p><code>三色标记</code>是一种用于 Java 虚拟机（JVM）垃圾回收算法的技术，配合<a href="/posts/6a10d920">可达性分析算法</a>实现垃圾的高效、准确的收集。</p>
+<p>在三色标记中，JVM将内存对象分为三个不同的颜色：白色、灰色和黑色。</p>
+<ul>
+<li><code>白色</code>：表示对象尚未被扫描和标记。</li>
+<li><code>灰色</code>：表示对象已经被扫描，但是它引用的其他对象尚未被扫描和标记。</li>
+<li><code>黑色</code>：表示对象已经被扫描和标记，并且它引用的其他对象也已经被扫描和标记。</li>
+</ul>
+<p>JVM 使用三色标记来跟踪哪些对象可以被安全地回收。当 JVM 进行垃圾回收时，它会从根对象开始遍历所有对象，并将它们标记为灰色或黑色。然后，JVM 会清除所有白色对象，因为这些对象没有任何引用。</p>
+<p>在三色标记算法中，灰色的对象表示悬挂的对象，即其引用的对象尚未被处理。如果某个对象的所有引用都已经被扫描和标记，那么它就会被标记为黑色。</p>
+<p>通过使用三色标记算法，JVM 可以更快地确定哪些对象可以被安全地回收，从而提高了应用程序的性能和可靠性。</p>
+<h3 id="分代收集算法"><a class="markdownIt-Anchor" href="#分代收集算法"></a> 分代收集算法</h3>
+<p><code>分代收集算法</code>是目前主流的垃圾回收算法。它根据对象的存活周期把堆区域分为新生代和老年代两个区域。新生代中的对象通常存活时间较短，而老年代中的对象则存活时间较长。不同区域采用不同的垃圾回收算法。</p>
+<p>新生代通常使用复制算法。它把新生代分为Eden区和两个Survivor区，每次只使用Eden区和其中一个Survivor区，将已经标记了的存活对象复制到另一块未使用的Survivor区中，然后清除Eden区和已使用的Survivor区中的无用对象。</p>
+<p>老年代通常使用标记-整理算法。因为老年代中的对象存活时间较长，所以会产生大量的内存碎片。标记-整理算法通过整理过程来解决这个问题。</p>
+<h2 id="总结"><a class="markdownIt-Anchor" href="#总结"></a> 总结</h2>
+<p>JVM垃圾回收算法包括标记-清除算法、复制算法、标记-整理算法和分代收集算法等。不同的垃圾回收算法适用于不同的场景，需要根据具体情况进行选择。对于Java程序开发人员来说，理解JVM垃圾回收算法对于优化程序性能至关重要。</p>
+]]></content>
+      <categories>
+        <category>Java</category>
+        <category>JVM</category>
+        <category>GC</category>
+      </categories>
+      <tags>
+        <tag>Java</tag>
+        <tag>JVM</tag>
+        <tag>GC</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>CMS 垃圾回收器</title>
+    <url>/posts/d20aa128/</url>
+    <content><![CDATA[<p>CMS 的全称为 Concurrent Mark Sweep（并发标记清除），是 <code>JDK1.5</code> 版本之后内置的一种垃圾回收器。与其他垃圾回收器不同，CMS 的目标是实现最短的GC停顿时间，即使在大型堆内存的情况下也能保证应用的响应速度和性能。</p>
+<div class="note-large notel-yellow"><div class="notel-title"><p>注意</p>
+</div><div class="notel-content"><p>随着JDK版本的不断升级，从JDK 9开始，CMS收集器已经被标记为“即将被弃用”（Deprecated），而在JDK 14中彻底被删除。原因是CMS收集器存在以下问题：</p>
+<ol>
+<li>空间碎片：由于CMS收集器只能对老年代进行回收，所以会产生大量的空间碎片。这会导致后续的内存分配操作变得困难，甚至可能出现 OutOfMemoryError 错误。</li>
+<li>CPU占用：由于CMS收集器需要与应用程序线程并发工作，所以会占用一些CPU资源，影响应用程序的性能。</li>
+<li>内存泄漏：如果CMS收集器无法回收所有的垃圾，就会导致内存泄漏。</li>
+</ol>
+<p>因此，<a href="/posts/bc8ac7bc/"><code>G1收集器</code></a>逐渐成为了JDK的默认垃圾收集器。G1收集器采用分代回收的思想，可以更好地处理大量对象的分配和释放，避免了CMS收集器的一些缺点。</p>
+ </div></div>
+<h2 id="区域划分"><a class="markdownIt-Anchor" href="#区域划分"></a> 区域划分</h2>
+<p>在进行垃圾回收时，它将<span style="border-bottom:2px solid yellow">堆内存</span>划分为多个区域，在不影响应用程序执行的情况下进行垃圾回收。</p>
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="cmsmemory.webp"
+                      alt="cms memory" 
+                ></p>
+<div class="note-large notel-green"><div class="notel-title"><p>堆内存的区域划分</p>
+</div><div class="notel-content"><ul>
+<li><code>新生代</code>：包括Eden区和两个Survivor区（From Space和To Space）。当新对象被创建时，它们会首先被分配到Eden区。当Eden区满时，会触发Minor GC。在Minor GC过程中，Eden区和Survivor区中的存活对象会被复制到另一个Survivor区中，并经过一系列复制和清理操作后，存活的对象会被复制到另一个Survivor区中。每次Minor GC后，From Space和To Space会互换角色。（Eden 区 和 两个 Survivor区的大小比例：8:1:1，可以使用 <code>-XX:SurvivorRatio</code> 惊醒调整，默认值为 8）</li>
+<li><code>老年代</code>：存放长时间存活的对象。当Old区满时，会触发Full GC。Full GC会暂停整个JVM，对全局进行垃圾回收。由于Full GC需要暂停整个JVM，因此CMS垃圾回收器总是尽可能地减少Full GC的发生次数。</li>
+</ul>
+ </div></div>
+<h2 id="工作原理"><a class="markdownIt-Anchor" href="#工作原理"></a> 工作原理</h2>
+<p>CMS垃圾回收器采用了“标记-清除”算法，其主要过程如下：</p>
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://icefrozen.github.io/article/java-cms-gc/1552636737931java-cms-gc_.png"
+                      alt="cms" 
+                ></p>
+<ol>
+<li><code>初始标记</code>：暂停所有应用线程，必须短暂暂停以达到<a href="/posts/5a9ba959/">安全点</a>；标记出所有根对象以及直接与其相关的对象；</li>
+<li><code>并发标记</code>：恢复所有应用线程，同时并发地遍历老年代中的所有对象进行标记；</li>
+<li><code>重新标记</code>：暂停所有应用线程，必须短暂暂停以达到<a href="/posts/5a9ba959/">安全点</a>；处理并发标记期间因用户程序继续执行而被遗漏的新生代对象；</li>
+<li><code>并发清除</code>：同时清除标记完成的所有不再使用的对象。</li>
+</ol>
+<h2 id="优缺点"><a class="markdownIt-Anchor" href="#优缺点"></a> 优缺点</h2>
+<div class="note-large notel-green"><div class="notel-title"><p>优点</p>
+</div><div class="notel-content"><ol>
+<li>垃圾回收期间最大程度上减少了应用程序的停顿时间；</li>
+<li>适用于大型堆内存的JVM，CMS在回收大对象时非常高效；</li>
+<li>消耗的CPU资源较少；</li>
+</ol>
+ </div></div>
+<div class="note-large notel-red"><div class="notel-title"><p>缺点</p>
+</div><div class="notel-content"><ol>
+<li>运作过程中需要占用一定的内存空间以记录清除信息；</li>
+<li>在进行并发标记和清除的过程中，由于用户线程和垃圾回收线程交错执行，所以会对CPU产生一定压力；</li>
+<li>整个运作过程相对复杂，实现难度较大。</li>
+</ol>
+ </div></div>
+<h2 id="使用建议"><a class="markdownIt-Anchor" href="#使用建议"></a> 使用建议</h2>
+<ol>
+<li>应用程序必须运行在64位的JVM上；</li>
+<li>不推荐将老年代的内存分配过小，否则可能频繁触发Full GC；</li>
+<li>避免在快照时间段内生成大量的对象，否则可能导致CMS无法顺利完成垃圾回收操作。</li>
+</ol>
+<h2 id="结论"><a class="markdownIt-Anchor" href="#结论"></a> 结论</h2>
+<p>G1（Garbage First）垃圾收集器是一种用于管理Java虚拟机内存的垃圾回收器，它将堆内存分成大小相等的区域，并根据实际情况自适应调整垃圾回收策略，从而避免全局暂停，提高了响应时间和吞吐量。G1垃圾收集器具有分代收集、并发收集、可预测性和空间利用率等优点，但同时也存在初始标记和最终标记需要STW、物理内存占用等缺点。</p>
+]]></content>
+      <categories>
+        <category>Java</category>
+        <category>JVM</category>
+        <category>GC</category>
+      </categories>
+      <tags>
+        <tag>Java</tag>
+        <tag>JVM</tag>
+        <tag>GC</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>G1 垃圾收集器</title>
+    <url>/posts/bc8ac7bc/</url>
+    <content><![CDATA[<p>G1 垃圾收集器是一种新型的垃圾收集器，专门针对大堆内存的应用程序进行优化，可以更好地处理大量对象的分配和释放，减少停顿时间，并帮助应用程序提高性能。G1 收集器是在 JDK 7 update 4 版本中首次推出的，在 Java 9 中正式成为默认的垃圾收集器。通过启动参数&quot;<code>-XX:+UseG1GC</code>&quot;来使用 G1 垃圾收集器。</p>
+<h2 id="区域划分"><a class="markdownIt-Anchor" href="#区域划分"></a> 区域划分</h2>
+<p><code>G1（Garbage-First）</code>垃圾收集器，将 Java 堆内存划分为多个大小相等的区域（Region），并对这些区域进行垃圾回收。每个区域的大小通常是1MB到32MB之间，并且可以通过JVM参数 <code>-XX:G1HeapRegionSize</code> 进行调整，默认为 1M。</p>
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://imgconvert.csdnimg.cn/aHR0cHM6Ly91cGxvYWQtaW1hZ2VzLmppYW5zaHUuaW8vdXBsb2FkX2ltYWdlcy82MjcxMzc2LWNkMDIwOWM0YTNiZWRiNzUucG5n?x-oss-process=image/format,png"
+                      alt="" 
+                ></p>
+<div class="note-large notel-green"><div class="notel-title"><p>堆内存的区域划分</p>
+</div><div class="notel-content"><ul>
+<li>Eden 区：当新对象被创建时，它们会首先被分配到Eden区。Eden区是G1垃圾收集器的年轻代区域。默认情况下，Eden区的大小占整个Java堆内存的5%到10%。</li>
+<li>存活区（Survivor区）：与 CMS 垃圾收集器类似，G1 垃圾收集器还使用了两个 Survivor 区，并且 Survivor 区的大小与 Eden 区的大小相等。当执行年轻代垃圾回收时，存活的对象会被移动到 Survivor 区。默认情况下，Survivo r区的大小占整个 Java 堆内存的5%到10%。</li>
+<li>Old 区：存放长时间存活的对象。G1 垃圾收集器采用了“增量式整理”算法来避免 Full GC 带来的停顿时间过长。默认情况下，Old 区的大小占整个 Java 堆内存的60%到80%。</li>
+<li>Humongous 区：专门用来存储大对象，如果一个对象的大小超过了一个区域的 50%，那么这个对象将直接被分配到 Humongous 区，而不是被分配到 Eden区或 Old 区。对于 Humongous 对象，G1 垃圾收集器将使用“复制”算法进行垃圾回收。</li>
+</ul>
+ </div></div>
+<h2 id="工作原理"><a class="markdownIt-Anchor" href="#工作原理"></a> 工作原理</h2>
+<p>G1 垃圾收集器采用“复制和标记整理”两种算法来回收内存，主要工作流程：</p>
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://imgconvert.csdnimg.cn/aHR0cDovL3BpY3R1cmUudGp0dWxvbmcudG9wL0NNUyVFNiU5NCVCNiVFOSU5QiU4NiVFNSU5OSVBOC5qcGc?x-oss-process=image/format,png"
+                      alt="G1" 
+                ></p>
+<ol>
+<li>初始标记阶段：在此阶段中，G1收集器会标记所有被根对象直接关联的对象，并记录它们的位置和状态。</li>
+<li>并发标记阶段：在此阶段中，G1收集器会并发地处理堆中的对象，找出所有与标记对象直接或间接关联的对象，并标记它们。</li>
+<li>最终标记阶段：在此阶段中，G1收集器会重新暂停应用程序，完成对并发标记过程中可能遗漏的标记的补充，以确保所有存活的对象都已被标记。</li>
+<li>筛选阶段：在此阶段中，G1收集器会基于可回收的内存大小和回收时间预算来确定哪些区域需要被回收，并将这些区域加入回收集。</li>
+<li>清理阶段：在此阶段中，G1收集器会清理回收集中的区域，并将其中的内存返回给Java虚拟机，使其可以再次使用。</li>
+</ol>
+<p>总的来说，G1垃圾收集器通过将堆内存分成多个大小相等的区域，将大型堆的垃圾收集任务分成多个小的垃圾收集任务，从而避免了全局暂停，具有更高的可预测性和可控性。同时，G1垃圾收集器也可以根据应用程序产生的垃圾量自适应调整阶段时间，提高了垃圾回收的效率。</p>
+<h2 id="优缺点"><a class="markdownIt-Anchor" href="#优缺点"></a> 优缺点</h2>
+<div class="note-large notel-green"><div class="notel-title"><p>优点</p>
+</div><div class="notel-content"><ol>
+<li>分代收集：G1垃圾收集器将堆内存分为多个大小相等的区域，并根据它们的特征来进行垃圾回收。这样可以避免全局暂停，提高了响应时间和吞吐量。（<span style="border-bottom: 2px solid green">G1 收集器也引入了&quot;<code>混合模式</code>&quot;的回收策略，将Young GC和部分Full GC结合起来，从而达到更好的性能。</span>）</li>
+<li>并发收集：在并发标记阶段，G1垃圾收集器可以与应用程序并发执行。这意味着应用程序可以在垃圾回收期间继续运行，减少了暂停时间，提高了系统的可用性。</li>
+<li>可预测性：G1垃圾收集器会自动调整垃圾回收策略，以满足应用程序需要的响应时间和吞吐量。这使得应用程序的性能更加稳定和可预测。</li>
+<li>空间利用率：G1垃圾收集器可以更好地利用堆空间，减少了碎片化问题，从而可以更有效地使用可用内存。</li>
+</ol>
+ </div></div>
+<div class="note-large notel-red"><div class="notel-title"><p>缺点</p>
+</div><div class="notel-content"><ol>
+<li>初始标记和最终标记仍需STW: 尽管 G1 收集器的大部分工作都是并发的，但在 JVM 执行初始标记和最终标记时仍需要暂停应用程序。这一点可能会导致应用程序在某些情况下出现停顿。</li>
+<li>物理内存占用：G1收集器需要维护大量的数据结构来跟踪堆内存的使用情况，这会对物理内存造成一定的负担。</li>
+<li>相比CMS，在GC过程中会占用更多的CPU时间。</li>
+<li>长时间运行的应用可能会出现某些性能问题，因为G1垃圾收集器不能保证我们的操作不会访问已经被回收的对象（也就是说，它不能保证与CMS相同的延迟）。</li>
+</ol>
+ </div></div>
+<h2 id="使用建议"><a class="markdownIt-Anchor" href="#使用建议"></a> 使用建议</h2>
+<ol>
+<li>长期运行的应用程序：对于需要长时间运行的应用程序，使用G1垃圾收集器可以减少暂停时间并提高吞吐量。这是因为G1收集器可以将大型堆分成多个大小相等的区域，并且只回收那些空间最多的区域。</li>
+<li>大型内存项目：由于G1收集器具有更好的内存利用率和更低的碎片化，因此适用于需要大量内存的项目。</li>
+<li>多核处理器：G1收集器在多核处理器上的性能表现更佳。因为它可以以并发方式执行垃圾回收操作，从而使每个核处理器都可以同时处理GC操作和应用程序代码。</li>
+<li>稳定的堆大小：G1收集器的优化需要稳定的堆大小才能发挥最大效益，建议将Xmx值设置为整个堆的90%到95%。</li>
+<li>谨慎使用-XX:MaxGCPauseMillis参数：G1的目标是进行可控制、可预测的垃圾回收，而不是无限制地降低停顿时间。设置过低的 MaxGCPauseMillis 值会导致过多的垃圾回收操作和资源消耗，从而降低垃圾回收的效率和性能。</li>
+<li>监控和调整：使用G1垃圾收集器需要监控应用程序的性能，并根据实际情况进行调整。可以通过JVM参数和工具来调整G1收集器的行为，以达到最佳性能。</li>
+</ol>
+<h2 id="结论"><a class="markdownIt-Anchor" href="#结论"></a> 结论</h2>
+<p>G1 垃圾收集器是一种新型的垃圾收集器，专门针对大堆内存的应用程序进行优化，可以更好地处理大量对象的分配和释放，减少停顿时间，并帮助应用程序提高性能。</p>
+]]></content>
+      <categories>
+        <category>Java</category>
+        <category>JVM</category>
+        <category>GC</category>
+      </categories>
+      <tags>
+        <tag>Java</tag>
+        <tag>JVM</tag>
+        <tag>GC</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>JVM 安全点</title>
+    <url>/posts/5a9ba959/</url>
+    <content><![CDATA[<p>JVM的安全点（Safepoint）是JVM执行垃圾回收时的一个重要概念。<span style="border-bottom:2px solid green;">在JVM进行垃圾回收操作时，需要保证堆的一致性，因此需要挂起所有运行Java代码的线程并记录它们的状态。这些特定位置就被称为 <em><strong><code>安全点</code></strong></em>。</span>&gt;</p>
+<h2 id="安全点的作用"><a class="markdownIt-Anchor" href="#安全点的作用"></a> 安全点的作用</h2>
+<p>当一个线程处于安全点时，JVM可以确保该线程不会同时访问堆内存中的对象。如果不挂起所有线程，那么这些线程可能正在访问堆内存中的对象。如果同时执行垃圾回收，则这些线程可能同时修改这些对象，导致数据错误或不一致。因此，在进行垃圾回收操作时，必须等待所有线程到达安全点，并将它们挂起，然后才能继续执行垃圾回收操作。</p>
+<h2 id="安全点的触发条件"><a class="markdownIt-Anchor" href="#安全点的触发条件"></a> 安全点的触发条件</h2>
+<div class="note-large notel-yellow"><div class="notel-title"><p>当一个线程处于安全点时，它必须满足以下条件之一</p>
+</div><div class="notel-content"><ol>
+<li>执行Java方法的字节码指令结束或异常抛出；</li>
+<li>执行JNI（Java Native Interface）方法的字节码指令结束或异常抛出；</li>
+<li>执行VM操作（如Thread.sleep）的字节码指令结束或异常抛出。</li>
+</ol>
+ </div></div>
+<p>这意味着当一个线程处于安全点时，它一定是上述情况之一。只有在这些情况下，线程才被挂起进行垃圾回收操作。</p>
+<h2 id="安全点的影响"><a class="markdownIt-Anchor" href="#安全点的影响"></a> 安全点的影响</h2>
+<p>当JVM进行垃圾回收操作时，必须等待所有线程到达安全点，并将它们挂起，然后才能继续执行垃圾回收操作。这种等待时间可能会导致一些线程长时间等待，从而导致应用程序响应时间变慢。</p>
+<p>为了减少这种情况的发生，JVM提供了多种垃圾回收算法和垃圾回收器，以便在特定的场景中选择最佳的垃圾回收策略。例如CMS（Concurrent Mark Sweep）垃圾回收器就是在并发标记阶段尽可能减少安全点的数量的一种垃圾回收器。</p>
+<p>此外，我们也可以通过调整线程数、线程优先级、堆内存大小等措施来减少安全点的影响。</p>
+<h2 id="总结"><a class="markdownIt-Anchor" href="#总结"></a> 总结</h2>
+<p>安全点是一个重要的概念，在JVM进行垃圾回收操作时扮演着至关重要的角色。了解安全点的作用、触发条件和影响，对于Java开发者来说是非常重要的。在实际开发中，我们需要根据应用场景选择合适的垃圾回收算法和垃圾回收器，并采取相应的措施来减少安全点的影响，以使应用程序能够达到更好的性能和响应速度。</p>
+]]></content>
+      <categories>
+        <category>Java</category>
+        <category>JVM</category>
+        <category>GC</category>
+      </categories>
+      <tags>
+        <tag>Java</tag>
+        <tag>JVM</tag>
+        <tag>GC</tag>
       </tags>
   </entry>
   <entry>
@@ -417,262 +877,6 @@
       </tags>
   </entry>
   <entry>
-    <title>JVM 垃圾回收算法</title>
-    <url>/posts/94863c7b/</url>
-    <content><![CDATA[<p>与其他语言相比，Java有着自动内存管理的优势，即由JVM自动进行内存分配和垃圾回收处理。本篇博客将介绍JVM中的垃圾回收算法。</p>
-<h2 id="垃圾回收的基本概念"><a class="markdownIt-Anchor" href="#垃圾回收的基本概念"></a> 垃圾回收的基本概念</h2>
-<p>垃圾回收的目的是释放无用的内存空间以供后续的内存分配使用。JVM中使用垃圾回收器（Garbage Collector）来自动实现这个过程。垃圾回收器会在发现内存中存在无用的对象时，将其所占用的内存空间回收。</p>
-<p>为了实现垃圾回收，需要定义什么是“无用对象”。在JVM中，一个对象被判定为无用对象，当且仅当它满足下列条件：</p>
-<ul>
-<li>该对象没有被引用</li>
-<li>该对象的所有引用均已断开</li>
-</ul>
-<p>垃圾回收算法的目标是尽可能快地识别和回收无用对象，同时保持系统性能的稳定。</p>
-<h2 id="常见垃圾回收算法"><a class="markdownIt-Anchor" href="#常见垃圾回收算法"></a> 常见垃圾回收算法</h2>
-<h3 id="标记-清除算法"><a class="markdownIt-Anchor" href="#标记-清除算法"></a> 标记-清除算法</h3>
-<p><img  
-                     lazyload
-                     src="/images/loading.svg"
-                     data-src="https://luolanmeet.github.io/jvm-note/content/part2/%E5%9E%83%E5%9C%BE%E6%94%B6%E9%9B%86%E5%99%A8/%E5%9E%83%E5%9C%BE%E6%94%B6%E9%9B%86%E7%AE%97%E6%B3%95/img/%E6%A0%87%E8%AE%B0-%E6%B8%85%E9%99%A4%E7%AE%97%E6%B3%95.png"
-                      alt="标记清楚" 
-                ></p>
-<p><code>标记-清除算法</code>是最基本的垃圾回收算法。它分为两个阶段：标记和清除。</p>
-<p>在标记阶段，垃圾回收器遍历堆中的所有对象，并标记出所有被引用的对象。在清除阶段，垃圾回收器将未被标记的对象所占用的内存空间全部回收。</p>
-<p>这个算法的缺点是会产生碎片，因为回收后的内存空间是不连续的。如果始终使用标记-清除算法，那么随着时间的推移，内存空间中的空洞（即碎片）将越来越多，导致内存分配效率降低。</p>
-<h3 id="复制算法"><a class="markdownIt-Anchor" href="#复制算法"></a> 复制算法</h3>
-<p><img  
-                     lazyload
-                     src="/images/loading.svg"
-                     data-src="https://luolanmeet.github.io/jvm-note/content/part2/%E5%9E%83%E5%9C%BE%E6%94%B6%E9%9B%86%E5%99%A8/%E5%9E%83%E5%9C%BE%E6%94%B6%E9%9B%86%E7%AE%97%E6%B3%95/img/%E6%A0%87%E8%AE%B0-%E5%A4%8D%E5%88%B6%E7%AE%97%E6%B3%95.png"
-                      alt="复制算法" 
-                ></p>
-<p><code>复制算法</code>是一种高效的垃圾回收算法。它将堆空间划分为大小相等的两块，每次只使用其中一块。当这一块内存空间用完时，垃圾回收器将已经标记了的存活对象复制到另一块未使用的空间中，然后清除已使用的那一块空间并交换它们的角色。</p>
-<p>复制算法的缺点是需要消耗一半的空间。同时，如果存活对象很多，每次都要进行复制操作，也会带来不小的性能开销。</p>
-<h3 id="标记-整理算法"><a class="markdownIt-Anchor" href="#标记-整理算法"></a> 标记-整理算法</h3>
-<p><img  
-                     lazyload
-                     src="/images/loading.svg"
-                     data-src="https://luolanmeet.github.io/jvm-note/content/part2/%E5%9E%83%E5%9C%BE%E6%94%B6%E9%9B%86%E5%99%A8/%E5%9E%83%E5%9C%BE%E6%94%B6%E9%9B%86%E7%AE%97%E6%B3%95/img/%E6%A0%87%E8%AE%B0-%E6%95%B4%E7%90%86%E7%AE%97%E6%B3%95.png"
-                      alt="整理算法" 
-                ></p>
-<p><code>标记-整理算法</code>是对标记-清除算法的改进。它同样分为两个阶段：标记和整理。</p>
-<p>在标记阶段，垃圾回收器遍历堆中的所有对象，并标记出所有被引用的对象。在整理阶段，垃圾回收器将所有存活对象移到堆的一端，然后清除堆的另外一端上的所有无用对象。</p>
-<p>标记-整理算法通过整理过程来解决标记-清除算法产生的碎片问题，使得内存空间变得连续起来。</p>
-<h3 id="三色标记"><a class="markdownIt-Anchor" href="#三色标记"></a> 三色标记</h3>
-<p><code>三色标记</code>是一种用于 Java 虚拟机（JVM）垃圾回收算法的技术，配合<a href="/posts/6a10d920">可达性分析算法</a>实现垃圾的高效、准确的收集。</p>
-<p>在三色标记中，JVM将内存对象分为三个不同的颜色：白色、灰色和黑色。</p>
-<ul>
-<li><code>白色</code>：表示对象尚未被扫描和标记。</li>
-<li><code>灰色</code>：表示对象已经被扫描，但是它引用的其他对象尚未被扫描和标记。</li>
-<li><code>黑色</code>：表示对象已经被扫描和标记，并且它引用的其他对象也已经被扫描和标记。</li>
-</ul>
-<p>JVM 使用三色标记来跟踪哪些对象可以被安全地回收。当 JVM 进行垃圾回收时，它会从根对象开始遍历所有对象，并将它们标记为灰色或黑色。然后，JVM 会清除所有白色对象，因为这些对象没有任何引用。</p>
-<p>在三色标记算法中，灰色的对象表示悬挂的对象，即其引用的对象尚未被处理。如果某个对象的所有引用都已经被扫描和标记，那么它就会被标记为黑色。</p>
-<p>通过使用三色标记算法，JVM 可以更快地确定哪些对象可以被安全地回收，从而提高了应用程序的性能和可靠性。</p>
-<h3 id="分代收集算法"><a class="markdownIt-Anchor" href="#分代收集算法"></a> 分代收集算法</h3>
-<p><code>分代收集算法</code>是目前主流的垃圾回收算法。它根据对象的存活周期把堆区域分为新生代和老年代两个区域。新生代中的对象通常存活时间较短，而老年代中的对象则存活时间较长。不同区域采用不同的垃圾回收算法。</p>
-<p>新生代通常使用复制算法。它把新生代分为Eden区和两个Survivor区，每次只使用Eden区和其中一个Survivor区，将已经标记了的存活对象复制到另一块未使用的Survivor区中，然后清除Eden区和已使用的Survivor区中的无用对象。</p>
-<p>老年代通常使用标记-整理算法。因为老年代中的对象存活时间较长，所以会产生大量的内存碎片。标记-整理算法通过整理过程来解决这个问题。</p>
-<h2 id="总结"><a class="markdownIt-Anchor" href="#总结"></a> 总结</h2>
-<p>JVM垃圾回收算法包括标记-清除算法、复制算法、标记-整理算法和分代收集算法等。不同的垃圾回收算法适用于不同的场景，需要根据具体情况进行选择。对于Java程序开发人员来说，理解JVM垃圾回收算法对于优化程序性能至关重要。</p>
-]]></content>
-      <categories>
-        <category>Java</category>
-        <category>JVM</category>
-        <category>GC</category>
-      </categories>
-      <tags>
-        <tag>Java</tag>
-        <tag>JVM</tag>
-        <tag>GC</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>G1 垃圾收集器</title>
-    <url>/posts/bc8ac7bc/</url>
-    <content><![CDATA[<p>G1 垃圾收集器是一种新型的垃圾收集器，专门针对大堆内存的应用程序进行优化，可以更好地处理大量对象的分配和释放，减少停顿时间，并帮助应用程序提高性能。G1 收集器是在 JDK 7 update 4 版本中首次推出的，在 Java 9 中正式成为默认的垃圾收集器。通过启动参数&quot;<code>-XX:+UseG1GC</code>&quot;来使用 G1 垃圾收集器。</p>
-<h2 id="区域划分"><a class="markdownIt-Anchor" href="#区域划分"></a> 区域划分</h2>
-<p><code>G1（Garbage-First）</code>垃圾收集器，将 Java 堆内存划分为多个大小相等的区域（Region），并对这些区域进行垃圾回收。每个区域的大小通常是1MB到32MB之间，并且可以通过JVM参数 <code>-XX:G1HeapRegionSize</code> 进行调整，默认为 1M。</p>
-<p><img  
-                     lazyload
-                     src="/images/loading.svg"
-                     data-src="https://imgconvert.csdnimg.cn/aHR0cHM6Ly91cGxvYWQtaW1hZ2VzLmppYW5zaHUuaW8vdXBsb2FkX2ltYWdlcy82MjcxMzc2LWNkMDIwOWM0YTNiZWRiNzUucG5n?x-oss-process=image/format,png"
-                      alt="" 
-                ></p>
-<div class="note-large notel-green"><div class="notel-title"><p>堆内存的区域划分</p>
-</div><div class="notel-content"><ul>
-<li>Eden 区：当新对象被创建时，它们会首先被分配到Eden区。Eden区是G1垃圾收集器的年轻代区域。默认情况下，Eden区的大小占整个Java堆内存的5%到10%。</li>
-<li>存活区（Survivor区）：与 CMS 垃圾收集器类似，G1 垃圾收集器还使用了两个 Survivor 区，并且 Survivor 区的大小与 Eden 区的大小相等。当执行年轻代垃圾回收时，存活的对象会被移动到 Survivor 区。默认情况下，Survivo r区的大小占整个 Java 堆内存的5%到10%。</li>
-<li>Old 区：存放长时间存活的对象。G1 垃圾收集器采用了“增量式整理”算法来避免 Full GC 带来的停顿时间过长。默认情况下，Old 区的大小占整个 Java 堆内存的60%到80%。</li>
-<li>Humongous 区：专门用来存储大对象，如果一个对象的大小超过了一个区域的 50%，那么这个对象将直接被分配到 Humongous 区，而不是被分配到 Eden区或 Old 区。对于 Humongous 对象，G1 垃圾收集器将使用“复制”算法进行垃圾回收。</li>
-</ul>
- </div></div>
-<h2 id="工作原理"><a class="markdownIt-Anchor" href="#工作原理"></a> 工作原理</h2>
-<p>G1 垃圾收集器采用“复制和标记整理”两种算法来回收内存，主要工作流程：</p>
-<p><img  
-                     lazyload
-                     src="/images/loading.svg"
-                     data-src="https://imgconvert.csdnimg.cn/aHR0cDovL3BpY3R1cmUudGp0dWxvbmcudG9wL0NNUyVFNiU5NCVCNiVFOSU5QiU4NiVFNSU5OSVBOC5qcGc?x-oss-process=image/format,png"
-                      alt="G1" 
-                ></p>
-<ol>
-<li>初始标记阶段：在此阶段中，G1收集器会标记所有被根对象直接关联的对象，并记录它们的位置和状态。</li>
-<li>并发标记阶段：在此阶段中，G1收集器会并发地处理堆中的对象，找出所有与标记对象直接或间接关联的对象，并标记它们。</li>
-<li>最终标记阶段：在此阶段中，G1收集器会重新暂停应用程序，完成对并发标记过程中可能遗漏的标记的补充，以确保所有存活的对象都已被标记。</li>
-<li>筛选阶段：在此阶段中，G1收集器会基于可回收的内存大小和回收时间预算来确定哪些区域需要被回收，并将这些区域加入回收集。</li>
-<li>清理阶段：在此阶段中，G1收集器会清理回收集中的区域，并将其中的内存返回给Java虚拟机，使其可以再次使用。</li>
-</ol>
-<p>总的来说，G1垃圾收集器通过将堆内存分成多个大小相等的区域，将大型堆的垃圾收集任务分成多个小的垃圾收集任务，从而避免了全局暂停，具有更高的可预测性和可控性。同时，G1垃圾收集器也可以根据应用程序产生的垃圾量自适应调整阶段时间，提高了垃圾回收的效率。</p>
-<h2 id="优缺点"><a class="markdownIt-Anchor" href="#优缺点"></a> 优缺点</h2>
-<div class="note-large notel-green"><div class="notel-title"><p>优点</p>
-</div><div class="notel-content"><ol>
-<li>分代收集：G1垃圾收集器将堆内存分为多个大小相等的区域，并根据它们的特征来进行垃圾回收。这样可以避免全局暂停，提高了响应时间和吞吐量。（<span style="border-bottom: 2px solid green">G1 收集器也引入了&quot;<code>混合模式</code>&quot;的回收策略，将Young GC和部分Full GC结合起来，从而达到更好的性能。</span>）</li>
-<li>并发收集：在并发标记阶段，G1垃圾收集器可以与应用程序并发执行。这意味着应用程序可以在垃圾回收期间继续运行，减少了暂停时间，提高了系统的可用性。</li>
-<li>可预测性：G1垃圾收集器会自动调整垃圾回收策略，以满足应用程序需要的响应时间和吞吐量。这使得应用程序的性能更加稳定和可预测。</li>
-<li>空间利用率：G1垃圾收集器可以更好地利用堆空间，减少了碎片化问题，从而可以更有效地使用可用内存。</li>
-</ol>
- </div></div>
-<div class="note-large notel-red"><div class="notel-title"><p>缺点</p>
-</div><div class="notel-content"><ol>
-<li>初始标记和最终标记仍需STW: 尽管 G1 收集器的大部分工作都是并发的，但在 JVM 执行初始标记和最终标记时仍需要暂停应用程序。这一点可能会导致应用程序在某些情况下出现停顿。</li>
-<li>物理内存占用：G1收集器需要维护大量的数据结构来跟踪堆内存的使用情况，这会对物理内存造成一定的负担。</li>
-<li>相比CMS，在GC过程中会占用更多的CPU时间。</li>
-<li>长时间运行的应用可能会出现某些性能问题，因为G1垃圾收集器不能保证我们的操作不会访问已经被回收的对象（也就是说，它不能保证与CMS相同的延迟）。</li>
-</ol>
- </div></div>
-<h2 id="使用建议"><a class="markdownIt-Anchor" href="#使用建议"></a> 使用建议</h2>
-<ol>
-<li>长期运行的应用程序：对于需要长时间运行的应用程序，使用G1垃圾收集器可以减少暂停时间并提高吞吐量。这是因为G1收集器可以将大型堆分成多个大小相等的区域，并且只回收那些空间最多的区域。</li>
-<li>大型内存项目：由于G1收集器具有更好的内存利用率和更低的碎片化，因此适用于需要大量内存的项目。</li>
-<li>多核处理器：G1收集器在多核处理器上的性能表现更佳。因为它可以以并发方式执行垃圾回收操作，从而使每个核处理器都可以同时处理GC操作和应用程序代码。</li>
-<li>稳定的堆大小：G1收集器的优化需要稳定的堆大小才能发挥最大效益，建议将Xmx值设置为整个堆的90%到95%。</li>
-<li>谨慎使用-XX:MaxGCPauseMillis参数：G1的目标是进行可控制、可预测的垃圾回收，而不是无限制地降低停顿时间。设置过低的 MaxGCPauseMillis 值会导致过多的垃圾回收操作和资源消耗，从而降低垃圾回收的效率和性能。</li>
-<li>监控和调整：使用G1垃圾收集器需要监控应用程序的性能，并根据实际情况进行调整。可以通过JVM参数和工具来调整G1收集器的行为，以达到最佳性能。</li>
-</ol>
-<h2 id="结论"><a class="markdownIt-Anchor" href="#结论"></a> 结论</h2>
-<p>G1 垃圾收集器是一种新型的垃圾收集器，专门针对大堆内存的应用程序进行优化，可以更好地处理大量对象的分配和释放，减少停顿时间，并帮助应用程序提高性能。</p>
-]]></content>
-      <categories>
-        <category>Java</category>
-        <category>JVM</category>
-        <category>GC</category>
-      </categories>
-      <tags>
-        <tag>Java</tag>
-        <tag>JVM</tag>
-        <tag>GC</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>CMS 垃圾回收器</title>
-    <url>/posts/d20aa128/</url>
-    <content><![CDATA[<p>CMS 的全称为 Concurrent Mark Sweep（并发标记清除），是 <code>JDK1.5</code> 版本之后内置的一种垃圾回收器。与其他垃圾回收器不同，CMS 的目标是实现最短的GC停顿时间，即使在大型堆内存的情况下也能保证应用的响应速度和性能。</p>
-<div class="note-large notel-yellow"><div class="notel-title"><p>注意</p>
-</div><div class="notel-content"><p>随着JDK版本的不断升级，从JDK 9开始，CMS收集器已经被标记为“即将被弃用”（Deprecated），而在JDK 14中彻底被删除。原因是CMS收集器存在以下问题：</p>
-<ol>
-<li>空间碎片：由于CMS收集器只能对老年代进行回收，所以会产生大量的空间碎片。这会导致后续的内存分配操作变得困难，甚至可能出现 OutOfMemoryError 错误。</li>
-<li>CPU占用：由于CMS收集器需要与应用程序线程并发工作，所以会占用一些CPU资源，影响应用程序的性能。</li>
-<li>内存泄漏：如果CMS收集器无法回收所有的垃圾，就会导致内存泄漏。</li>
-</ol>
-<p>因此，<a href="/posts/bc8ac7bc/"><code>G1收集器</code></a>逐渐成为了JDK的默认垃圾收集器。G1收集器采用分代回收的思想，可以更好地处理大量对象的分配和释放，避免了CMS收集器的一些缺点。</p>
- </div></div>
-<h2 id="区域划分"><a class="markdownIt-Anchor" href="#区域划分"></a> 区域划分</h2>
-<p>在进行垃圾回收时，它将<span style="border-bottom:2px solid yellow">堆内存</span>划分为多个区域，在不影响应用程序执行的情况下进行垃圾回收。</p>
-<p><img  
-                     lazyload
-                     src="/images/loading.svg"
-                     data-src="cmsmemory.webp"
-                      alt="cms memory" 
-                ></p>
-<div class="note-large notel-green"><div class="notel-title"><p>堆内存的区域划分</p>
-</div><div class="notel-content"><ul>
-<li><code>新生代</code>：包括Eden区和两个Survivor区（From Space和To Space）。当新对象被创建时，它们会首先被分配到Eden区。当Eden区满时，会触发Minor GC。在Minor GC过程中，Eden区和Survivor区中的存活对象会被复制到另一个Survivor区中，并经过一系列复制和清理操作后，存活的对象会被复制到另一个Survivor区中。每次Minor GC后，From Space和To Space会互换角色。（Eden 区 和 两个 Survivor区的大小比例：8:1:1，可以使用 <code>-XX:SurvivorRatio</code> 惊醒调整，默认值为 8）</li>
-<li><code>老年代</code>：存放长时间存活的对象。当Old区满时，会触发Full GC。Full GC会暂停整个JVM，对全局进行垃圾回收。由于Full GC需要暂停整个JVM，因此CMS垃圾回收器总是尽可能地减少Full GC的发生次数。</li>
-</ul>
- </div></div>
-<h2 id="工作原理"><a class="markdownIt-Anchor" href="#工作原理"></a> 工作原理</h2>
-<p>CMS垃圾回收器采用了“标记-清除”算法，其主要过程如下：</p>
-<p><img  
-                     lazyload
-                     src="/images/loading.svg"
-                     data-src="https://icefrozen.github.io/article/java-cms-gc/1552636737931java-cms-gc_.png"
-                      alt="cms" 
-                ></p>
-<ol>
-<li><code>初始标记</code>：暂停所有应用线程，必须短暂暂停以达到<a href="/posts/5a9ba959/">安全点</a>；标记出所有根对象以及直接与其相关的对象；</li>
-<li><code>并发标记</code>：恢复所有应用线程，同时并发地遍历老年代中的所有对象进行标记；</li>
-<li><code>重新标记</code>：暂停所有应用线程，必须短暂暂停以达到<a href="/posts/5a9ba959/">安全点</a>；处理并发标记期间因用户程序继续执行而被遗漏的新生代对象；</li>
-<li><code>并发清除</code>：同时清除标记完成的所有不再使用的对象。</li>
-</ol>
-<h2 id="优缺点"><a class="markdownIt-Anchor" href="#优缺点"></a> 优缺点</h2>
-<div class="note-large notel-green"><div class="notel-title"><p>优点</p>
-</div><div class="notel-content"><ol>
-<li>垃圾回收期间最大程度上减少了应用程序的停顿时间；</li>
-<li>适用于大型堆内存的JVM，CMS在回收大对象时非常高效；</li>
-<li>消耗的CPU资源较少；</li>
-</ol>
- </div></div>
-<div class="note-large notel-red"><div class="notel-title"><p>缺点</p>
-</div><div class="notel-content"><ol>
-<li>运作过程中需要占用一定的内存空间以记录清除信息；</li>
-<li>在进行并发标记和清除的过程中，由于用户线程和垃圾回收线程交错执行，所以会对CPU产生一定压力；</li>
-<li>整个运作过程相对复杂，实现难度较大。</li>
-</ol>
- </div></div>
-<h2 id="使用建议"><a class="markdownIt-Anchor" href="#使用建议"></a> 使用建议</h2>
-<ol>
-<li>应用程序必须运行在64位的JVM上；</li>
-<li>不推荐将老年代的内存分配过小，否则可能频繁触发Full GC；</li>
-<li>避免在快照时间段内生成大量的对象，否则可能导致CMS无法顺利完成垃圾回收操作。</li>
-</ol>
-<h2 id="结论"><a class="markdownIt-Anchor" href="#结论"></a> 结论</h2>
-<p>G1（Garbage First）垃圾收集器是一种用于管理Java虚拟机内存的垃圾回收器，它将堆内存分成大小相等的区域，并根据实际情况自适应调整垃圾回收策略，从而避免全局暂停，提高了响应时间和吞吐量。G1垃圾收集器具有分代收集、并发收集、可预测性和空间利用率等优点，但同时也存在初始标记和最终标记需要STW、物理内存占用等缺点。</p>
-]]></content>
-      <categories>
-        <category>Java</category>
-        <category>JVM</category>
-        <category>GC</category>
-      </categories>
-      <tags>
-        <tag>Java</tag>
-        <tag>JVM</tag>
-        <tag>GC</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>JVM 安全点</title>
-    <url>/posts/5a9ba959/</url>
-    <content><![CDATA[<p>JVM的安全点（Safepoint）是JVM执行垃圾回收时的一个重要概念。<span style="border-bottom:2px solid green;">在JVM进行垃圾回收操作时，需要保证堆的一致性，因此需要挂起所有运行Java代码的线程并记录它们的状态。这些特定位置就被称为 <em><strong><code>安全点</code></strong></em>。</span>&gt;</p>
-<h2 id="安全点的作用"><a class="markdownIt-Anchor" href="#安全点的作用"></a> 安全点的作用</h2>
-<p>当一个线程处于安全点时，JVM可以确保该线程不会同时访问堆内存中的对象。如果不挂起所有线程，那么这些线程可能正在访问堆内存中的对象。如果同时执行垃圾回收，则这些线程可能同时修改这些对象，导致数据错误或不一致。因此，在进行垃圾回收操作时，必须等待所有线程到达安全点，并将它们挂起，然后才能继续执行垃圾回收操作。</p>
-<h2 id="安全点的触发条件"><a class="markdownIt-Anchor" href="#安全点的触发条件"></a> 安全点的触发条件</h2>
-<div class="note-large notel-yellow"><div class="notel-title"><p>当一个线程处于安全点时，它必须满足以下条件之一</p>
-</div><div class="notel-content"><ol>
-<li>执行Java方法的字节码指令结束或异常抛出；</li>
-<li>执行JNI（Java Native Interface）方法的字节码指令结束或异常抛出；</li>
-<li>执行VM操作（如Thread.sleep）的字节码指令结束或异常抛出。</li>
-</ol>
- </div></div>
-<p>这意味着当一个线程处于安全点时，它一定是上述情况之一。只有在这些情况下，线程才被挂起进行垃圾回收操作。</p>
-<h2 id="安全点的影响"><a class="markdownIt-Anchor" href="#安全点的影响"></a> 安全点的影响</h2>
-<p>当JVM进行垃圾回收操作时，必须等待所有线程到达安全点，并将它们挂起，然后才能继续执行垃圾回收操作。这种等待时间可能会导致一些线程长时间等待，从而导致应用程序响应时间变慢。</p>
-<p>为了减少这种情况的发生，JVM提供了多种垃圾回收算法和垃圾回收器，以便在特定的场景中选择最佳的垃圾回收策略。例如CMS（Concurrent Mark Sweep）垃圾回收器就是在并发标记阶段尽可能减少安全点的数量的一种垃圾回收器。</p>
-<p>此外，我们也可以通过调整线程数、线程优先级、堆内存大小等措施来减少安全点的影响。</p>
-<h2 id="总结"><a class="markdownIt-Anchor" href="#总结"></a> 总结</h2>
-<p>安全点是一个重要的概念，在JVM进行垃圾回收操作时扮演着至关重要的角色。了解安全点的作用、触发条件和影响，对于Java开发者来说是非常重要的。在实际开发中，我们需要根据应用场景选择合适的垃圾回收算法和垃圾回收器，并采取相应的措施来减少安全点的影响，以使应用程序能够达到更好的性能和响应速度。</p>
-]]></content>
-      <categories>
-        <category>Java</category>
-        <category>JVM</category>
-        <category>GC</category>
-      </categories>
-      <tags>
-        <tag>Java</tag>
-        <tag>JVM</tag>
-        <tag>GC</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>Java 对象的组成</title>
     <url>/posts/dcb2c325/</url>
     <content><![CDATA[<p>在JVM中，每个对象都由三个部分组成：对象头、实例变量和对齐填充。</p>
@@ -792,77 +996,6 @@
         <tag>Java</tag>
         <tag>JVM</tag>
         <tag>Java 对象</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>Java17环境配置- MacOS</title>
-    <url>/posts/21377094/</url>
-    <content><![CDATA[<p>Java 17 是一种新版本的Java开发环境，使用 Java 17 进行程序开发时需要在计算机上安装 Java 17 环境。本文将介绍如何在 MacOS 中配置 Java 17环境。</p>
-<h2 id="macos系统中配置java-17环境"><a class="markdownIt-Anchor" href="#macos系统中配置java-17环境"></a> MacOS系统中配置Java 17环境：</h2>
-<h3 id="1-下载java-17安装包"><a class="markdownIt-Anchor" href="#1-下载java-17安装包"></a> 1. 下载Java 17安装包。</h3>
-<p>在<a class="link"   href="https://www.oracle.com/java/technologies/javase/jdk17-archive-downloads.html" >Oracle官网 <i class="fa-regular fa-arrow-up-right-from-square fa-sm"></i></a>上下载 Java 17<br />
-的安装包，选择与MacOS系统相应的版本。</p>
-<h3 id="2-安装-java-17"><a class="markdownIt-Anchor" href="#2-安装-java-17"></a> 2. 安装 Java 17。</h3>
-<p>双击下载好的 Java 17 安装包，按照步骤进行安装即可。</p>
-<h3 id="3-配置环境变量"><a class="markdownIt-Anchor" href="#3-配置环境变量"></a> 3. 配置环境变量。</h3>
-<div class="tabs" id="tab-first-unique-01"><ul class="nav-tabs"><li class="tab active"><a class="#first-unique-01-1">macOS 10.15+（zsh）</a></li><li class="tab"><a class="#first-unique-01-2">macOS 10.15之前（bash）</a></li></ul><div class="tab-content"><div class="tab-pane active" id="first-unique-01-1"><ol>
-<li>
-<p>打开<i class="fa-solid fa-rectangle-terminal"></i><code>Terminal</code>（中文叫<code>终端</code>）应用程序。</p>
-</li>
-<li>
-<p>在命令行输入以下命令，编辑<code>~/.zshrc</code>文件：</p>
-<div class="highlight-container" data-rel="Shell"><figure class="iseeu highlight shell"><table><tr><td class="code"><pre><span class="line">nano ~/.zshrc </span><br></pre></td></tr></table></figure></div>
-</li>
-<li>
-<p>在文件的最后，加入如下信息</p>
-<div class="highlight-container" data-rel="Shell"><figure class="iseeu highlight shell"><table><tr><td class="code"><pre><span class="line">export PATH=&quot;/Library/Java/JavaVirtualMachines/jdk-17.jdk/Contents/Home/bin:$PATH&quot;</span><br></pre></td></tr></table></figure></div>
-</li>
-<li>
-<p>按下“Ctrl+X”键，选择“Y”保存文件并按“Enter”键退出编辑。</p>
-</li>
-<li>
-<p>执行以下命令让修改后的环境变量生效：</p>
-<div class="highlight-container" data-rel="Shell"><figure class="iseeu highlight shell"><table><tr><td class="code"><pre><span class="line">source ~/.zshrc</span><br></pre></td></tr></table></figure></div>
-</li>
-<li>
-<p>验证Java 17是否配置成功。</p>
-<div class="highlight-container" data-rel="Shell"><figure class="iseeu highlight shell"><table><tr><td class="code"><pre><span class="line">java -version</span><br><span class="line"></span><br><span class="line">java version &quot;17.0.1&quot; 2021-01-17 LTS</span><br><span class="line">Java(TM) SE Runtime Environment (build 17.0.1+9-LTS-190)</span><br><span class="line">Java HotSpot(TM) 64-Bit Server VM (build 17.0.1+9-LTS-190, mixed mode, sharing)</span><br></pre></td></tr></table></figure></div>
-</li>
-</ol></div><div class="tab-pane" id="first-unique-01-2"><ol>
-<li>
-<p>打开<i class="fa-solid fa-rectangle-terminal"></i><code>Terminal</code>（中文叫<code>终端</code>）应用程序。</p>
-</li>
-<li>
-<p>在命令行输入以下命令，编辑<code>~/.bash_profile</code>文件：</p>
-<div class="highlight-container" data-rel="Shell"><figure class="iseeu highlight shell"><table><tr><td class="code"><pre><span class="line">nano ~/.bash_profile</span><br></pre></td></tr></table></figure></div>
-</li>
-<li>
-<p>在文件的最后，加入如下信息</p>
-<div class="highlight-container" data-rel="Shell"><figure class="iseeu highlight shell"><table><tr><td class="code"><pre><span class="line">export PATH=&quot;/Library/Java/JavaVirtualMachines/jdk-17.jdk/Contents/Home/bin:$PATH&quot;</span><br></pre></td></tr></table></figure></div>
-</li>
-<li>
-<p>按下“Ctrl+X”键，选择“Y”保存文件并按“Enter”键退出编辑。</p>
-</li>
-<li>
-<p>执行以下命令让修改后的环境变量生效：</p>
-<div class="highlight-container" data-rel="Shell"><figure class="iseeu highlight shell"><table><tr><td class="code"><pre><span class="line">source ~/.bash_profile</span><br></pre></td></tr></table></figure></div>
-</li>
-<li>
-<p>验证Java 17是否配置成功。</p>
-<div class="highlight-container" data-rel="Shell"><figure class="iseeu highlight shell"><table><tr><td class="code"><pre><span class="line">java -version</span><br><span class="line"></span><br><span class="line">java version &quot;17.0.1&quot; 2021-01-17 LTS</span><br><span class="line">Java(TM) SE Runtime Environment (build 17.0.1+9-LTS-190)</span><br><span class="line">Java HotSpot(TM) 64-Bit Server VM (build 17.0.1+9-LTS-190, mixed mode, sharing)</span><br></pre></td></tr></table></figure></div>
-</li>
-</ol></div></div></div>
-<h3 id="4-配置完成"><a class="markdownIt-Anchor" href="#4-配置完成"></a> 4. 配置完成</h3>
-<p>经过上诉步骤操作完成后，我们就可以子啊本地计算机进行Java程序的开发了。</p>
-]]></content>
-      <categories>
-        <category>Java</category>
-        <category>Java 基础</category>
-        <category>Java 环境</category>
-      </categories>
-      <tags>
-        <tag>Java</tag>
-        <tag>Java 环境配置</tag>
       </tags>
   </entry>
   <entry>
