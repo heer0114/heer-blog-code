@@ -298,6 +298,271 @@
       </tags>
   </entry>
   <entry>
+    <title>Nacos 架构</title>
+    <url>/posts/59ff8987/</url>
+    <content><![CDATA[<p>Nacos 开源之前在阿里内部已经发展了十年，沉淀了很多优秀的能力，也有很多历史负担，在开源的时候我们取其精华进行开源，为了提升代码的健壮性和扩展性，进行了充分的分层和模块化设计。</p>
+<div class="note note-warning icon-padding"><i class="note-icon fa-solid fa-exclamation-circle"></i><p>内容摘抄自<a class="link"   href="https://nacos.io/zh-cn/docs/v2/quickstart/quick-start.html" >Nacos官方文档 <i class="fa-regular fa-arrow-up-right-from-square fa-sm"></i></a>，可以点击链接移步官方文档</p>
+</div>
+<h2 id="基本架构及概念"><a class="markdownIt-Anchor" href="#基本架构及概念"></a> 基本架构及概念</h2>
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://cdn.nlark.com/yuque/0/2019/jpeg/338441/1561217892717-1418fb9b-7faa-4324-87b9-f1740329f564.jpeg"
+                      alt="nacos_arch.jpg" 
+                ></p>
+<h3 id="服务-service"><a class="markdownIt-Anchor" href="#服务-service"></a> 服务 (Service)</h3>
+<p>服务是指一个或一组软件功能（例如特定信息的检索或一组操作的执行），其目的是不同的客户端可以为不同的目的重用（例如通过跨进程的网络调用）。Nacos 支持主流的服务生态，如 Kubernetes Service、gRPC|Dubbo RPC Service 或者 Spring Cloud RESTful Service。</p>
+<h3 id="服务注册中心-service-registry"><a class="markdownIt-Anchor" href="#服务注册中心-service-registry"></a> 服务注册中心 (Service Registry)</h3>
+<p>服务注册中心，它是服务，其实例及元数据的数据库。服务实例在启动时注册到服务注册表，并在关闭时注销。服务和路由器的客户端查询服务注册表以查找服务的可用实例。服务注册中心可能会调用服务实例的健康检查 API 来验证它是否能够处理请求。</p>
+<h3 id="服务元数据-service-metadata"><a class="markdownIt-Anchor" href="#服务元数据-service-metadata"></a> 服务元数据 (Service Metadata)</h3>
+<p>服务元数据是指包括服务端点(endpoints)、服务标签、服务版本号、服务实例权重、路由规则、安全策略等描述服务的数据。</p>
+<h3 id="服务提供方-service-provider"><a class="markdownIt-Anchor" href="#服务提供方-service-provider"></a> 服务提供方 (Service Provider)</h3>
+<p>是指提供可复用和可调用服务的应用方。</p>
+<h3 id="服务消费方-service-consumer"><a class="markdownIt-Anchor" href="#服务消费方-service-consumer"></a> 服务消费方 (Service Consumer)</h3>
+<p>是指会发起对某个服务调用的应用方。</p>
+<h3 id="配置-configuration"><a class="markdownIt-Anchor" href="#配置-configuration"></a> 配置 (Configuration)</h3>
+<p>在系统开发过程中通常会将一些需要变更的参数、变量等从代码中分离出来独立管理，以独立的配置文件的形式存在。目的是让静态的系统工件或者交付物（如 WAR，JAR 包等）更好地和实际的物理运行环境进行适配。配置管理一般包含在系统部署的过程中，由系统管理员或者运维人员完成这个步骤。配置变更是调整系统运行时的行为的有效手段之一。</p>
+<h3 id="配置管理-configuration-management"><a class="markdownIt-Anchor" href="#配置管理-configuration-management"></a> 配置管理 (Configuration Management)</h3>
+<p>在数据中心中，系统中所有配置的编辑、存储、分发、变更管理、历史版本管理、变更审计等所有与配置相关的活动统称为配置管理。</p>
+<h3 id="名字服务-naming-service"><a class="markdownIt-Anchor" href="#名字服务-naming-service"></a> 名字服务 (Naming Service)</h3>
+<p>提供分布式系统中所有对象(Object)、实体(Entity)的“名字”到关联的元数据之间的映射管理服务，例如 ServiceName -&gt; Endpoints Info, Distributed Lock Name -&gt; Lock Owner/Status Info, DNS Domain Name -&gt; IP List, 服务发现和 DNS 就是名字服务的2大场景。</p>
+<h3 id="配置服务-configuration-service"><a class="markdownIt-Anchor" href="#配置服务-configuration-service"></a> 配置服务 (Configuration Service)</h3>
+<p>在服务或者应用运行过程中，提供动态配置或者元数据以及配置管理的服务提供者。</p>
+<h3 id="更多概念"><a class="markdownIt-Anchor" href="#更多概念"></a> <a class="link"   href="https://nacos.io/zh-cn/docs/v2/concepts.html" >更多概念… <i class="fa-regular fa-arrow-up-right-from-square fa-sm"></i></a></h3>
+<h2 id="逻辑架构及其组件介绍"><a class="markdownIt-Anchor" href="#逻辑架构及其组件介绍"></a> 逻辑架构及其组件介绍</h2>
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://cdn.nlark.com/yuque/0/2022/png/25601973/1646715315872-7ee3679a-e66e-49e9-ba9f-d24168a86c14.png"
+                      alt="nacos-logic.jpg" 
+                ></p>
+<ul>
+<li>服务管理：实现服务CRUD，域名CRUD，服务健康状态检查，服务权重管理等功能</li>
+<li>配置管理：实现配置管CRUD，版本管理，灰度管理，监听管理，推送轨迹，聚合数据等功能</li>
+<li>元数据管理：提供元数据CURD 和打标能力</li>
+<li>插件机制：实现三个模块可分可合能力，实现扩展点SPI机制</li>
+<li>事件机制：实现异步化事件通知，sdk数据变化异步通知等逻辑</li>
+<li>日志模块：管理日志分类，日志级别，日志可移植性（尤其避免冲突），日志格式，异常码+帮助文档</li>
+<li>回调机制：sdk通知数据，通过统一的模式回调用户处理。接口和数据结构需要具备可扩展性</li>
+<li>寻址模式：解决ip，域名，nameserver、广播等多种寻址模式，需要可扩展</li>
+<li>推送通道：解决server与存储、server间、server与sdk间推送性能问题</li>
+<li>容量管理：管理每个租户，分组下的容量，防止存储被写爆，影响服务可用性</li>
+<li>流量管理：按照租户，分组等多个维度对请求频率，长链接个数，报文大小，请求流控进行控制</li>
+<li>缓存机制：容灾目录，本地缓存，server缓存机制。容灾目录使用需要工具</li>
+<li>启动模式：按照单机模式，配置模式，服务模式，dns模式，或者all模式，启动不同的程序+UI</li>
+<li>一致性协议：解决不同数据，不同一致性要求情况下，不同一致性机制</li>
+<li>存储模块：解决数据持久化、非持久化存储，解决数据分片问题</li>
+<li>Nameserver：解决namespace到clusterid的路由问题，解决用户环境与nacos物理环境映射问题</li>
+<li>CMDB：解决元数据存储，与三方cmdb系统对接问题，解决应用，人，资源关系</li>
+<li>Metrics：暴露标准metrics数据，方便与三方监控系统打通</li>
+<li>Trace：暴露标准trace，方便与SLA系统打通，日志白平化，推送轨迹等能力，并且可以和计量计费系统打通</li>
+<li>接入管理：相当于阿里云开通服务，分配身份、容量、权限过程</li>
+<li>用户管理：解决用户管理，登录，sso等问题</li>
+<li>权限管理：解决身份识别，访问控制，角色管理等问题</li>
+<li>审计系统：扩展接口方便与不同公司审计系统打通</li>
+<li>通知系统：核心数据变更，或者操作，方便通过SMS系统打通，通知到对应人数据变更</li>
+<li>OpenAPI：暴露标准Rest风格HTTP接口，简单易用，方便多语言集成</li>
+<li>Console：易用控制台，做服务管理、配置管理等操作</li>
+<li>SDK：多语言sdk</li>
+<li>Agent：dns-f类似模式，或者与mesh等方案集成</li>
+<li>CLI：命令行对产品进行轻量化管理，像git一样好用</li>
+</ul>
+<h2 id="领域模型"><a class="markdownIt-Anchor" href="#领域模型"></a> 领域模型</h2>
+<h3 id="数据模型"><a class="markdownIt-Anchor" href="#数据模型"></a> 数据模型</h3>
+<p>Nacos 数据模型 Key 由三元组唯一确定, Namespace默认是空串，公共命名空间（public），分组默认是 DEFAULT_GROUP。</p>
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://cdn.nlark.com/yuque/0/2019/jpeg/338441/1561217857314-95ab332c-acfb-40b2-957a-aae26c2b5d71.jpeg"
+                      alt="nacos_data_model" 
+                ></p>
+<h3 id="服务领域模型"><a class="markdownIt-Anchor" href="#服务领域模型"></a> 服务领域模型</h3>
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://cdn.nlark.com/yuque/0/2019/jpeg/338441/1561217924697-ba504a35-129f-4fc6-b0df-1130b995375a.jpeg"
+                      alt="nacos_naming_data_model" 
+                ></p>
+<h3 id="配置领域模型"><a class="markdownIt-Anchor" href="#配置领域模型"></a> 配置领域模型</h3>
+<p>围绕配置，主要有两个关联的实体，一个是配置变更历史，一个是服务标签（用于打标分类，方便索引），由 ID 关联。</p>
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://cdn.nlark.com/yuque/0/2019/jpeg/338441/1561217958896-4465757f-f588-4797-9c90-a76e604fabb4.jpeg"
+                      alt="nacos_config_er" 
+                ></p>
+<h2 id="类视图"><a class="markdownIt-Anchor" href="#类视图"></a> 类视图</h2>
+<h3 id="nacos-sdk-类视图"><a class="markdownIt-Anchor" href="#nacos-sdk-类视图"></a> Nacos-SDK 类视图</h3>
+<p>服务部分待续</p>
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://cdn.nlark.com/yuque/0/2022/png/25574784/1650771676187-d95a9e45-8656-4d1a-8b5b-ed63a23a816b.png"
+                      alt="nacos_sdk_class_relation" 
+                ></p>
+<h2 id="构建物-部署及启动模式"><a class="markdownIt-Anchor" href="#构建物-部署及启动模式"></a> 构建物、部署及启动模式</h2>
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://cdn.yuque.com/lark/0/2018/png/15914/1531730742844-e8325932-258b-49b2-9473-8d1199efe20d.png"
+                      alt="undefined" 
+                ></p>
+<h3 id="两种交付工件"><a class="markdownIt-Anchor" href="#两种交付工件"></a> 两种交付工件</h3>
+<p>Nacos 支持标准 Docker 镜像(TODO: 0.2版本开始支持）及 zip(tar.gz)压缩包的构建物。</p>
+<h3 id="两种启动模式"><a class="markdownIt-Anchor" href="#两种启动模式"></a> 两种启动模式</h3>
+<p>Nacos 支持将注册中心(Service Registry）与配置中心(Config Center) 在一个进程合并部署或者将2者分离部署的两种模式。</p>
+<h3 id="免费的公有云服务模式"><a class="markdownIt-Anchor" href="#免费的公有云服务模式"></a> 免费的公有云服务模式</h3>
+<p>除了您自己部署和启动 Nacos 服务之外，在云计算时代，Nacos 也支持公有云模式，在阿里云公有云的商业产品（如<a class="link"   href="https://cn.aliyun.com/product/aliware/mse?spm=nacos-website.topbar.0.0.0m" >MSE <i class="fa-regular fa-arrow-up-right-from-square fa-sm"></i></a>, <a class="link"   href="https://www.aliyun.com/product/edas" >EDAS <i class="fa-regular fa-arrow-up-right-from-square fa-sm"></i></a>) 中会提供 Nacos 的免费的公有云服务。我们也欢迎和支持其他的公有云提供商提供 Nacos 的公有云服务。</p>
+]]></content>
+      <categories>
+        <category>Nacos</category>
+        <category>概念架构</category>
+      </categories>
+      <tags>
+        <tag>Nacos</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Nacos 简介</title>
+    <url>/posts/9d0a5cc1/</url>
+    <content><![CDATA[<p>欢迎来到 Nacos 的世界！</p>
+<p>Nacos /nɑ:kəʊs/ 是 Dynamic Naming and Configuration Service的首字母简称，一个更易于构建云原生应用的动态服务发现、配置管理和服务管理平台。</p>
+<p>Nacos 致力于帮助您发现、配置和管理微服务。Nacos 提供了一组简单易用的特性集，帮助您快速实现动态服务发现、服务配置、服务元数据及流量管理。</p>
+<p>Nacos 帮助您更敏捷和容易地构建、交付和管理微服务平台。 Nacos 是构建以“服务”为中心的现代应用架构 (例如微服务范式、云原生范式) 的服务基础设施。</p>
+<div class="note note-warning icon-padding"><i class="note-icon fa-solid fa-exclamation-circle"></i><p>内容摘抄自<a class="link"   href="https://nacos.io/zh-cn/docs/v2/quickstart/quick-start.html" >Nacos官方文档 <i class="fa-regular fa-arrow-up-right-from-square fa-sm"></i></a>，可以点击链接移步官方文档</p>
+</div>
+<h2 id="什么是-nacos"><a class="markdownIt-Anchor" href="#什么是-nacos"></a> 什么是 Nacos？</h2>
+<p>服务（Service）是 Nacos 世界的一等公民。Nacos 支持几乎所有主流类型的“服务”的发现、配置和管理：</p>
+<p><a class="link"   href="https://kubernetes.io/docs/concepts/services-networking/service/" >Kubernetes Service <i class="fa-regular fa-arrow-up-right-from-square fa-sm"></i></a></p>
+<p><a class="link"   href="https://grpc.io/docs/guides/concepts.html#service-definition" >gRPC <i class="fa-regular fa-arrow-up-right-from-square fa-sm"></i></a> &amp; <a class="link"   href="https://dubbo.incubator.apache.org/" >Dubbo RPC Service <i class="fa-regular fa-arrow-up-right-from-square fa-sm"></i></a></p>
+<p><a class="link"   href="https://spring.io/projects/spring-restdocs" >Spring Cloud RESTful Service <i class="fa-regular fa-arrow-up-right-from-square fa-sm"></i></a></p>
+<p>Nacos 的关键特性包括:</p>
+<ul>
+<li>
+<p><strong>服务发现和服务健康监测</strong></p>
+<p>Nacos 支持基于 DNS 和基于 RPC 的服务发现。服务提供者使用 <a class="link"   href="https://nacos.io/zh-cn/docs/sdk.html" >原生SDK <i class="fa-regular fa-arrow-up-right-from-square fa-sm"></i></a>、<a class="link"   href="https://nacos.io/zh-cn/docs/open-api.html" >OpenAPI <i class="fa-regular fa-arrow-up-right-from-square fa-sm"></i></a>、或一个<a class="link"   href="https://nacos.io/zh-cn/docs/other-language.html" >独立的Agent TODO <i class="fa-regular fa-arrow-up-right-from-square fa-sm"></i></a>注册 Service 后，服务消费者可以使用<a class="link"   href="https://nacos.io/zh-cn/docs/xx" >DNS TODO <i class="fa-regular fa-arrow-up-right-from-square fa-sm"></i></a> 或<a class="link"   href="https://nacos.io/zh-cn/docs/open-api.html" >HTTP&amp;API <i class="fa-regular fa-arrow-up-right-from-square fa-sm"></i></a>查找和发现服务。</p>
+<p>Nacos 提供对服务的实时的健康检查，阻止向不健康的主机或服务实例发送请求。Nacos 支持传输层 (PING 或 TCP)和应用层 (如 HTTP、MySQL、用户自定义）的健康检查。 对于复杂的云环境和网络拓扑环境中（如 VPC、边缘网络等）服务的健康检查，Nacos 提供了 agent 上报模式和服务端主动检测2种健康检查模式。Nacos 还提供了统一的健康检查仪表盘，帮助您根据健康状态管理服务的可用性及流量。</p>
+</li>
+<li>
+<p><strong>动态配置服务</strong></p>
+<p>动态配置服务可以让您以中心化、外部化和动态化的方式管理所有环境的应用配置和服务配置。</p>
+<p>动态配置消除了配置变更时重新部署应用和服务的需要，让配置管理变得更加高效和敏捷。</p>
+<p>配置中心化管理让实现无状态服务变得更简单，让服务按需弹性扩展变得更容易。</p>
+<p>Nacos 提供了一个简洁易用的UI (<a class="link"   href="http://console.nacos.io/nacos/index.html" >控制台样例 Demo <i class="fa-regular fa-arrow-up-right-from-square fa-sm"></i></a>) 帮助您管理所有的服务和应用的配置。Nacos 还提供包括配置版本跟踪、金丝雀发布、一键回滚配置以及客户端配置更新状态跟踪在内的一系列开箱即用的配置管理特性，帮助您更安全地在生产环境中管理配置变更和降低配置变更带来的风险。</p>
+</li>
+<li>
+<p><strong>动态 DNS 服务</strong></p>
+<p>动态 DNS 服务支持权重路由，让您更容易地实现中间层负载均衡、更灵活的路由策略、流量控制以及数据中心内网的简单DNS解析服务。动态DNS服务还能让您更容易地实现以 DNS 协议为基础的服务发现，以帮助您消除耦合到厂商私有服务发现 API 上的风险。</p>
+<p>Nacos 提供了一些简单的 <a class="link"   href="https://nacos.io/zh-cn/docs/xx" >DNS APIs TODO <i class="fa-regular fa-arrow-up-right-from-square fa-sm"></i></a> 帮助您管理服务的关联域名和可用的 IP:PORT 列表.</p>
+</li>
+<li>
+<p><strong>服务及其元数据管理</strong></p>
+<p>Nacos 能让您从微服务平台建设的视角管理数据中心的所有服务及元数据，包括管理服务的描述、生命周期、服务的静态依赖分析、服务的健康状态、服务的流量管理、路由及安全策略、服务的 SLA 以及最首要的 metrics 统计数据。</p>
+</li>
+<li>
+<p><a class="link"   href="https://nacos.io/zh-cn/docs/docs/zh-cn/archive/roadmap.html" >更多的特性列表 … <i class="fa-regular fa-arrow-up-right-from-square fa-sm"></i></a></p>
+</li>
+</ul>
+<h2 id="nacos-地图"><a class="markdownIt-Anchor" href="#nacos-地图"></a> Nacos 地图</h2>
+<p>一图看懂 Nacos，下面架构部分会详细介绍。 <img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://nacos.io/img/nacosMap.jpg"
+                      alt="nacos_map" 
+                ></p>
+<ul>
+<li>特性大图：要从功能特性，非功能特性，全面介绍我们要解的问题域的特性诉求</li>
+<li>架构大图：通过清晰架构，让您快速进入 Nacos 世界</li>
+<li>业务大图：利用当前特性可以支持的业务场景，及其最佳实践</li>
+<li>生态大图：系统梳理 Nacos 和主流技术生态的关系</li>
+<li>优势大图：展示 Nacos 核心竞争力</li>
+<li>战略大图：要从战略到战术层面讲 Nacos 的宏观优势</li>
+</ul>
+<h2 id="nacos-生态图"><a class="markdownIt-Anchor" href="#nacos-生态图"></a> Nacos 生态图</h2>
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://cdn.nlark.com/lark/0/2018/png/11189/1533045871534-e64b8031-008c-4dfc-b6e8-12a597a003fb.png"
+                      alt="nacos_landscape.png" 
+                ></p>
+<p>如 Nacos 全景图所示，Nacos 无缝支持一些主流的开源生态，例如</p>
+<ul>
+<li><a class="link"   href="https://nacos.io/en-us/docs/quick-start-spring-cloud.html" >Spring Cloud <i class="fa-regular fa-arrow-up-right-from-square fa-sm"></i></a></li>
+<li><a class="link"   href="https://nacos.io/zh-cn/docs/use-nacos-with-dubbo.html" >Apache Dubbo and Dubbo Mesh <i class="fa-regular fa-arrow-up-right-from-square fa-sm"></i></a></li>
+<li><a class="link"   href="https://nacos.io/zh-cn/docs/use-nacos-with-kubernetes.html" >Kubernetes and CNCF <i class="fa-regular fa-arrow-up-right-from-square fa-sm"></i></a>。</li>
+</ul>
+<p>使用 Nacos 简化服务发现、配置管理、服务治理及管理的解决方案，让微服务的发现、管理、共享、组合更加容易。</p>
+]]></content>
+      <categories>
+        <category>Nacos</category>
+        <category>概念架构</category>
+      </categories>
+      <tags>
+        <tag>Nacos</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Nacos 概念</title>
+    <url>/posts/68e0beb6/</url>
+    <content><![CDATA[<p>Nacos 引入了一些基本的概念，系统性的了解一下这些概念可以帮助您更好的理解和正确的使用 Nacos 产品。</p>
+<div class="note note-warning icon-padding"><i class="note-icon fa-solid fa-exclamation-circle"></i><p>内容摘抄自<a class="link"   href="https://nacos.io/zh-cn/docs/v2/quickstart/quick-start.html" >Nacos官方文档 <i class="fa-regular fa-arrow-up-right-from-square fa-sm"></i></a>，可以点击链接移步官方文档</p>
+</div>
+<h2 id="地域"><a class="markdownIt-Anchor" href="#地域"></a> 地域</h2>
+<p>物理的数据中心，资源创建成功后不能更换。</p>
+<h2 id="可用区"><a class="markdownIt-Anchor" href="#可用区"></a> 可用区</h2>
+<p>同一地域内，电力和网络互相独立的物理区域。同一可用区内，实例的网络延迟较低。</p>
+<h2 id="接入点"><a class="markdownIt-Anchor" href="#接入点"></a> 接入点</h2>
+<p>地域的某个服务的入口域名。</p>
+<h2 id="命名空间"><a class="markdownIt-Anchor" href="#命名空间"></a> 命名空间</h2>
+<p>用于进行租户粒度的配置隔离。不同的命名空间下，可以存在相同的 Group 或 Data ID 的配置。Namespace 的常用场景之一是不同环境的配置的区分隔离，例如开发测试环境和生产环境的资源（如配置、服务）隔离等。</p>
+<h2 id="配置"><a class="markdownIt-Anchor" href="#配置"></a> 配置</h2>
+<p>在系统开发过程中，开发者通常会将一些需要变更的参数、变量等从代码中分离出来独立管理，以独立的配置文件的形式存在。目的是让静态的系统工件或者交付物（如 WAR，JAR 包等）更好地和实际的物理运行环境进行适配。配置管理一般包含在系统部署的过程中，由系统管理员或者运维人员完成。配置变更是调整系统运行时的行为的有效手段。</p>
+<h2 id="配置管理"><a class="markdownIt-Anchor" href="#配置管理"></a> 配置管理</h2>
+<p>系统配置的编辑、存储、分发、变更管理、历史版本管理、变更审计等所有与配置相关的活动。</p>
+<h2 id="配置项"><a class="markdownIt-Anchor" href="#配置项"></a> 配置项</h2>
+<p>一个具体的可配置的参数与其值域，通常以 param-key=param-value 的形式存在。例如我们常配置系统的日志输出级别（logLevel=INFO|WARN|ERROR） 就是一个配置项。</p>
+<h2 id="配置集"><a class="markdownIt-Anchor" href="#配置集"></a> 配置集</h2>
+<p>一组相关或者不相关的配置项的集合称为配置集。在系统中，一个配置文件通常就是一个配置集，包含了系统各个方面的配置。例如，一个配置集可能包含了数据源、线程池、日志级别等配置项。</p>
+<h2 id="配置集-id"><a class="markdownIt-Anchor" href="#配置集-id"></a> 配置集 ID</h2>
+<p>Nacos 中的某个配置集的 ID。配置集 ID 是组织划分配置的维度之一。Data ID 通常用于组织划分系统的配置集。一个系统或者应用可以包含多个配置集，每个配置集都可以被一个有意义的名称标识。Data ID 通常采用类 Java 包（如 com.taobao.tc.refund.log.level）的命名规则保证全局唯一性。此命名规则非强制。</p>
+<h2 id="配置分组"><a class="markdownIt-Anchor" href="#配置分组"></a> 配置分组</h2>
+<p>Nacos 中的一组配置集，是组织配置的维度之一。通过一个有意义的字符串（如 Buy 或 Trade ）对配置集进行分组，从而区分 Data ID 相同的配置集。当您在 Nacos 上创建一个配置时，如果未填写配置分组的名称，则配置分组的名称默认采用 DEFAULT_GROUP 。配置分组的常见场景：不同的应用或组件使用了相同的配置类型，如 database_url 配置和 MQ_topic 配置。</p>
+<h2 id="配置快照"><a class="markdownIt-Anchor" href="#配置快照"></a> 配置快照</h2>
+<p>Nacos 的客户端 SDK 会在本地生成配置的快照。当客户端无法连接到 Nacos Server 时，可以使用配置快照显示系统的整体容灾能力。配置快照类似于 Git 中的本地 commit，也类似于缓存，会在适当的时机更新，但是并没有缓存过期（expiration）的概念。</p>
+<h2 id="服务"><a class="markdownIt-Anchor" href="#服务"></a> 服务</h2>
+<p>通过预定义接口网络访问的提供给客户端的软件功能。</p>
+<h2 id="服务名"><a class="markdownIt-Anchor" href="#服务名"></a> 服务名</h2>
+<p>服务提供的标识，通过该标识可以唯一确定其指代的服务。</p>
+<h2 id="服务注册中心"><a class="markdownIt-Anchor" href="#服务注册中心"></a> 服务注册中心</h2>
+<p>存储服务实例和服务负载均衡策略的数据库。</p>
+<h2 id="服务发现"><a class="markdownIt-Anchor" href="#服务发现"></a> 服务发现</h2>
+<p>在计算机网络上，（通常使用服务名）对服务下的实例的地址和元数据进行探测，并以预先定义的接口提供给客户端进行查询。</p>
+<h2 id="元信息"><a class="markdownIt-Anchor" href="#元信息"></a> 元信息</h2>
+<p>Nacos数据（如配置和服务）描述信息，如服务版本、权重、容灾策略、负载均衡策略、鉴权配置、各种自定义标签 (label)，从作用范围来看，分为服务级别的元信息、集群的元信息及实例的元信息。</p>
+<h2 id="应用"><a class="markdownIt-Anchor" href="#应用"></a> 应用</h2>
+<p>用于标识服务提供方的服务的属性。</p>
+<h2 id="服务分组"><a class="markdownIt-Anchor" href="#服务分组"></a> 服务分组</h2>
+<p>不同的服务可以归类到同一分组。</p>
+<h2 id="虚拟集群"><a class="markdownIt-Anchor" href="#虚拟集群"></a> 虚拟集群</h2>
+<p>同一个服务下的所有服务实例组成一个默认集群, 集群可以被进一步按需求划分，划分的单位可以是虚拟集群。</p>
+<h2 id="实例"><a class="markdownIt-Anchor" href="#实例"></a> 实例</h2>
+<p>提供一个或多个服务的具有可访问网络地址（IP:Port）的进程。</p>
+<h2 id="权重"><a class="markdownIt-Anchor" href="#权重"></a> 权重</h2>
+<p>实例级别的配置。权重为浮点数。权重越大，分配给该实例的流量越大。</p>
+<h2 id="健康检查"><a class="markdownIt-Anchor" href="#健康检查"></a> 健康检查</h2>
+<p>以指定方式检查服务下挂载的实例 (Instance) 的健康度，从而确认该实例 (Instance) 是否能提供服务。根据检查结果，实例 (Instance) 会被判断为健康或不健康。对服务发起解析请求时，不健康的实例 (Instance) 不会返回给客户端。</p>
+<h2 id="健康保护阈值"><a class="markdownIt-Anchor" href="#健康保护阈值"></a> 健康保护阈值</h2>
+<p>为了防止因过多实例 (Instance) 不健康导致流量全部流向健康实例 (Instance) ，继而造成流量压力把健康实例 (Instance) 压垮并形成雪崩效应，应将健康保护阈值定义为一个 0 到 1 之间的浮点数。当域名健康实例数 (Instance) 占总服务实例数 (Instance) 的比例小于该值时，无论实例 (Instance) 是否健康，都会将这个实例 (Instance) 返回给客户端。这样做虽然损失了一部分流量，但是保证了集群中剩余健康实例 (Instance) 能正常工作。</p>
+]]></content>
+      <categories>
+        <category>Nacos</category>
+        <category>概念架构</category>
+      </categories>
+      <tags>
+        <tag>Nacos</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>Springboot2.7集成ShardingSphereJdbc5.1.1</title>
     <url>/posts/db89d0f7/</url>
     <content><![CDATA[<p>ShardingSphere是一个开源的分布式数据库中间件，它支持多种关系型数据库，例如MySQL、Oracle、SQL Server等。在本篇博客中，将介绍如何使用Spring Boot 2.7集成ShardingSphere-jdbc5.1.1，并提供相应的配置文件和Java代码演示。</p>
@@ -338,6 +603,390 @@
       <tags>
         <tag>ShardingSphere</tag>
         <tag>Springboot</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>ShardingSphereJdbc 执行流程</title>
+    <url>/posts/61dead18/</url>
+    <content><![CDATA[<p>ShardingSphere是一种分布式数据库中间件，为了方便数据分片而设计，ShardingSphere-JDBC5是其中的一个子项目。它提供了对JDBC的扩展，允许在单个逻辑数据源上实现数据分片。</p>
+<h2 id="执行流程"><a class="markdownIt-Anchor" href="#执行流程"></a> 执行流程</h2>
+<p>ShardingSphere-JDBC主要由两部分组成：客户端和服务端。客户端的作用是将SQL解析后分发给不同的服务节点，服务端负责处理请求并返回结果。下面是执行流程图：</p>
+<pre class="mermaid">graph TD;
+    User[用户] --> Application(应用)
+    
+    subgraph ShardingSphereJDBC执行流程 
+    Application -- 发起SQL请求 --> Proxy(Proxy) 
+    
+    Proxy -- 解析SQL --> Router(Router) 
+    Proxy -- 执行SQL --> Executor(Executor) 
+    
+    Router -- 分片规则解析 --> ShardingRule(Sharding Rule) 
+    Router -- 路由 --> DataSourceRouter(DataSource Router) 
+    
+    DataSourceRouter -- 数据源选择 --> DataSource1(数据源1) 
+    DataSourceRouter -- 数据源选择 --> DataSource2(数据源2) 
+    
+    DataSource1 -- 执行SQL --> Database1(Database1) 
+    DataSource2 -- 执行SQL --> Database2(Database2) 
+    
+    Database1 -- 返回结果 --> Executor 
+    Database2 -- 返回结果 --> Executor 
+    
+    Executor -- 结果聚合 --> Proxy 
+    Proxy -- 返回结果 --> Application
+    end</pre>
+<p>以上是整个执行流程，下面将详细介绍每一步的内容。</p>
+<h3 id="解析sql"><a class="markdownIt-Anchor" href="#解析sql"></a> 解析SQL</h3>
+<p>首先，客户端需要先解析用户提交的SQL语句，这里使用的是JSqlParser这个库。该库能够将SQL语句解析成一个AST（抽象语法树），然后我们可以从AST中提取出所有的表名、列名、操作符等信息。</p>
+<h3 id="获取分片规则"><a class="markdownIt-Anchor" href="#获取分片规则"></a> 获取分片规则</h3>
+<p>接下来，客户端需要获取分片规则。分片规则是由用户在配置文件中设置的，它指定了数据的分片方式，比如按照ID值进行分片，或者按照日期进行分片。客户端会将这些规则发送给服务端，以便服务端能够正确地处理请求。</p>
+<h3 id="生成分片执行计划"><a class="markdownIt-Anchor" href="#生成分片执行计划"></a> 生成分片执行计划</h3>
+<p>有了分片规则之后，客户端就可以根据每一条SQL语句生成一个分片执行计划了。执行计划包含了每个分片节点需要执行的SQL语句以及对应的参数值。这里使用了一个叫做ShardingEngine的核心类来生成执行计划。</p>
+<h3 id="执行sql"><a class="markdownIt-Anchor" href="#执行sql"></a> 执行SQL</h3>
+<p>客户端将执行计划发送到服务端之后，服务端就可以开始执行SQL语句了。服务端会根据执行计划中指定的SQL语句和参数值在对应的数据库节点上执行查询操作，并将结果返回给客户端。</p>
+<h3 id="合并结果"><a class="markdownIt-Anchor" href="#合并结果"></a> 合并结果</h3>
+<p>由于数据被分散到了多个节点上，所以服务端在执行SQL语句之后，需要将结果合并成一个整体的结果集。这里采用了JDBC的ResultSet接口来实现结果集的合并操作。</p>
+<h2 id="总结"><a class="markdownIt-Anchor" href="#总结"></a> 总结</h2>
+<p>ShardingSphere-JDBC5是一个非常实用的分布式数据库中间件，它能够帮助我们快速地实现数据分片，提高查询性能和吞吐量。整个项目架构清晰，核心类也比较简单易懂。使用ShardingSphere可以让我们更加专注于业务开发，而不需要过多地关注底层的数据分片实现细节。</p>
+]]></content>
+      <categories>
+        <category>ShardingSphere</category>
+        <category>ShardingSphereJdbc</category>
+      </categories>
+      <tags>
+        <tag>ShardingSphere</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>JVM - 类加载过程</title>
+    <url>/posts/82c940cf/</url>
+    <content><![CDATA[<p>在Java中，类的加载是一个非常重要的过程，其负责将类文件从磁盘读取到内存中，并对其进行解析和初始化。JVM类加载过程一共分为以下<span style="border-bottom:2px solid green">三个步骤：加载、连接、初始化。</span></p>
+<pre class="mermaid">graph LR;
+    User[用户] --> Application(应用)
+    
+    subgraph JVM类加载流程 
+    Application -- 执行Java代码 --> ClassLoader(类加载器) 
+    
+    ClassLoader -- 加载类 --> BootstrapClassLoader(启动类加载器) 
+    ClassLoader -- 加载类 --> ExtensionClassLoader(扩展类加载器) 
+    ClassLoader -- 加载类 --> AppClassLoader(应用类加载器) 
+    
+    subgraph 类初始化 
+    AppClassLoader -- 类加载完成 --> Linking(连接阶段) 
+    Linking -- 初始化类变量 --> Init(初始化阶段) 
+    
+    Init -- 执行static块 --> Done(初始化完成) 
+    end
+    
+    Done -- 创建对象 --> Object(对象) 
+    Object -- 调用方法 --> Application
+    end</pre>
+<h2 id="加载"><a class="markdownIt-Anchor" href="#加载"></a> 加载</h2>
+<p><span style="border-bottom:2px solid green"><code>加载</code>是指将类文件从文件系统或者网络中读取到内存当中</span>（<a href="/posts/4f318695/"><code>类加载器</code></a>的功劳），并为之创建一个Class对象。在JVM中，Class对象是用来描述类的，其中包含了类的成员变量、方法等信息。当我们使用new关键字创建对象时，JVM会根据Class对象来实例化该类的对象并返回它。</p>
+<p>在类加载时，JVM采用了<span style="border-bottom:2px solid green"><code>双亲委派模型</code>，即将类的加载任务委派给父类加载器，如果父类加载器无法完成加载任务，才由子类加载器去尝试加载。</span>这种机制可以保证类的唯一性，避免了类的重复加载。</p>
+<h2 id="连接"><a class="markdownIt-Anchor" href="#连接"></a> 连接</h2>
+<p><span style="border-bottom:2px solid green"><code>连接</code>是指将已经读取到内存中的类文件进行校验、准备和解析的过程。</span></p>
+<ol>
+<li><strong>校验（Verification）</strong>：对类文件进行格式的校验，以确保它们符合JVM规范。如果校验失败，则会抛出ClassFormatError异常。</li>
+<li><strong>准备（Preparation）</strong>：为类变量分配内存，并设置默认值。在这个阶段，类变量并没有被初始化，只是分配了内存空间。</li>
+<li><strong>解析（Resolution）</strong>：将符号引用转化为直接引用的过程。在Java中，使用类名来访问一个类时，实际上是使用了符号引用。而在解析阶段，JVM会将其转化为直接引用，即具体的内存地址或偏移量。</li>
+</ol>
+<h2 id="初始化"><a class="markdownIt-Anchor" href="#初始化"></a> 初始化</h2>
+<p><span style="border-bottom:2px solid green"><code>初始化</code>是指执行类构造器方法()的过程。该方法由编译器生成，主要负责将类变量赋初值，以及执行静态代码块等操作。</span></p>
+<p>在执行()方法前，JVM会先执行父类的()方法，保证父类的静态成员变量和静态代码块也得到正确的初始化。</p>
+<p>在实例化对象时，JVM会首先调用父类的构造器方法，然后再调用子类的构造器方法。在执行构造器方法前，JVM会先执行实例变量初始化和非静态代码块。</p>
+<h2 id="双亲委派"><a class="markdownIt-Anchor" href="#双亲委派"></a> 双亲委派</h2>
+<p>双亲委派模型是Java类加载机制的核心。该模型是指当一个类加载器收到类加载请求时，它首先将这个请求转发给它的父类加载器，如果父类加载器无法完成类加载任务，才由自己去尝试加载。如下图：</p>
+<pre class="mermaid">graph LR;
+    User[用户] --> Application(应用)
+    
+    subgraph JVM类加载双亲委派流程 
+    Application -- 加载类 --> AppClassLoader(应用类加载器) 
+    
+    AppClassLoader -- 向上委派 --> ExtensionClassLoader(扩展类加载器) 
+    
+    ExtensionClassLoader -- 向上委派 --> BootstrapClassLoader(启动类加载器) 
+
+    BootstrapClassLoader -- 尝试加载类 --> Class(类) 
+    
+    Class -- 返回类实例 --> BootstrapClassLoader 
+    
+    BootstrapClassLoader -- 返回类实例 --> ExtensionClassLoader
+    
+    ExtensionClassLoader -- 返回类实例 --> AppClassLoader
+    
+    AppClassLoader -- 类加载完成 --> Linking(连接阶段) 
+    
+    Linking -- 初始化类变量 --> Done(初始化阶段) 
+    
+    Done -- 创建对象 --> Object(对象) 
+    Object -- 调用方法 --> Application
+    end</pre>
+<p>这种机制可以保证类的唯一性，避免了类的重复加载。例如，我们在JVM中使用String类时，它的加载过程如下所示：</p>
+<ol>
+<li>如果应用程序类加载器在它的类路径中找到了String类，那么它直接返回该Class对象。</li>
+<li>如果应用程序类加载器没有找到String类，那么它将请求转发给扩展类加载器。</li>
+<li>如果扩展类加载器在它的类路径中找到了String类，那么它直接返回该Class对象。</li>
+<li>如果扩展类加载器没有找到String类，那么它将请求转发给启动类加载器。</li>
+<li>启动类加载器在JVM核心类库中找到了String类，并将其返回给扩展类加载器。</li>
+<li>扩展类加载器将String类返回给应用程序类加载器。</li>
+<li>应用程序类加载器将String类返回给JVM。</li>
+</ol>
+<p>由于双亲委派模型的存在，当我们使用自定义类加载器时，可以避免类的重复加载。例如，我们如果想在同一个JVM中加载两个版本的com.example.MyClass类，则可以分别使用两个不同的类加载器来加载这两个版本的类，这样就不会出现类的冲突和覆盖问题。</p>
+<h2 id="总结"><a class="markdownIt-Anchor" href="#总结"></a> 总结</h2>
+<p>JVM的类加载过程是一个非常重要的过程，它负责将类文件从磁盘读取到内存中，并对其进行解析和初始化。在加载时，JVM采用了双亲委派模型，保证了类的唯一性和避免了类的重复加载。在实际开发中，我们可以通过自定义类加载器来实现特定的需求，例如在同一个JVM中加载多个版本的类。</p>
+]]></content>
+      <categories>
+        <category>JVM</category>
+        <category>类加载</category>
+      </categories>
+      <tags>
+        <tag>JVM</tag>
+        <tag>类加载器</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>JVM - 自定义类加载器</title>
+    <url>/posts/f5831f17/</url>
+    <content><![CDATA[<p>在Java中，每个类都被分配一个唯一的类加载器来加载它们。默认情况下，Java使用三个类加载器：引导类加载器、扩展类加载器和系统类加载器。这些类加载器可以处理大多数情况，但有时需要自定义类加载器来加载某些特定的类或资源。本文将介绍如何使用自定义类加载器在运行时加载类。</p>
+<h2 id="获取class对象"><a class="markdownIt-Anchor" href="#获取class对象"></a> 获取Class对象</h2>
+<p>首先，我们需要获取要加载的类的Class对象。这可以通过调用ClassLoader的<code>defineClass</code>方法来完成。以下是一个简单的获取Class对象的示例代码：</p>
+<div class="highlight-container" data-rel="Java"><figure class="iseeu highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">MyClassLoader</span> <span class="keyword">extends</span> <span class="title class_">ClassLoader</span> &#123;</span><br><span class="line">    <span class="keyword">public</span> Class&lt;?&gt; getClass(String name, <span class="type">byte</span>[] bytes) &#123;</span><br><span class="line">        <span class="keyword">return</span> defineClass(name, bytes, <span class="number">0</span>, bytes.length);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></div>
+<p>上述代码中的<code>getClass</code>方法接收两个参数：要加载的类的名称和类字节码数组。然后，该方法调用<code>defineClass</code>方法来创建并返回与给定字节数组相关联的Class对象。</p>
+<h2 id="自定义类加载器"><a class="markdownIt-Anchor" href="#自定义类加载器"></a> 自定义类加载器</h2>
+<h3 id="实现自己的类加载器"><a class="markdownIt-Anchor" href="#实现自己的类加载器"></a> 实现自己的类加载器</h3>
+<p>接下来，我们需要实现自定义类加载器。以下是一个简单的自定义类加载器的实现：</p>
+<div class="highlight-container" data-rel="Java"><figure class="iseeu highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">MyClassLoader</span> <span class="keyword">extends</span> <span class="title class_">ClassLoader</span> &#123;</span><br><span class="line">    <span class="keyword">private</span> String path;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="title function_">MyClassLoader</span><span class="params">(String path)</span> &#123;</span><br><span class="line">        <span class="built_in">this</span>.path = path;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="keyword">protected</span> Class&lt;?&gt; findClass(String name) <span class="keyword">throws</span> ClassNotFoundException &#123;</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            <span class="type">byte</span>[] bytes = loadClassData(name);</span><br><span class="line">            <span class="keyword">return</span> defineClass(name, bytes, <span class="number">0</span>, bytes.length);</span><br><span class="line">        &#125; <span class="keyword">catch</span> (IOException e) &#123;</span><br><span class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> <span class="title class_">ClassNotFoundException</span>(<span class="string">&quot;Class &quot;</span> + name + <span class="string">&quot; not found.&quot;</span>, e);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="type">byte</span>[] loadClassData(String name) <span class="keyword">throws</span> IOException &#123;</span><br><span class="line">        <span class="type">InputStream</span> <span class="variable">stream</span> <span class="operator">=</span> getClass().getClassLoader().getResourceAsStream(path + name.replace(<span class="string">&quot;.&quot;</span>, <span class="string">&quot;/&quot;</span>) + <span class="string">&quot;.class&quot;</span>);</span><br><span class="line">        <span class="type">ByteArrayOutputStream</span> <span class="variable">buffer</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">ByteArrayOutputStream</span>();</span><br><span class="line">        <span class="type">int</span> <span class="variable">data</span> <span class="operator">=</span> stream.read();</span><br><span class="line"></span><br><span class="line">        <span class="keyword">while</span> (data != -<span class="number">1</span>) &#123;</span><br><span class="line">            buffer.write(data);</span><br><span class="line">            data = stream.read();</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        stream.close();</span><br><span class="line">        <span class="keyword">return</span> buffer.toByteArray();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></div>
+<p>上述代码中的自定义类加载器使用了一个路径来指定要加载的类的位置。在<code>findClass</code>方法中，它首先调用<code>loadClassData</code>方法来从文件系统中读取类字节码。然后，它将该字节数组传递给<code>defineClass</code>方法来创建并返回与给定字节数组相关联的Class对象。</p>
+<h3 id="使用自定义的类加载器"><a class="markdownIt-Anchor" href="#使用自定义的类加载器"></a> 使用自定义的类加载器</h3>
+<p>以下是使用我们自定义的类加载器的示例代码：</p>
+<div class="highlight-container" data-rel="Java"><figure class="iseeu highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">Main</span> &#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> Exception &#123;</span><br><span class="line">        <span class="type">MyClassLoader</span> <span class="variable">loader</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">MyClassLoader</span>(<span class="string">&quot;/path/to/classes/&quot;</span>);</span><br><span class="line">        Class&lt;?&gt; clazz = loader.loadClass(<span class="string">&quot;com.example.MyClass&quot;</span>);</span><br><span class="line">        <span class="type">Object</span> <span class="variable">object</span> <span class="operator">=</span> clazz.getDeclaredConstructor().newInstance();</span><br><span class="line">        <span class="type">Method</span> <span class="variable">method</span> <span class="operator">=</span> clazz.getMethod(<span class="string">&quot;hello&quot;</span>);</span><br><span class="line">        method.invoke(object);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">MyClass</span> &#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">hello</span><span class="params">()</span> &#123;</span><br><span class="line">        System.out.println(<span class="string">&quot;Hello, world!&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></div>
+<p>上述代码中的<code>Main</code>类演示了如何使用自定义类加载器在运行时加载类。首先，它创建一个MyClassLoader对象，并使用该对象来加载名为<code>com.example.MyClass</code>的类。然后，它使用反射机制调用<code>hello</code>方法，从而在控制台上输出一条消息。</p>
+<h2 id="总结"><a class="markdownIt-Anchor" href="#总结"></a> 总结</h2>
+<p>通过自定义类加载器，我们可以在运行时加载特定的类或资源。在这个过程中，自定义类加载器会从指定的位置加载字节码，并使用<code>defineClass</code>方法创建Class对象。这种能力可以被用于实现动态加载、模块化和插件系统等高级功能。但是，需要注意的是，自定义类加载器可能会对Java程序的安全性和稳定性产生影响，因此需要谨慎使用。</p>
+]]></content>
+      <categories>
+        <category>JVM</category>
+        <category>类加载</category>
+      </categories>
+      <tags>
+        <tag>JVM</tag>
+        <tag>类加载器</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>JVM - 类加载器</title>
+    <url>/posts/4f318695/</url>
+    <content><![CDATA[<p>JVM（Java Virtual Machine）是Java程序的运行环境，它能够将Java代码转换成可执行的字节码，并在不同平台上运行。在JVM中，类加载器（Class Loader）负责将Java字节码加载到JVM中。</p>
+<h2 id="类加载器概述"><a class="markdownIt-Anchor" href="#类加载器概述"></a> 类加载器概述</h2>
+<p>类加载器是JVM中的一个重要组件，它主要用于加载Java类和资源文件。在JVM中，类加载器会按照一定的顺序查找需要加载的类，如果类没有被加载，则会通过类加载器将其加载到内存中。</p>
+<div class="note-large notel-green"><div class="notel-title"><p>JVM中存在三种类加载器</p>
+</div><div class="notel-content"><ol>
+<li><strong>启动类加载器（Bootstrap ClassLoader）</strong>：负责加载Java的核心类库，如java.lang包中的类。</li>
+<li><strong>扩展类加载器（Extension ClassLoader）</strong>：负责加载Java扩展库，如javax.*包中的类。</li>
+<li><strong>应用程序类加载器（Application ClassLoader）</strong>：负责加载应用程序的类，即我们自己编写的类。</li>
+<li><strong>自定义类加载器</strong>：开发者可以通过继承ClassLoader类来创建自定义的类加载器，以满足特定的需求。</li>
+</ol>
+ </div></div>
+<h2 id="java-9之前的类加载器"><a class="markdownIt-Anchor" href="#java-9之前的类加载器"></a> Java 9之前的类加载器</h2>
+<p>在Java 9之前，JVM中的类加载器存在两个问题：</p>
+<ol>
+<li><strong>命名空间污染</strong>：由于每个类加载器都有自己的命名空间，因此可能会导致多个类加载器加载同一个类，从而引发命名空间污染问题。</li>
+<li><strong>无法卸载类</strong>：由于JVM中的类加载器不支持卸载已经加载的类，因此可能会导致内存泄漏问题。</li>
+</ol>
+<p>为了解决这些问题，Java 9引入了一种新的类加载器架构。</p>
+<h2 id="java-9之后的类加载器"><a class="markdownIt-Anchor" href="#java-9之后的类加载器"></a> Java 9之后的类加载器</h2>
+<p>在Java 9中，JVM中的类加载器被重新设计为：</p>
+<div class="note-large notel-green"><div class="notel-title"><p>Java9类加载器</p>
+</div><div class="notel-content"><ol>
+<li><strong>启动类加载器</strong>：负责加载Java的核心类库，如java.lang包中的类。</li>
+<li><strong>平台类加载器</strong>：负责加载Java扩展库，如javax.*包中的类。</li>
+<li><strong>应用程序类加载器</strong>：负责加载应用程序的类，即我们自己编写的类。</li>
+<li><strong>模块类加载器</strong>：负责加载模块中的类。</li>
+</ol>
+ </div></div>
+<p>Java 9中的模块化系统为JVM类加载器带来了一些重大变化，可以解决Java 9之前存在的问题。</p>
+<h3 id="模块化类加载器"><a class="markdownIt-Anchor" href="#模块化类加载器"></a> 模块化类加载器</h3>
+<p>在Java 9中，每个模块都有自己的类加载器，这些类加载器由模块路径（Module Path）上的模块描述符（Module Descriptor）指定。模块描述符是一个文件，它描述了模块的依赖关系和导出的包。模块加载器会按照模块描述符中指定的依赖关系来加载模块，并将其放置在自己的命名空间中。</p>
+<p>模块化类加载器具有以下特点：</p>
+<ol>
+<li><strong>命名空间隔离</strong>：每个模块都有自己的命名空间，避免了命名空间污染问题。</li>
+<li><strong>可卸载性</strong>：由于每个模块都有自己的类加载器，因此可以卸载整个模块，避免了内存泄漏问题。</li>
+</ol>
+<h3 id="模块路径和类路径"><a class="markdownIt-Anchor" href="#模块路径和类路径"></a> 模块路径和类路径</h3>
+<p>在Java 9中，存在两种类路径：</p>
+<ol>
+<li><strong>模块路径（Module Path）</strong>：它用于指定模块所在的路径，其中包括了每个模块的描述符和类文件。模块路径是Java 9中新增的概念，它是实现模块化的关键。</li>
+<li><strong>类路径（Class Path）</strong>：它用于指定非模块化代码所在的路径，其中包括了每个类文件和JAR文件。类路径是Java早期就存在的概念，在Java 9中仍然保留。</li>
+</ol>
+<h2 id="总结"><a class="markdownIt-Anchor" href="#总结"></a> 总结</h2>
+<p>Java 9引入了模块化系统，它将Java代码分解为更小、更简单的组件，并将其打包成模块。每个模块都有自己的依赖关系和导出的API。这种模块化系统使得Java应用程序更加易于开发、维护和部署。</p>
+<p>在Java 9中，类加载器被重新设计为启动类加载器、平台类加载器、应用程序类加载器和模块类加载器。其中，模块类加载器具有命名空间隔离和可卸载性的特点，这些特点可以避免命名空间污染和内存泄漏问题。</p>
+<p>总之，Java 9的类加载器架构是一个重大的变化，它提供了更好的模块化支持，并且解决了Java 9之前存在的一些问题。</p>
+]]></content>
+      <categories>
+        <category>JVM</category>
+        <category>类加载</category>
+      </categories>
+      <tags>
+        <tag>JVM</tag>
+        <tag>类加载器</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>JVM - 运行时数据区</title>
+    <url>/posts/243280dc/</url>
+    <content><![CDATA[<p>JVM（Java Virtual Machine）是一个虚拟机，它是 Java 语言能够运行的关键所在。JVM 的结构包含了多个不同的组件，其中最重要的就是它的运行时数据区。</p>
+<h2 id="jvm-运行时数据区的概述"><a class="markdownIt-Anchor" href="#jvm-运行时数据区的概述"></a> JVM 运行时数据区的概述</h2>
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://mydlq-club.oss-cn-beijing.aliyuncs.com/images/my-jvm-constitute-concept.svg"
+                      alt="jvm 运行时数据区" 
+                ></p>
+<div class="note-large notel-green"><div class="notel-title"><p>运行时数据区可以分为以下几个部分</p>
+</div><div class="notel-content"><ol>
+<li><code>程序计数器：</code>程序计数器是一块较小的内存空间，它保存了当前线程正在执行的字节码指令的地址。当执行方法时，程序计数器会记录下一条将要执行的指令。由于每个线程都需要有自己的程序计数器，因此它是线程私有的。</li>
+<li><code>Java 虚拟机栈：</code>每个线程在运行时都会有一个对应的虚拟机栈，它用于存储方法调用的信息，包括局部变量、操作数栈、返回值等。每次方法调用时，JVM 都会创建一个对应的栈帧，并把它压入栈顶。当方法返回时，对应的栈帧会被弹出。由于每个线程都需要有自己的虚拟机栈，因此它也是线程私有的。</li>
+<li><code>堆：</code>堆是 JVM 中最大的一块内存空间，它用于存储对象实例。当使用 new 关键字创建一个对象时，JVM 会在堆上分配一块内存来存储该对象的实例。由于所有线程都需要共享堆空间，因此堆是线程共享的。</li>
+<li><code>方法区：</code>方法区也被称为永久代（PermGen），它用于存储类信息、常量、静态变量等数据。与堆一样，方法区也是线程共享的。</li>
+</ol>
+ </div></div>
+<h2 id="jvm-运行时数据区的特点"><a class="markdownIt-Anchor" href="#jvm-运行时数据区的特点"></a> JVM 运行时数据区的特点</h2>
+<ol>
+<li><code>线程私有和线程共享：</code>如上所述，程序计数器和虚拟机栈是线程私有的，而堆和方法区是线程共享的。</li>
+<li><code>自动内存管理：</code>JVM 的运行时数据区采用了自动内存管理的方式，即 Java 垃圾回收机制。当对象不再被引用时，JVM 会将其标记为垃圾，并进行回收。</li>
+<li><code>动态扩展和收缩：</code>JVM 的运行时数据区可以根据应用程序的需求动态地进行扩展或收缩。当内存不足时，JVM 会自动触发垃圾回收机制，清理掉无用的对象释放内存。当内存达到一定阈值时，JVM 可以通过调整堆大小来扩展内存空间。</li>
+</ol>
+<h2 id="总结"><a class="markdownIt-Anchor" href="#总结"></a> 总结</h2>
+<p>JVM 运行时数据区是 Java 虚拟机中最重要的组成部分之一，它用于存储程序执行时所需的数据。JVM 运行时数据区分为程序计数器、虚拟机栈、堆和方法区四个部分，其中程序计数器和虚拟机栈是线程私有的，堆和方法区是线程共享的。JVM 的运行时数据区采用了自动内存管理的方式，并且可以根据应用程序的需求动态地进行扩展或收缩。</p>
+]]></content>
+      <categories>
+        <category>JVM</category>
+        <category>数据区</category>
+      </categories>
+      <tags>
+        <tag>JVM</tag>
+        <tag>运行时数据区</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Java 对象的组成</title>
+    <url>/posts/dcb2c325/</url>
+    <content><![CDATA[<p>在JVM中，每个对象都由三个部分组成：对象头、实例变量和对齐填充。</p>
+<h2 id="组成部分"><a class="markdownIt-Anchor" href="#组成部分"></a> 组成部分</h2>
+<div class="note note-green"><p>在JVM中，每个对象都由三个部分组成：对象头、实例变量和对齐填充。</p>
+</div>
+<h3 id="对象头"><a class="markdownIt-Anchor" href="#对象头"></a> 对象头</h3>
+<p>对象头是存储在每个Java对象之前的一段内存空间，用于存储对象的元数据信息，包括以下内容：</p>
+<ul>
+<li>Mark Word：标记字，用于存储锁相关信息、GC状态信息等。</li>
+<li>Class pointer：指向该对象所属类的指针，用于确定对象类型。</li>
+<li>数组长度：如果该对象是数组，则用于存储数组长度。</li>
+</ul>
+<p>对象头的大小取决于平台的位数以及压缩指针技术的使用情况等因素。</p>
+<h3 id="实例变量"><a class="markdownIt-Anchor" href="#实例变量"></a> 实例变量</h3>
+<p>实例变量是对象的成员变量，定义了该对象的属性。它们被存储在紧随对象头之后的内存空间中。实例变量的大小和类型取决于对象所属类中定义的成员变量。</p>
+<h3 id="对齐填充"><a class="markdownIt-Anchor" href="#对齐填充"></a> 对齐填充</h3>
+<p>为了保证对象的大小是8字节的倍数，JVM会在实例变量之后添加一些额外的字节，即对齐填充。这些额外的字节没有任何实际作用，只是为了满足内存对齐的要求。</p>
+<p>对齐填充的大小取决于对象头和实例变量所占用的内存空间。</p>
+<h3 id="实际大小"><a class="markdownIt-Anchor" href="#实际大小"></a> 实际大小</h3>
+<p>总体来说，一个Java对象的实际大小有以下三个部分组成：</p>
+<ol>
+<li>对象头的大小：在不同的JVM实现中，对象头的大小可能会有所不同。</li>
+<li>实例变量的大小：该对象中定义的所有实例变量的大小。</li>
+<li>对齐填充的大小：为了满足内存对齐的要求而添加的额外字节。</li>
+</ol>
+<p>具体的实际大小取决于平台的位数、操作系统的类型以及JVM实现的不同等因素。</p>
+<h2 id="总结"><a class="markdownIt-Anchor" href="#总结"></a> 总结</h2>
+<p>JVM对象由对象头、实例变量和对齐填充三个部分组成。对象头用于存储对象的元数据信息；实例变量定义了该对象的属性；对齐填充用于保证对象大小是8字节的倍数。理解JVM对象的组成对于Java程序开发人员来说是非常重要的，可以帮助他们更好地管理内存资源，提高程序性能。</p>
+]]></content>
+      <categories>
+        <category>JVM</category>
+        <category>Java 对象</category>
+      </categories>
+      <tags>
+        <tag>JVM</tag>
+        <tag>Java</tag>
+        <tag>Java 对象</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Java 对象是否存活</title>
+    <url>/posts/6a10d920/</url>
+    <content><![CDATA[<p>在JVM中，垃圾回收器会对内存中的对象进行生死判定，将无用的对象回收以释放内存空间。本篇博客将介绍JVM对象生死判定的过程。</p>
+<h2 id="算法"><a class="markdownIt-Anchor" href="#算法"></a> 算法</h2>
+<div class="note note-green"><p>用来判定对象存亡的常用算法有两种：引用计数法、可达性分析算法。</p>
+</div>
+<h3 id="引用计数法"><a class="markdownIt-Anchor" href="#引用计数法"></a> 引用计数法</h3>
+<p>引用计数法是最简单也是最基础的垃圾回收算法之一。该算法通过跟踪每个对象被引用的次数来判断对象是否已经成为垃圾。</p>
+<p>当一个新对象被创建时，其引用计数为1。当其他对象引用该对象时，其对应的引用计数加1。当某个对象的引用计数变为0时，说明该对象已经成为垃圾，可以被回收。</p>
+<p>然而，引用计数法有一个明显的问题：<span style="border-bottom:2px dashed red;">循环引用。如果两个或多个对象之间互相引用，它们的引用计数永远不会变成0，导致垃圾回收器无法将它们回收。</span>因此，引用计数法并不适用于实际的垃圾回收。</p>
+<h3 id="可达性分析算法"><a class="markdownIt-Anchor" href="#可达性分析算法"></a> 可达性分析算法</h3>
+<div class="note note-green"><p>JVM 使用此算法</p>
+</div>
+<p>可达性分析算法是目前主流的垃圾回收算法之一。它基于“GC Roots”的概念来判断对象是否可达。</p>
+<p>在JVM中，GC Roots包括以下几类：</p>
+<ul>
+<li>虚拟机栈（栈帧中的本地变量表）中引用的对象。</li>
+<li>方法区中静态属性引用的对象。</li>
+<li>方法区中常量引用的对象。</li>
+<li>本地方法栈中JNI（Java Native Interface）引用的对象。</li>
+</ul>
+<p>可达性分析算法从GC Roots开始遍历内存中的所有对象，将可以到达的对象标记为“存活”，而未被标记的对象则被视为垃圾。</p>
+<p>可达性分析算法可以有效地处理循环引用问题，并且能够精确地识别出无用对象。</p>
+<h2 id="对象生死判定流程"><a class="markdownIt-Anchor" href="#对象生死判定流程"></a> 对象生死判定流程</h2>
+<p>JVM中的垃圾回收器会周期性地对内存中的对象进行生死判定，以便将无用对象回收。其具体流程如下：</p>
+<ol>
+<li>根据GC Roots开始遍历内存中的所有对象。</li>
+<li>将所有可以到达的对象标记为“存活”。</li>
+<li>将未被标记的对象视为垃圾，进行回收。</li>
+</ol>
+<p>需要注意的是，在进行垃圾回收时，可能会造成一些短暂的系统停顿。这是因为垃圾回收器需要暂停正在执行的程序，并锁定整个堆空间，以便安全地对内存中的对象进行回收。为了减少这种停顿时间，JVM引入了一些优化措施，如并发标记和整理、增量式收集等。</p>
+<h2 id="总结"><a class="markdownIt-Anchor" href="#总结"></a> 总结</h2>
+<p>JVM对象生死判定是垃圾回收机制的重要组成部分。可达性分析算法是目前主流的垃圾回收算法之一，它可以精确地识别出无用对象，并解决循环引用问题。程序员需要了解JVM对象生死判定的过程，以便更好地管理内存资源，提高程序性能。</p>
+]]></content>
+      <categories>
+        <category>JVM</category>
+        <category>Java 对象</category>
+      </categories>
+      <tags>
+        <tag>JVM</tag>
+        <tag>Java</tag>
+        <tag>Java 对象</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Java 对象的生命周期</title>
+    <url>/posts/dcb2c325/</url>
+    <content><![CDATA[<p>Java虚拟机（JVM）是一种能够在不同平台上运行Java程序的虚拟机。在JVM中，每个对象都有其自己的生命周期。本篇博客将介绍JVM对象的生命周期。</p>
+<h2 id="生命周期阶段"><a class="markdownIt-Anchor" href="#生命周期阶段"></a> 生命周期阶段</h2>
+<div class="note note-green"><p>Java 对象的生命周期的几个阶段，分别为：对象的创建、使用、回收、销毁，下边逐个来进行介绍；</p>
+</div>
+<h3 id="对象的创建"><a class="markdownIt-Anchor" href="#对象的创建"></a> 对象的创建</h3>
+<p>当使用<code>new</code>关键字创建一个对象时，JVM会先检查类是否已经被加载和链接过。如果没有加载，则先进行类的加载和连接操作。然后为该对象分配内存空间，并对分配到的内存空间进行清零赋值，即初始化对象的所有实例变量为默认值。</p>
+<p>接着，JVM会调用对象的构造函数（Constructor），初始化对象的实例变量。如果该类没有显式地定义构造函数，则JVM会提供一个默认的无参构造函数。</p>
+<p>最后，JVM会把对象的引用返回给程序员，以便程序员可以通过该引用来操作该对象。</p>
+<h3 id="对象的使用"><a class="markdownIt-Anchor" href="#对象的使用"></a> 对象的使用</h3>
+<p>在对象创建后，程序员可以通过对象的引用对它进行操作。对象在内存中的位置由对象的引用来确定。当一个对象被使用时，它可能会被传递给其他方法或者被保存在某些数据结构中。</p>
+<h3 id="对象的回收"><a class="markdownIt-Anchor" href="#对象的回收"></a> 对象的回收</h3>
+<p>当一个对象不再被程序员所引用时，该对象就成了垃圾（Garbage）。JVM需要将这些无用的对象从内存中清除，以便后面的内存分配可以使用这些空间。</p>
+<p>JVM中的垃圾回收（Garbage Collection）机制负责回收这些无用对象。当JVM检测到一个对象已经成为垃圾时，它就会自动地将该对象所占用的内存空间释放出来，以便程序后续的内存分配可以使用这些空间。</p>
+<p>在JVM中，垃圾回收是由垃圾回收器（Garbage Collector）来完成的。不同的垃圾回收器采用不同的算法来实现垃圾回收。常见的垃圾回收算法包括标记-清除算法、复制算法、标记-整理算法和分代收集算法等。</p>
+<h3 id="对象的销毁"><a class="markdownIt-Anchor" href="#对象的销毁"></a> 对象的销毁</h3>
+<p>当一个对象被回收后，JVM并不会立即销毁它。相反，JVM会等待垃圾回收器对内存进行整理后，再对垃圾对象进行销毁。销毁一个对象的最终步骤是调用其<code>finalize()</code>方法。该方法是Object类中定义的一个方法，在GC进行回收之前会先调用该方法。</p>
+<p>在Java 9之后，<code>finalize()</code>方法已经被废弃，取而代之的是使用Cleaner API进行资源管理。</p>
+<h2 id="总结"><a class="markdownIt-Anchor" href="#总结"></a> 总结</h2>
+<p>JVM对象的生命周期包括对象的创建、使用、回收和销毁等阶段。理解JVM对象的生命周期对于Java程序开发人员来说是非常重要的，可以帮助他们更好地管理内存资源，提高程序性能。</p>
+]]></content>
+      <categories>
+        <category>JVM</category>
+        <category>Java 对象</category>
+      </categories>
+      <tags>
+        <tag>JVM</tag>
+        <tag>Java</tag>
+        <tag>Java 对象</tag>
       </tags>
   </entry>
   <entry>
@@ -408,6 +1057,287 @@
       <tags>
         <tag>Java</tag>
         <tag>Java 环境配置</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>JVM 垃圾回收算法</title>
+    <url>/posts/94863c7b/</url>
+    <content><![CDATA[<p>与其他语言相比，Java有着自动内存管理的优势，即由JVM自动进行内存分配和垃圾回收处理。本篇博客将介绍JVM中的垃圾回收算法。</p>
+<h2 id="垃圾回收的基本概念"><a class="markdownIt-Anchor" href="#垃圾回收的基本概念"></a> 垃圾回收的基本概念</h2>
+<p>垃圾回收的目的是释放无用的内存空间以供后续的内存分配使用。JVM中使用垃圾回收器（Garbage Collector）来自动实现这个过程。垃圾回收器会在发现内存中存在无用的对象时，将其所占用的内存空间回收。</p>
+<p>为了实现垃圾回收，需要定义什么是“无用对象”。在JVM中，一个对象被判定为无用对象，当且仅当它满足下列条件：</p>
+<ul>
+<li>该对象没有被引用</li>
+<li>该对象的所有引用均已断开</li>
+</ul>
+<p>垃圾回收算法的目标是尽可能快地识别和回收无用对象，同时保持系统性能的稳定。</p>
+<h2 id="常见垃圾回收算法"><a class="markdownIt-Anchor" href="#常见垃圾回收算法"></a> 常见垃圾回收算法</h2>
+<h3 id="标记-清除算法"><a class="markdownIt-Anchor" href="#标记-清除算法"></a> 标记-清除算法</h3>
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://luolanmeet.github.io/jvm-note/content/part2/%E5%9E%83%E5%9C%BE%E6%94%B6%E9%9B%86%E5%99%A8/%E5%9E%83%E5%9C%BE%E6%94%B6%E9%9B%86%E7%AE%97%E6%B3%95/img/%E6%A0%87%E8%AE%B0-%E6%B8%85%E9%99%A4%E7%AE%97%E6%B3%95.png"
+                      alt="标记清楚" 
+                ></p>
+<p><code>标记-清除算法</code>是最基本的垃圾回收算法。它分为两个阶段：标记和清除。</p>
+<p>在标记阶段，垃圾回收器遍历堆中的所有对象，并标记出所有被引用的对象。在清除阶段，垃圾回收器将未被标记的对象所占用的内存空间全部回收。</p>
+<p>这个算法的缺点是会产生碎片，因为回收后的内存空间是不连续的。如果始终使用标记-清除算法，那么随着时间的推移，内存空间中的空洞（即碎片）将越来越多，导致内存分配效率降低。</p>
+<h3 id="复制算法"><a class="markdownIt-Anchor" href="#复制算法"></a> 复制算法</h3>
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://luolanmeet.github.io/jvm-note/content/part2/%E5%9E%83%E5%9C%BE%E6%94%B6%E9%9B%86%E5%99%A8/%E5%9E%83%E5%9C%BE%E6%94%B6%E9%9B%86%E7%AE%97%E6%B3%95/img/%E6%A0%87%E8%AE%B0-%E5%A4%8D%E5%88%B6%E7%AE%97%E6%B3%95.png"
+                      alt="复制算法" 
+                ></p>
+<p><code>复制算法</code>是一种高效的垃圾回收算法。它将堆空间划分为大小相等的两块，每次只使用其中一块。当这一块内存空间用完时，垃圾回收器将已经标记了的存活对象复制到另一块未使用的空间中，然后清除已使用的那一块空间并交换它们的角色。</p>
+<p>复制算法的缺点是需要消耗一半的空间。同时，如果存活对象很多，每次都要进行复制操作，也会带来不小的性能开销。</p>
+<h3 id="标记-整理算法"><a class="markdownIt-Anchor" href="#标记-整理算法"></a> 标记-整理算法</h3>
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://luolanmeet.github.io/jvm-note/content/part2/%E5%9E%83%E5%9C%BE%E6%94%B6%E9%9B%86%E5%99%A8/%E5%9E%83%E5%9C%BE%E6%94%B6%E9%9B%86%E7%AE%97%E6%B3%95/img/%E6%A0%87%E8%AE%B0-%E6%95%B4%E7%90%86%E7%AE%97%E6%B3%95.png"
+                      alt="整理算法" 
+                ></p>
+<p><code>标记-整理算法</code>是对标记-清除算法的改进。它同样分为两个阶段：标记和整理。</p>
+<p>在标记阶段，垃圾回收器遍历堆中的所有对象，并标记出所有被引用的对象。在整理阶段，垃圾回收器将所有存活对象移到堆的一端，然后清除堆的另外一端上的所有无用对象。</p>
+<p>标记-整理算法通过整理过程来解决标记-清除算法产生的碎片问题，使得内存空间变得连续起来。</p>
+<h3 id="三色标记"><a class="markdownIt-Anchor" href="#三色标记"></a> 三色标记</h3>
+<p><code>三色标记</code>是一种用于 Java 虚拟机（JVM）垃圾回收算法的技术，配合<a href="/posts/6a10d920">可达性分析算法</a>实现垃圾的高效、准确的收集。</p>
+<p>在三色标记中，JVM将内存对象分为三个不同的颜色：白色、灰色和黑色。</p>
+<ul>
+<li><code>白色</code>：表示对象尚未被扫描和标记。</li>
+<li><code>灰色</code>：表示对象已经被扫描，但是它引用的其他对象尚未被扫描和标记。</li>
+<li><code>黑色</code>：表示对象已经被扫描和标记，并且它引用的其他对象也已经被扫描和标记。</li>
+</ul>
+<p>JVM 使用三色标记来跟踪哪些对象可以被安全地回收。当 JVM 进行垃圾回收时，它会从根对象开始遍历所有对象，并将它们标记为灰色或黑色。然后，JVM 会清除所有白色对象，因为这些对象没有任何引用。</p>
+<p>在三色标记算法中，灰色的对象表示悬挂的对象，即其引用的对象尚未被处理。如果某个对象的所有引用都已经被扫描和标记，那么它就会被标记为黑色。</p>
+<p>通过使用三色标记算法，JVM 可以更快地确定哪些对象可以被安全地回收，从而提高了应用程序的性能和可靠性。</p>
+<h3 id="分代收集算法"><a class="markdownIt-Anchor" href="#分代收集算法"></a> 分代收集算法</h3>
+<p><code>分代收集算法</code>是目前主流的垃圾回收算法。它根据对象的存活周期把堆区域分为新生代和老年代两个区域。新生代中的对象通常存活时间较短，而老年代中的对象则存活时间较长。不同区域采用不同的垃圾回收算法。</p>
+<p>新生代通常使用复制算法。它把新生代分为Eden区和两个Survivor区，每次只使用Eden区和其中一个Survivor区，将已经标记了的存活对象复制到另一块未使用的Survivor区中，然后清除Eden区和已使用的Survivor区中的无用对象。</p>
+<p>老年代通常使用标记-整理算法。因为老年代中的对象存活时间较长，所以会产生大量的内存碎片。标记-整理算法通过整理过程来解决这个问题。</p>
+<h2 id="总结"><a class="markdownIt-Anchor" href="#总结"></a> 总结</h2>
+<p>JVM垃圾回收算法包括标记-清除算法、复制算法、标记-整理算法和分代收集算法等。不同的垃圾回收算法适用于不同的场景，需要根据具体情况进行选择。对于Java程序开发人员来说，理解JVM垃圾回收算法对于优化程序性能至关重要。</p>
+]]></content>
+      <categories>
+        <category>JVM</category>
+        <category>GC</category>
+      </categories>
+      <tags>
+        <tag>JVM</tag>
+        <tag>Java</tag>
+        <tag>GC</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>CMS 垃圾回收器</title>
+    <url>/posts/d20aa128/</url>
+    <content><![CDATA[<p>CMS 的全称为 Concurrent Mark Sweep（并发标记清除），是 <code>JDK1.5</code> 版本之后内置的一种垃圾回收器。与其他垃圾回收器不同，CMS 的目标是实现最短的GC停顿时间，即使在大型堆内存的情况下也能保证应用的响应速度和性能。</p>
+<div class="note-large notel-yellow"><div class="notel-title"><p>注意</p>
+</div><div class="notel-content"><p>随着JDK版本的不断升级，从JDK 9开始，CMS收集器已经被标记为“即将被弃用”（Deprecated），而在JDK 14中彻底被删除。原因是CMS收集器存在以下问题：</p>
+<ol>
+<li>空间碎片：由于CMS收集器只能对老年代进行回收，所以会产生大量的空间碎片。这会导致后续的内存分配操作变得困难，甚至可能出现 OutOfMemoryError 错误。</li>
+<li>CPU占用：由于CMS收集器需要与应用程序线程并发工作，所以会占用一些CPU资源，影响应用程序的性能。</li>
+<li>内存泄漏：如果CMS收集器无法回收所有的垃圾，就会导致内存泄漏。</li>
+</ol>
+<p>因此，<a href="/posts/bc8ac7bc/"><code>G1收集器</code></a>逐渐成为了JDK的默认垃圾收集器。G1收集器采用分代回收的思想，可以更好地处理大量对象的分配和释放，避免了CMS收集器的一些缺点。</p>
+ </div></div>
+<h2 id="区域划分"><a class="markdownIt-Anchor" href="#区域划分"></a> 区域划分</h2>
+<p>在进行垃圾回收时，它将<span style="border-bottom:2px solid yellow">堆内存</span>划分为多个区域，在不影响应用程序执行的情况下进行垃圾回收。</p>
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="cmsmemory.webp"
+                      alt="cms memory" 
+                ></p>
+<div class="note-large notel-green"><div class="notel-title"><p>堆内存的区域划分</p>
+</div><div class="notel-content"><ul>
+<li><code>新生代</code>：包括Eden区和两个Survivor区（From Space和To Space）。当新对象被创建时，它们会首先被分配到Eden区。当Eden区满时，会触发Minor GC。在Minor GC过程中，Eden区和Survivor区中的存活对象会被复制到另一个Survivor区中，并经过一系列复制和清理操作后，存活的对象会被复制到另一个Survivor区中。每次Minor GC后，From Space和To Space会互换角色。（Eden 区 和 两个 Survivor区的大小比例：8:1:1，可以使用 <code>-XX:SurvivorRatio</code> 惊醒调整，默认值为 8）</li>
+<li><code>老年代</code>：存放长时间存活的对象。当Old区满时，会触发Full GC。Full GC会暂停整个JVM，对全局进行垃圾回收。由于Full GC需要暂停整个JVM，因此CMS垃圾回收器总是尽可能地减少Full GC的发生次数。</li>
+</ul>
+ </div></div>
+<h2 id="工作原理"><a class="markdownIt-Anchor" href="#工作原理"></a> 工作原理</h2>
+<p>CMS垃圾回收器采用了“标记-清除”算法，其主要过程如下：</p>
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://icefrozen.github.io/article/java-cms-gc/1552636737931java-cms-gc_.png"
+                      alt="cms" 
+                ></p>
+<ol>
+<li><code>初始标记</code>：暂停所有应用线程，必须短暂暂停以达到<a href="/posts/5a9ba959/">安全点</a>；标记出所有根对象以及直接与其相关的对象；</li>
+<li><code>并发标记</code>：恢复所有应用线程，同时并发地遍历老年代中的所有对象进行标记；</li>
+<li><code>重新标记</code>：暂停所有应用线程，必须短暂暂停以达到<a href="/posts/5a9ba959/">安全点</a>；处理并发标记期间因用户程序继续执行而被遗漏的新生代对象；</li>
+<li><code>并发清除</code>：同时清除标记完成的所有不再使用的对象。</li>
+</ol>
+<h2 id="优缺点"><a class="markdownIt-Anchor" href="#优缺点"></a> 优缺点</h2>
+<div class="note-large notel-green"><div class="notel-title"><p>优点</p>
+</div><div class="notel-content"><ol>
+<li>垃圾回收期间最大程度上减少了应用程序的停顿时间；</li>
+<li>适用于大型堆内存的JVM，CMS在回收大对象时非常高效；</li>
+<li>消耗的CPU资源较少；</li>
+</ol>
+ </div></div>
+<div class="note-large notel-red"><div class="notel-title"><p>缺点</p>
+</div><div class="notel-content"><ol>
+<li>运作过程中需要占用一定的内存空间以记录清除信息；</li>
+<li>在进行并发标记和清除的过程中，由于用户线程和垃圾回收线程交错执行，所以会对CPU产生一定压力；</li>
+<li>整个运作过程相对复杂，实现难度较大。</li>
+</ol>
+ </div></div>
+<h2 id="使用建议"><a class="markdownIt-Anchor" href="#使用建议"></a> 使用建议</h2>
+<ol>
+<li>应用程序必须运行在64位的JVM上；</li>
+<li>不推荐将老年代的内存分配过小，否则可能频繁触发Full GC；</li>
+<li>避免在快照时间段内生成大量的对象，否则可能导致CMS无法顺利完成垃圾回收操作。</li>
+</ol>
+<h2 id="结论"><a class="markdownIt-Anchor" href="#结论"></a> 结论</h2>
+<p>G1（Garbage First）垃圾收集器是一种用于管理Java虚拟机内存的垃圾回收器，它将堆内存分成大小相等的区域，并根据实际情况自适应调整垃圾回收策略，从而避免全局暂停，提高了响应时间和吞吐量。G1垃圾收集器具有分代收集、并发收集、可预测性和空间利用率等优点，但同时也存在初始标记和最终标记需要STW、物理内存占用等缺点。</p>
+]]></content>
+      <categories>
+        <category>JVM</category>
+        <category>GC</category>
+      </categories>
+      <tags>
+        <tag>JVM</tag>
+        <tag>Java</tag>
+        <tag>GC</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>G1 垃圾收集器</title>
+    <url>/posts/bc8ac7bc/</url>
+    <content><![CDATA[<p>G1 垃圾收集器是一种新型的垃圾收集器，专门针对大堆内存的应用程序进行优化，可以更好地处理大量对象的分配和释放，减少停顿时间，并帮助应用程序提高性能。G1 收集器是在 JDK 7 update 4 版本中首次推出的，在 Java 9 中正式成为默认的垃圾收集器。通过启动参数&quot;<code>-XX:+UseG1GC</code>&quot;来使用 G1 垃圾收集器。</p>
+<h2 id="区域划分"><a class="markdownIt-Anchor" href="#区域划分"></a> 区域划分</h2>
+<p><code>G1（Garbage-First）</code>垃圾收集器，将 Java 堆内存划分为多个大小相等的区域（Region），并对这些区域进行垃圾回收。每个区域的大小通常是1MB到32MB之间，并且可以通过JVM参数 <code>-XX:G1HeapRegionSize</code> 进行调整，默认为 1M。</p>
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://imgconvert.csdnimg.cn/aHR0cHM6Ly91cGxvYWQtaW1hZ2VzLmppYW5zaHUuaW8vdXBsb2FkX2ltYWdlcy82MjcxMzc2LWNkMDIwOWM0YTNiZWRiNzUucG5n?x-oss-process=image/format,png"
+                      alt="" 
+                ></p>
+<div class="note-large notel-green"><div class="notel-title"><p>堆内存的区域划分</p>
+</div><div class="notel-content"><ul>
+<li>Eden 区：当新对象被创建时，它们会首先被分配到Eden区。Eden区是G1垃圾收集器的年轻代区域。默认情况下，Eden区的大小占整个Java堆内存的5%到10%。</li>
+<li>存活区（Survivor区）：与 CMS 垃圾收集器类似，G1 垃圾收集器还使用了两个 Survivor 区，并且 Survivor 区的大小与 Eden 区的大小相等。当执行年轻代垃圾回收时，存活的对象会被移动到 Survivor 区。默认情况下，Survivo r区的大小占整个 Java 堆内存的5%到10%。</li>
+<li>Old 区：存放长时间存活的对象。G1 垃圾收集器采用了“增量式整理”算法来避免 Full GC 带来的停顿时间过长。默认情况下，Old 区的大小占整个 Java 堆内存的60%到80%。</li>
+<li>Humongous 区：专门用来存储大对象，如果一个对象的大小超过了一个区域的 50%，那么这个对象将直接被分配到 Humongous 区，而不是被分配到 Eden区或 Old 区。对于 Humongous 对象，G1 垃圾收集器将使用“复制”算法进行垃圾回收。</li>
+</ul>
+ </div></div>
+<h2 id="工作原理"><a class="markdownIt-Anchor" href="#工作原理"></a> 工作原理</h2>
+<p>G1 垃圾收集器采用“复制和标记整理”两种算法来回收内存，主要工作流程：</p>
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://imgconvert.csdnimg.cn/aHR0cDovL3BpY3R1cmUudGp0dWxvbmcudG9wL0NNUyVFNiU5NCVCNiVFOSU5QiU4NiVFNSU5OSVBOC5qcGc?x-oss-process=image/format,png"
+                      alt="G1" 
+                ></p>
+<ol>
+<li>初始标记阶段：在此阶段中，G1收集器会标记所有被根对象直接关联的对象，并记录它们的位置和状态。</li>
+<li>并发标记阶段：在此阶段中，G1收集器会并发地处理堆中的对象，找出所有与标记对象直接或间接关联的对象，并标记它们。</li>
+<li>最终标记阶段：在此阶段中，G1收集器会重新暂停应用程序，完成对并发标记过程中可能遗漏的标记的补充，以确保所有存活的对象都已被标记。</li>
+<li>筛选阶段：在此阶段中，G1收集器会基于可回收的内存大小和回收时间预算来确定哪些区域需要被回收，并将这些区域加入回收集。</li>
+<li>清理阶段：在此阶段中，G1收集器会清理回收集中的区域，并将其中的内存返回给Java虚拟机，使其可以再次使用。</li>
+</ol>
+<p>总的来说，G1垃圾收集器通过将堆内存分成多个大小相等的区域，将大型堆的垃圾收集任务分成多个小的垃圾收集任务，从而避免了全局暂停，具有更高的可预测性和可控性。同时，G1垃圾收集器也可以根据应用程序产生的垃圾量自适应调整阶段时间，提高了垃圾回收的效率。</p>
+<h2 id="优缺点"><a class="markdownIt-Anchor" href="#优缺点"></a> 优缺点</h2>
+<div class="note-large notel-green"><div class="notel-title"><p>优点</p>
+</div><div class="notel-content"><ol>
+<li>分代收集：G1垃圾收集器将堆内存分为多个大小相等的区域，并根据它们的特征来进行垃圾回收。这样可以避免全局暂停，提高了响应时间和吞吐量。（<span style="border-bottom: 2px solid green">G1 收集器也引入了&quot;<code>混合模式</code>&quot;的回收策略，将Young GC和部分Full GC结合起来，从而达到更好的性能。</span>）</li>
+<li>并发收集：在并发标记阶段，G1垃圾收集器可以与应用程序并发执行。这意味着应用程序可以在垃圾回收期间继续运行，减少了暂停时间，提高了系统的可用性。</li>
+<li>可预测性：G1垃圾收集器会自动调整垃圾回收策略，以满足应用程序需要的响应时间和吞吐量。这使得应用程序的性能更加稳定和可预测。</li>
+<li>空间利用率：G1垃圾收集器可以更好地利用堆空间，减少了碎片化问题，从而可以更有效地使用可用内存。</li>
+</ol>
+ </div></div>
+<div class="note-large notel-red"><div class="notel-title"><p>缺点</p>
+</div><div class="notel-content"><ol>
+<li>初始标记和最终标记仍需STW: 尽管 G1 收集器的大部分工作都是并发的，但在 JVM 执行初始标记和最终标记时仍需要暂停应用程序。这一点可能会导致应用程序在某些情况下出现停顿。</li>
+<li>物理内存占用：G1收集器需要维护大量的数据结构来跟踪堆内存的使用情况，这会对物理内存造成一定的负担。</li>
+<li>相比CMS，在GC过程中会占用更多的CPU时间。</li>
+<li>长时间运行的应用可能会出现某些性能问题，因为G1垃圾收集器不能保证我们的操作不会访问已经被回收的对象（也就是说，它不能保证与CMS相同的延迟）。</li>
+</ol>
+ </div></div>
+<h2 id="使用建议"><a class="markdownIt-Anchor" href="#使用建议"></a> 使用建议</h2>
+<ol>
+<li>长期运行的应用程序：对于需要长时间运行的应用程序，使用G1垃圾收集器可以减少暂停时间并提高吞吐量。这是因为G1收集器可以将大型堆分成多个大小相等的区域，并且只回收那些空间最多的区域。</li>
+<li>大型内存项目：由于G1收集器具有更好的内存利用率和更低的碎片化，因此适用于需要大量内存的项目。</li>
+<li>多核处理器：G1收集器在多核处理器上的性能表现更佳。因为它可以以并发方式执行垃圾回收操作，从而使每个核处理器都可以同时处理GC操作和应用程序代码。</li>
+<li>稳定的堆大小：G1收集器的优化需要稳定的堆大小才能发挥最大效益，建议将Xmx值设置为整个堆的90%到95%。</li>
+<li>谨慎使用-XX:MaxGCPauseMillis参数：G1的目标是进行可控制、可预测的垃圾回收，而不是无限制地降低停顿时间。设置过低的 MaxGCPauseMillis 值会导致过多的垃圾回收操作和资源消耗，从而降低垃圾回收的效率和性能。</li>
+<li>监控和调整：使用G1垃圾收集器需要监控应用程序的性能，并根据实际情况进行调整。可以通过JVM参数和工具来调整G1收集器的行为，以达到最佳性能。</li>
+</ol>
+<h2 id="结论"><a class="markdownIt-Anchor" href="#结论"></a> 结论</h2>
+<p>G1 垃圾收集器是一种新型的垃圾收集器，专门针对大堆内存的应用程序进行优化，可以更好地处理大量对象的分配和释放，减少停顿时间，并帮助应用程序提高性能。</p>
+]]></content>
+      <categories>
+        <category>JVM</category>
+        <category>GC</category>
+      </categories>
+      <tags>
+        <tag>JVM</tag>
+        <tag>Java</tag>
+        <tag>GC</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>JVM 安全点</title>
+    <url>/posts/5a9ba959/</url>
+    <content><![CDATA[<p>JVM的安全点（Safepoint）是JVM执行垃圾回收时的一个重要概念。<span style="border-bottom:2px solid green;">在JVM进行垃圾回收操作时，需要保证堆的一致性，因此需要挂起所有运行Java代码的线程并记录它们的状态。这些特定位置就被称为 <em><strong><code>安全点</code></strong></em>。</span>&gt;</p>
+<h2 id="安全点的作用"><a class="markdownIt-Anchor" href="#安全点的作用"></a> 安全点的作用</h2>
+<p>当一个线程处于安全点时，JVM可以确保该线程不会同时访问堆内存中的对象。如果不挂起所有线程，那么这些线程可能正在访问堆内存中的对象。如果同时执行垃圾回收，则这些线程可能同时修改这些对象，导致数据错误或不一致。因此，在进行垃圾回收操作时，必须等待所有线程到达安全点，并将它们挂起，然后才能继续执行垃圾回收操作。</p>
+<h2 id="安全点的触发条件"><a class="markdownIt-Anchor" href="#安全点的触发条件"></a> 安全点的触发条件</h2>
+<div class="note-large notel-yellow"><div class="notel-title"><p>当一个线程处于安全点时，它必须满足以下条件之一</p>
+</div><div class="notel-content"><ol>
+<li>执行Java方法的字节码指令结束或异常抛出；</li>
+<li>执行JNI（Java Native Interface）方法的字节码指令结束或异常抛出；</li>
+<li>执行VM操作（如Thread.sleep）的字节码指令结束或异常抛出。</li>
+</ol>
+ </div></div>
+<p>这意味着当一个线程处于安全点时，它一定是上述情况之一。只有在这些情况下，线程才被挂起进行垃圾回收操作。</p>
+<h2 id="安全点的影响"><a class="markdownIt-Anchor" href="#安全点的影响"></a> 安全点的影响</h2>
+<p>当JVM进行垃圾回收操作时，必须等待所有线程到达安全点，并将它们挂起，然后才能继续执行垃圾回收操作。这种等待时间可能会导致一些线程长时间等待，从而导致应用程序响应时间变慢。</p>
+<p>为了减少这种情况的发生，JVM提供了多种垃圾回收算法和垃圾回收器，以便在特定的场景中选择最佳的垃圾回收策略。例如CMS（Concurrent Mark Sweep）垃圾回收器就是在并发标记阶段尽可能减少安全点的数量的一种垃圾回收器。</p>
+<p>此外，我们也可以通过调整线程数、线程优先级、堆内存大小等措施来减少安全点的影响。</p>
+<h2 id="总结"><a class="markdownIt-Anchor" href="#总结"></a> 总结</h2>
+<p>安全点是一个重要的概念，在JVM进行垃圾回收操作时扮演着至关重要的角色。了解安全点的作用、触发条件和影响，对于Java开发者来说是非常重要的。在实际开发中，我们需要根据应用场景选择合适的垃圾回收算法和垃圾回收器，并采取相应的措施来减少安全点的影响，以使应用程序能够达到更好的性能和响应速度。</p>
+]]></content>
+      <categories>
+        <category>JVM</category>
+        <category>GC</category>
+      </categories>
+      <tags>
+        <tag>JVM</tag>
+        <tag>Java</tag>
+        <tag>GC</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>ThreadLocal 基础使用</title>
+    <url>/posts/151f44ae/</url>
+    <content><![CDATA[<p>在Java多线程编程中，<code>ThreadLocal</code>类是一个非常有用的工具，它能够帮助我们轻松地实现线程本地存储。在本文中，我们将深入探讨<code>ThreadLocal</code>的实现原理和如何正确使用它。</p>
+<h2 id="threadlocal"><a class="markdownIt-Anchor" href="#threadlocal"></a> ThreadLocal</h2>
+<p>首先，我们来了解一下什么是ThreadLocal。简单来说，<code>ThreadLocal</code>是一种线程本地存储机制，它为每个线程提供了一个独立的变量副本，使得每个线程都可以独立地改变自己的副本，而不会影响其他线程的副本。</p>
+<h2 id="实现原理"><a class="markdownIt-Anchor" href="#实现原理"></a> 实现原理</h2>
+<p>下面我们来看一下<code>ThreadLocal</code>的实现原理。<code>ThreadLocal</code>本质上是一个 Map，其中 Key 是当前线程的引用，Value 是要存储的对象。由于每个线程的引用都是唯一的，因此每个线程都可以通过自己的引用获取到对应的值，而不会与其他线程发生干扰。</p>
+<p>具体实现方式是，在每个线程内部都有一个 ThreadLocalMap 对象，这个 Map 对象的 Key 就是 ThreadLocal 对象本身，而 Value 则是要存储的对象。当调用<code>ThreadLocal</code>的<code>get()</code>方法时，线程会先获取自己的 ThreadLocalMap 对象，然后以<code>ThreadLocal</code>对象为Key从Map中获取对应的值。</p>
+<h2 id="正确使用方式"><a class="markdownIt-Anchor" href="#正确使用方式"></a> 正确使用方式</h2>
+<p>虽然<code>ThreadLocal</code>是一个有用的工具，但也需要注意一些问题。下面是一些在使用<code>ThreadLocal</code>时需要遵循的最佳实践：</p>
+<h3 id="避免内存泄漏"><a class="markdownIt-Anchor" href="#避免内存泄漏"></a> 避免内存泄漏</h3>
+<p>由于Java中的线程是不会自动销毁的，如果我们在使用<code>ThreadLocal</code>时不注意清理，就可能导致内存泄漏。因此，在每个线程结束时都需要手动调用<code>ThreadLocal</code>的<code>remove()</code>方法，以便释放其占用的内存资源。</p>
+<h3 id="谨慎使用inheritablethreadlocal"><a class="markdownIt-Anchor" href="#谨慎使用inheritablethreadlocal"></a> 谨慎使用InheritableThreadLocal</h3>
+<p><code>InheritableThreadLocal</code>是<code>ThreadLocal</code>的一个子类，它允许子线程继承父线程的本地变量。但是，在使用<code>InheritableThreadLocal</code>时需要特别小心，因为它可能会导致父线程和子线程之间产生相互依赖的问题。因此，在使用<code>InheritableThreadLocal</code>时需要非常小心，并且需要充分了解它的实现原理和使用方式。</p>
+<h3 id="不要滥用threadlocal"><a class="markdownIt-Anchor" href="#不要滥用threadlocal"></a> 不要滥用ThreadLocal</h3>
+<p>尽管<code>ThreadLocal</code>是一个很方便的工具，但并不意味着可以滥用它。在多线程编程中，应该尽量避免使用全局变量和静态变量，而是尽可能地使用局部变量和方法参数。只有在确实有必要使用<code>ThreadLocal</code>时才应该这样做。</p>
+<h2 id="总结"><a class="markdownIt-Anchor" href="#总结"></a> 总结</h2>
+<p><code>ThreadLocal</code>是Java多线程编程中一个非常有用的工具，它可以轻松地实现线程本地存储。在正确使用<code>ThreadLocal</code>时，需要遵循一些最佳实践，以避免在项目中埋下坑。</p>
+]]></content>
+      <categories>
+        <category>Java</category>
+        <category>ThreadLocal</category>
+      </categories>
+      <tags>
+        <tag>Java</tag>
+        <tag>ThreadLocal</tag>
       </tags>
   </entry>
   <entry>
@@ -528,35 +1458,6 @@
       </tags>
   </entry>
   <entry>
-    <title>HashMap - resize()</title>
-    <url>/posts/80dd519a/</url>
-    <content><![CDATA[<p>在 Java 中，HashMap 是一个非常重要的集合类，它采用哈希表来存储键值对。当数据量变大时，需要调整哈希表的大小，以保证更好的性能和空间使用。resize() 方法就是 HashMap 进行扩容或缩减容量的方法。</p>
-<h2 id="什么情况下需要-resize-方法"><a class="markdownIt-Anchor" href="#什么情况下需要-resize-方法"></a> 什么情况下需要 resize() 方法</h2>
-<p>当 HashMap 存储的数据超过了负载因子乘以当前容量时（即元素个数 &gt; 负载因子 * 容量），就需要进行 resize 操作。负载因子通常为 0.75，在之前的 JDK 版本中是默认值为 0.75，JDK 1.8 开始可以自定义负载因子。</p>
-<p>resize 操作的目的是为了让 HashMap 在扩容或缩减容量后仍然能保持较低的查找和插入成本。如果 HashMap 中的键值对数量过多，则会导致哈希冲突概率增加，从而影响 HashMap 的性能。如果数量太少，则会造成空间浪费。</p>
-<h2 id="实现原理"><a class="markdownIt-Anchor" href="#实现原理"></a> 实现原理</h2>
-<p>HashMap 的 resize() 方法的实现原理涉及到两个主要步骤：</p>
-<ol>
-<li>创建新的数组并重新分配元素：首先根据新的容量创建一个新的数组，然后遍历原来的数组，并将所有元素重新分配到新数组中。</li>
-<li>调整哈希值：重新分配元素时，需要调整每个键值对的哈希值。这是因为在 Java 中，哈希值是由对象的 hashCode() 方法计算出来的。而当数组大小改变时，hashCode() 值需要重新计算。</li>
-</ol>
-<p>具体实现过程可以通过以下源码逐行解释：</p>
-<div class="highlight-container" data-rel="Java"><figure class="iseeu highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">final</span> Node&lt;K,V&gt;[] resize() &#123;</span><br><span class="line">    Node&lt;K,V&gt;[] oldTab = table; <span class="comment">// 保存原数组</span></span><br><span class="line"></span><br><span class="line">    <span class="type">int</span> <span class="variable">oldCap</span> <span class="operator">=</span> (oldTab == <span class="literal">null</span>) ? <span class="number">0</span> : oldTab.length; <span class="comment">// 计算原数组长度</span></span><br><span class="line">    <span class="type">int</span> <span class="variable">oldThr</span> <span class="operator">=</span> threshold; <span class="comment">// 计算原阈值</span></span><br><span class="line">    <span class="type">int</span> newCap, newThr = <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (oldCap &gt; <span class="number">0</span>) &#123; <span class="comment">// 如果原数组不为空，则进行扩容操作</span></span><br><span class="line">        <span class="keyword">if</span> (oldCap &gt;= MAXIMUM_CAPACITY) &#123; <span class="comment">// 判断原数组是否达到最大容量</span></span><br><span class="line">            threshold = Integer.MAX_VALUE;</span><br><span class="line">            <span class="keyword">return</span> oldTab;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">else</span> <span class="keyword">if</span> ((newCap = oldCap &lt;&lt; <span class="number">1</span>) &lt; MAXIMUM_CAPACITY &amp;&amp; oldCap &gt;= DEFAULT_INITIAL_CAPACITY)</span><br><span class="line">            newThr = oldThr &lt;&lt; <span class="number">1</span>; <span class="comment">// 扩容后新的阈值</span></span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">else</span> <span class="keyword">if</span> (oldThr &gt; <span class="number">0</span>) <span class="comment">// 如果原阈值大于0，则使用该值作为初始容量</span></span><br><span class="line">        newCap = oldThr;</span><br><span class="line">    <span class="keyword">else</span> &#123; <span class="comment">// 如果没有指定初始容量或阈值，默认使用默认值</span></span><br><span class="line">        newCap = DEFAULT_INITIAL_CAPACITY;</span><br><span class="line">        newThr = (<span class="type">int</span>)(DEFAULT_LOAD_FACTOR * DEFAULT_INITIAL_CAPACITY);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (newThr == <span class="number">0</span>) &#123; <span class="comment">// 如果 newThr 没有被初始化，则根据新的容量和负载因子计算新的阈值</span></span><br><span class="line">        <span class="type">float</span> <span class="variable">ft</span> <span class="operator">=</span> (<span class="type">float</span>)newCap * loadFactor;</span><br><span class="line">        newThr = (newCap &lt; MAXIMUM_CAPACITY &amp;&amp; ft &lt; (<span class="type">float</span>)MAXIMUM_CAPACITY ?</span><br><span class="line">                  (<span class="type">int</span>)ft : Integer.MAX_VALUE);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    threshold = newThr; <span class="comment">// 更新 HashMap 的阈值</span></span><br><span class="line"></span><br><span class="line">    <span class="meta">@SuppressWarnings(&#123;&quot;rawtypes&quot;,&quot;unchecked&quot;&#125;)</span></span><br><span class="line">        Node&lt;K,V&gt;[] newTab = (Node&lt;K,V&gt;[])<span class="keyword">new</span> <span class="title class_">Node</span>[newCap]; <span class="comment">// 创建新数组</span></span><br><span class="line">    table = newTab; <span class="comment">// 将 table 指向新数组</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (oldTab != <span class="literal">null</span>) &#123; <span class="comment">// 如果原数组不为空，则遍历原数组并将所有元素重新分配到新数组中</span></span><br><span class="line">        <span class="keyword">for</span> (<span class="type">int</span> <span class="variable">j</span> <span class="operator">=</span> <span class="number">0</span>; j &lt; oldCap; ++j) &#123;</span><br><span class="line">            Node&lt;K,V&gt; e;</span><br><span class="line">            <span class="keyword">if</span> ((e = oldTab[j]) != <span class="literal">null</span>) &#123;</span><br><span class="line">                oldTab[j] = <span class="literal">null</span>; <span class="comment">// 释放原有元素的引用</span></span><br><span class="line">                <span class="keyword">if</span> (e.next == <span class="literal">null</span>) <span class="comment">// 处理链表节点</span></span><br><span class="line">                    newTab[e.hash &amp; (newCap - <span class="number">1</span>)] = e;</span><br><span class="line">                <span class="keyword">else</span> <span class="keyword">if</span> (e <span class="keyword">instanceof</span> TreeNode) <span class="comment">// 处理红黑树节点</span></span><br><span class="line">                    ((TreeNode&lt;K,V&gt;)e).split(<span class="built_in">this</span>, newTab, j, oldCap);</span><br><span class="line">                <span class="keyword">else</span> &#123; <span class="comment">// 处理链表节点</span></span><br><span class="line">                    Node&lt;K,V&gt; loHead = <span class="literal">null</span>, loTail = <span class="literal">null</span>;</span><br><span class="line">                    Node&lt;K,V&gt; hiHead = <span class="literal">null</span>, hiTail = <span class="literal">null</span>;</span><br><span class="line">                    Node&lt;K,V&gt; next;</span><br><span class="line">                    <span class="keyword">do</span> &#123;</span><br><span class="line">                        next = e.next;</span><br><span class="line">                        <span class="keyword">if</span> ((e.hash &amp; oldCap) == <span class="number">0</span>) &#123; <span class="comment">// 判断元素是否需要放置到新数组的低位</span></span><br><span class="line">                            <span class="keyword">if</span> (loTail == <span class="literal">null</span>)</span><br><span class="line">                                loHead = e;</span><br><span class="line">                            <span class="keyword">else</span></span><br><span class="line">                                loTail.next = e;</span><br><span class="line">                            loTail = e;</span><br><span class="line">                        &#125;</span><br><span class="line">                        <span class="keyword">else</span> &#123; <span class="comment">// 放置到新数组的高位</span></span><br><span class="line">                            <span class="keyword">if</span> (hiTail == <span class="literal">null</span>)</span><br><span class="line">                                hiHead = e;</span><br><span class="line">                            <span class="keyword">else</span></span><br><span class="line">                                hiTail.next = e;</span><br><span class="line">                            hiTail = e;</span><br><span class="line">                        &#125;</span><br><span class="line">                    &#125; <span class="keyword">while</span> ((e = next) != <span class="literal">null</span>);</span><br><span class="line"></span><br><span class="line">                    <span class="keyword">if</span> (loTail != <span class="literal">null</span>) &#123; <span class="comment">// 将低位链表放到对应位置</span></span><br><span class="line">                        loTail.next = <span class="literal">null</span>;</span><br><span class="line">                        newTab[j] = loHead;</span><br><span class="line">                    &#125;</span><br><span class="line">                    <span class="keyword">if</span> (hiTail != <span class="literal">null</span>) &#123; <span class="comment">// 将高位链表放到对应位置</span></span><br><span class="line">                        hiTail.next = <span class="literal">null</span>;</span><br><span class="line">                        newTab[j + oldCap] = hiHead;</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> newTab; <span class="comment">// 返回新数组</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></div>
-<h2 id="resize-方法的时间复杂度"><a class="markdownIt-Anchor" href="#resize-方法的时间复杂度"></a> resize() 方法的时间复杂度</h2>
-<p>resize 操作需要遍历整个数组，并将元素重新分配到新数组中。因此，时间复杂度为 O(n)，其中 n 是 HashMap 中键值对的数量。</p>
-<h2 id="总结"><a class="markdownIt-Anchor" href="#总结"></a> 总结</h2>
-<p>HashMap 的 resize() 方法是用来扩容或者缩减 HashMap 容量的方法。它通过重新分配元素和调整哈希值来实现。当 HashMap 中的键值对数量超过负载因子乘以当前容量时，就需要进行 resize 操作。为了保证 HashMap 的性能和空间利用率，我们可以通过调整负载因子和初始容量来优化 HashMap 的 resize 操作。</p>
-]]></content>
-      <categories>
-        <category>Java</category>
-        <category>HashMap</category>
-      </categories>
-      <tags>
-        <tag>Java</tag>
-        <tag>HashMap</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>HashMap - put()</title>
     <url>/posts/80dd519a/</url>
     <content><![CDATA[<p>在 Java 8 中，HashMap 是一种常见的数据结构，用于存储键值对。put() 方法是其中最常用且最重要的方法之一。本文将详细介绍 Java 8 HashMap 的 put() 方法。</p>
@@ -591,583 +1492,32 @@
       </tags>
   </entry>
   <entry>
-    <title>ThreadLocal 基础使用</title>
-    <url>/posts/151f44ae/</url>
-    <content><![CDATA[<p>在Java多线程编程中，<code>ThreadLocal</code>类是一个非常有用的工具，它能够帮助我们轻松地实现线程本地存储。在本文中，我们将深入探讨<code>ThreadLocal</code>的实现原理和如何正确使用它。</p>
-<h2 id="threadlocal"><a class="markdownIt-Anchor" href="#threadlocal"></a> ThreadLocal</h2>
-<p>首先，我们来了解一下什么是ThreadLocal。简单来说，<code>ThreadLocal</code>是一种线程本地存储机制，它为每个线程提供了一个独立的变量副本，使得每个线程都可以独立地改变自己的副本，而不会影响其他线程的副本。</p>
+    <title>HashMap - resize()</title>
+    <url>/posts/80dd519a/</url>
+    <content><![CDATA[<p>在 Java 中，HashMap 是一个非常重要的集合类，它采用哈希表来存储键值对。当数据量变大时，需要调整哈希表的大小，以保证更好的性能和空间使用。resize() 方法就是 HashMap 进行扩容或缩减容量的方法。</p>
+<h2 id="什么情况下需要-resize-方法"><a class="markdownIt-Anchor" href="#什么情况下需要-resize-方法"></a> 什么情况下需要 resize() 方法</h2>
+<p>当 HashMap 存储的数据超过了负载因子乘以当前容量时（即元素个数 &gt; 负载因子 * 容量），就需要进行 resize 操作。负载因子通常为 0.75，在之前的 JDK 版本中是默认值为 0.75，JDK 1.8 开始可以自定义负载因子。</p>
+<p>resize 操作的目的是为了让 HashMap 在扩容或缩减容量后仍然能保持较低的查找和插入成本。如果 HashMap 中的键值对数量过多，则会导致哈希冲突概率增加，从而影响 HashMap 的性能。如果数量太少，则会造成空间浪费。</p>
 <h2 id="实现原理"><a class="markdownIt-Anchor" href="#实现原理"></a> 实现原理</h2>
-<p>下面我们来看一下<code>ThreadLocal</code>的实现原理。<code>ThreadLocal</code>本质上是一个 Map，其中 Key 是当前线程的引用，Value 是要存储的对象。由于每个线程的引用都是唯一的，因此每个线程都可以通过自己的引用获取到对应的值，而不会与其他线程发生干扰。</p>
-<p>具体实现方式是，在每个线程内部都有一个 ThreadLocalMap 对象，这个 Map 对象的 Key 就是 ThreadLocal 对象本身，而 Value 则是要存储的对象。当调用<code>ThreadLocal</code>的<code>get()</code>方法时，线程会先获取自己的 ThreadLocalMap 对象，然后以<code>ThreadLocal</code>对象为Key从Map中获取对应的值。</p>
-<h2 id="正确使用方式"><a class="markdownIt-Anchor" href="#正确使用方式"></a> 正确使用方式</h2>
-<p>虽然<code>ThreadLocal</code>是一个有用的工具，但也需要注意一些问题。下面是一些在使用<code>ThreadLocal</code>时需要遵循的最佳实践：</p>
-<h3 id="避免内存泄漏"><a class="markdownIt-Anchor" href="#避免内存泄漏"></a> 避免内存泄漏</h3>
-<p>由于Java中的线程是不会自动销毁的，如果我们在使用<code>ThreadLocal</code>时不注意清理，就可能导致内存泄漏。因此，在每个线程结束时都需要手动调用<code>ThreadLocal</code>的<code>remove()</code>方法，以便释放其占用的内存资源。</p>
-<h3 id="谨慎使用inheritablethreadlocal"><a class="markdownIt-Anchor" href="#谨慎使用inheritablethreadlocal"></a> 谨慎使用InheritableThreadLocal</h3>
-<p><code>InheritableThreadLocal</code>是<code>ThreadLocal</code>的一个子类，它允许子线程继承父线程的本地变量。但是，在使用<code>InheritableThreadLocal</code>时需要特别小心，因为它可能会导致父线程和子线程之间产生相互依赖的问题。因此，在使用<code>InheritableThreadLocal</code>时需要非常小心，并且需要充分了解它的实现原理和使用方式。</p>
-<h3 id="不要滥用threadlocal"><a class="markdownIt-Anchor" href="#不要滥用threadlocal"></a> 不要滥用ThreadLocal</h3>
-<p>尽管<code>ThreadLocal</code>是一个很方便的工具，但并不意味着可以滥用它。在多线程编程中，应该尽量避免使用全局变量和静态变量，而是尽可能地使用局部变量和方法参数。只有在确实有必要使用<code>ThreadLocal</code>时才应该这样做。</p>
+<p>HashMap 的 resize() 方法的实现原理涉及到两个主要步骤：</p>
+<ol>
+<li>创建新的数组并重新分配元素：首先根据新的容量创建一个新的数组，然后遍历原来的数组，并将所有元素重新分配到新数组中。</li>
+<li>调整哈希值：重新分配元素时，需要调整每个键值对的哈希值。这是因为在 Java 中，哈希值是由对象的 hashCode() 方法计算出来的。而当数组大小改变时，hashCode() 值需要重新计算。</li>
+</ol>
+<p>具体实现过程可以通过以下源码逐行解释：</p>
+<div class="highlight-container" data-rel="Java"><figure class="iseeu highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">final</span> Node&lt;K,V&gt;[] resize() &#123;</span><br><span class="line">    Node&lt;K,V&gt;[] oldTab = table; <span class="comment">// 保存原数组</span></span><br><span class="line"></span><br><span class="line">    <span class="type">int</span> <span class="variable">oldCap</span> <span class="operator">=</span> (oldTab == <span class="literal">null</span>) ? <span class="number">0</span> : oldTab.length; <span class="comment">// 计算原数组长度</span></span><br><span class="line">    <span class="type">int</span> <span class="variable">oldThr</span> <span class="operator">=</span> threshold; <span class="comment">// 计算原阈值</span></span><br><span class="line">    <span class="type">int</span> newCap, newThr = <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (oldCap &gt; <span class="number">0</span>) &#123; <span class="comment">// 如果原数组不为空，则进行扩容操作</span></span><br><span class="line">        <span class="keyword">if</span> (oldCap &gt;= MAXIMUM_CAPACITY) &#123; <span class="comment">// 判断原数组是否达到最大容量</span></span><br><span class="line">            threshold = Integer.MAX_VALUE;</span><br><span class="line">            <span class="keyword">return</span> oldTab;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">else</span> <span class="keyword">if</span> ((newCap = oldCap &lt;&lt; <span class="number">1</span>) &lt; MAXIMUM_CAPACITY &amp;&amp; oldCap &gt;= DEFAULT_INITIAL_CAPACITY)</span><br><span class="line">            newThr = oldThr &lt;&lt; <span class="number">1</span>; <span class="comment">// 扩容后新的阈值</span></span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">else</span> <span class="keyword">if</span> (oldThr &gt; <span class="number">0</span>) <span class="comment">// 如果原阈值大于0，则使用该值作为初始容量</span></span><br><span class="line">        newCap = oldThr;</span><br><span class="line">    <span class="keyword">else</span> &#123; <span class="comment">// 如果没有指定初始容量或阈值，默认使用默认值</span></span><br><span class="line">        newCap = DEFAULT_INITIAL_CAPACITY;</span><br><span class="line">        newThr = (<span class="type">int</span>)(DEFAULT_LOAD_FACTOR * DEFAULT_INITIAL_CAPACITY);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (newThr == <span class="number">0</span>) &#123; <span class="comment">// 如果 newThr 没有被初始化，则根据新的容量和负载因子计算新的阈值</span></span><br><span class="line">        <span class="type">float</span> <span class="variable">ft</span> <span class="operator">=</span> (<span class="type">float</span>)newCap * loadFactor;</span><br><span class="line">        newThr = (newCap &lt; MAXIMUM_CAPACITY &amp;&amp; ft &lt; (<span class="type">float</span>)MAXIMUM_CAPACITY ?</span><br><span class="line">                  (<span class="type">int</span>)ft : Integer.MAX_VALUE);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    threshold = newThr; <span class="comment">// 更新 HashMap 的阈值</span></span><br><span class="line"></span><br><span class="line">    <span class="meta">@SuppressWarnings(&#123;&quot;rawtypes&quot;,&quot;unchecked&quot;&#125;)</span></span><br><span class="line">        Node&lt;K,V&gt;[] newTab = (Node&lt;K,V&gt;[])<span class="keyword">new</span> <span class="title class_">Node</span>[newCap]; <span class="comment">// 创建新数组</span></span><br><span class="line">    table = newTab; <span class="comment">// 将 table 指向新数组</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (oldTab != <span class="literal">null</span>) &#123; <span class="comment">// 如果原数组不为空，则遍历原数组并将所有元素重新分配到新数组中</span></span><br><span class="line">        <span class="keyword">for</span> (<span class="type">int</span> <span class="variable">j</span> <span class="operator">=</span> <span class="number">0</span>; j &lt; oldCap; ++j) &#123;</span><br><span class="line">            Node&lt;K,V&gt; e;</span><br><span class="line">            <span class="keyword">if</span> ((e = oldTab[j]) != <span class="literal">null</span>) &#123;</span><br><span class="line">                oldTab[j] = <span class="literal">null</span>; <span class="comment">// 释放原有元素的引用</span></span><br><span class="line">                <span class="keyword">if</span> (e.next == <span class="literal">null</span>) <span class="comment">// 处理链表节点</span></span><br><span class="line">                    newTab[e.hash &amp; (newCap - <span class="number">1</span>)] = e;</span><br><span class="line">                <span class="keyword">else</span> <span class="keyword">if</span> (e <span class="keyword">instanceof</span> TreeNode) <span class="comment">// 处理红黑树节点</span></span><br><span class="line">                    ((TreeNode&lt;K,V&gt;)e).split(<span class="built_in">this</span>, newTab, j, oldCap);</span><br><span class="line">                <span class="keyword">else</span> &#123; <span class="comment">// 处理链表节点</span></span><br><span class="line">                    Node&lt;K,V&gt; loHead = <span class="literal">null</span>, loTail = <span class="literal">null</span>;</span><br><span class="line">                    Node&lt;K,V&gt; hiHead = <span class="literal">null</span>, hiTail = <span class="literal">null</span>;</span><br><span class="line">                    Node&lt;K,V&gt; next;</span><br><span class="line">                    <span class="keyword">do</span> &#123;</span><br><span class="line">                        next = e.next;</span><br><span class="line">                        <span class="keyword">if</span> ((e.hash &amp; oldCap) == <span class="number">0</span>) &#123; <span class="comment">// 判断元素是否需要放置到新数组的低位</span></span><br><span class="line">                            <span class="keyword">if</span> (loTail == <span class="literal">null</span>)</span><br><span class="line">                                loHead = e;</span><br><span class="line">                            <span class="keyword">else</span></span><br><span class="line">                                loTail.next = e;</span><br><span class="line">                            loTail = e;</span><br><span class="line">                        &#125;</span><br><span class="line">                        <span class="keyword">else</span> &#123; <span class="comment">// 放置到新数组的高位</span></span><br><span class="line">                            <span class="keyword">if</span> (hiTail == <span class="literal">null</span>)</span><br><span class="line">                                hiHead = e;</span><br><span class="line">                            <span class="keyword">else</span></span><br><span class="line">                                hiTail.next = e;</span><br><span class="line">                            hiTail = e;</span><br><span class="line">                        &#125;</span><br><span class="line">                    &#125; <span class="keyword">while</span> ((e = next) != <span class="literal">null</span>);</span><br><span class="line"></span><br><span class="line">                    <span class="keyword">if</span> (loTail != <span class="literal">null</span>) &#123; <span class="comment">// 将低位链表放到对应位置</span></span><br><span class="line">                        loTail.next = <span class="literal">null</span>;</span><br><span class="line">                        newTab[j] = loHead;</span><br><span class="line">                    &#125;</span><br><span class="line">                    <span class="keyword">if</span> (hiTail != <span class="literal">null</span>) &#123; <span class="comment">// 将高位链表放到对应位置</span></span><br><span class="line">                        hiTail.next = <span class="literal">null</span>;</span><br><span class="line">                        newTab[j + oldCap] = hiHead;</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> newTab; <span class="comment">// 返回新数组</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></div>
+<h2 id="resize-方法的时间复杂度"><a class="markdownIt-Anchor" href="#resize-方法的时间复杂度"></a> resize() 方法的时间复杂度</h2>
+<p>resize 操作需要遍历整个数组，并将元素重新分配到新数组中。因此，时间复杂度为 O(n)，其中 n 是 HashMap 中键值对的数量。</p>
 <h2 id="总结"><a class="markdownIt-Anchor" href="#总结"></a> 总结</h2>
-<p><code>ThreadLocal</code>是Java多线程编程中一个非常有用的工具，它可以轻松地实现线程本地存储。在正确使用<code>ThreadLocal</code>时，需要遵循一些最佳实践，以避免在项目中埋下坑。</p>
+<p>HashMap 的 resize() 方法是用来扩容或者缩减 HashMap 容量的方法。它通过重新分配元素和调整哈希值来实现。当 HashMap 中的键值对数量超过负载因子乘以当前容量时，就需要进行 resize 操作。为了保证 HashMap 的性能和空间利用率，我们可以通过调整负载因子和初始容量来优化 HashMap 的 resize 操作。</p>
 ]]></content>
       <categories>
         <category>Java</category>
-        <category>ThreadLocal</category>
+        <category>HashMap</category>
       </categories>
       <tags>
         <tag>Java</tag>
-        <tag>ThreadLocal</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>JVM - 运行时数据区</title>
-    <url>/posts/243280dc/</url>
-    <content><![CDATA[<p>JVM（Java Virtual Machine）是一个虚拟机，它是 Java 语言能够运行的关键所在。JVM 的结构包含了多个不同的组件，其中最重要的就是它的运行时数据区。</p>
-<h2 id="jvm-运行时数据区的概述"><a class="markdownIt-Anchor" href="#jvm-运行时数据区的概述"></a> JVM 运行时数据区的概述</h2>
-<p><img  
-                     lazyload
-                     src="/images/loading.svg"
-                     data-src="https://mydlq-club.oss-cn-beijing.aliyuncs.com/images/my-jvm-constitute-concept.svg"
-                      alt="jvm 运行时数据区" 
-                ></p>
-<div class="note-large notel-green"><div class="notel-title"><p>运行时数据区可以分为以下几个部分</p>
-</div><div class="notel-content"><ol>
-<li><code>程序计数器：</code>程序计数器是一块较小的内存空间，它保存了当前线程正在执行的字节码指令的地址。当执行方法时，程序计数器会记录下一条将要执行的指令。由于每个线程都需要有自己的程序计数器，因此它是线程私有的。</li>
-<li><code>Java 虚拟机栈：</code>每个线程在运行时都会有一个对应的虚拟机栈，它用于存储方法调用的信息，包括局部变量、操作数栈、返回值等。每次方法调用时，JVM 都会创建一个对应的栈帧，并把它压入栈顶。当方法返回时，对应的栈帧会被弹出。由于每个线程都需要有自己的虚拟机栈，因此它也是线程私有的。</li>
-<li><code>堆：</code>堆是 JVM 中最大的一块内存空间，它用于存储对象实例。当使用 new 关键字创建一个对象时，JVM 会在堆上分配一块内存来存储该对象的实例。由于所有线程都需要共享堆空间，因此堆是线程共享的。</li>
-<li><code>方法区：</code>方法区也被称为永久代（PermGen），它用于存储类信息、常量、静态变量等数据。与堆一样，方法区也是线程共享的。</li>
-</ol>
- </div></div>
-<h2 id="jvm-运行时数据区的特点"><a class="markdownIt-Anchor" href="#jvm-运行时数据区的特点"></a> JVM 运行时数据区的特点</h2>
-<ol>
-<li><code>线程私有和线程共享：</code>如上所述，程序计数器和虚拟机栈是线程私有的，而堆和方法区是线程共享的。</li>
-<li><code>自动内存管理：</code>JVM 的运行时数据区采用了自动内存管理的方式，即 Java 垃圾回收机制。当对象不再被引用时，JVM 会将其标记为垃圾，并进行回收。</li>
-<li><code>动态扩展和收缩：</code>JVM 的运行时数据区可以根据应用程序的需求动态地进行扩展或收缩。当内存不足时，JVM 会自动触发垃圾回收机制，清理掉无用的对象释放内存。当内存达到一定阈值时，JVM 可以通过调整堆大小来扩展内存空间。</li>
-</ol>
-<h2 id="总结"><a class="markdownIt-Anchor" href="#总结"></a> 总结</h2>
-<p>JVM 运行时数据区是 Java 虚拟机中最重要的组成部分之一，它用于存储程序执行时所需的数据。JVM 运行时数据区分为程序计数器、虚拟机栈、堆和方法区四个部分，其中程序计数器和虚拟机栈是线程私有的，堆和方法区是线程共享的。JVM 的运行时数据区采用了自动内存管理的方式，并且可以根据应用程序的需求动态地进行扩展或收缩。</p>
-]]></content>
-      <categories>
-        <category>JVM</category>
-        <category>数据区</category>
-      </categories>
-      <tags>
-        <tag>JVM</tag>
-        <tag>运行时数据区</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>JVM - 类加载器</title>
-    <url>/posts/4f318695/</url>
-    <content><![CDATA[<p>JVM（Java Virtual Machine）是Java程序的运行环境，它能够将Java代码转换成可执行的字节码，并在不同平台上运行。在JVM中，类加载器（Class Loader）负责将Java字节码加载到JVM中。</p>
-<h2 id="类加载器概述"><a class="markdownIt-Anchor" href="#类加载器概述"></a> 类加载器概述</h2>
-<p>类加载器是JVM中的一个重要组件，它主要用于加载Java类和资源文件。在JVM中，类加载器会按照一定的顺序查找需要加载的类，如果类没有被加载，则会通过类加载器将其加载到内存中。</p>
-<div class="note-large notel-green"><div class="notel-title"><p>JVM中存在三种类加载器</p>
-</div><div class="notel-content"><ol>
-<li><strong>启动类加载器（Bootstrap ClassLoader）</strong>：负责加载Java的核心类库，如java.lang包中的类。</li>
-<li><strong>扩展类加载器（Extension ClassLoader）</strong>：负责加载Java扩展库，如javax.*包中的类。</li>
-<li><strong>应用程序类加载器（Application ClassLoader）</strong>：负责加载应用程序的类，即我们自己编写的类。</li>
-<li><strong>自定义类加载器</strong>：开发者可以通过继承ClassLoader类来创建自定义的类加载器，以满足特定的需求。</li>
-</ol>
- </div></div>
-<h2 id="java-9之前的类加载器"><a class="markdownIt-Anchor" href="#java-9之前的类加载器"></a> Java 9之前的类加载器</h2>
-<p>在Java 9之前，JVM中的类加载器存在两个问题：</p>
-<ol>
-<li><strong>命名空间污染</strong>：由于每个类加载器都有自己的命名空间，因此可能会导致多个类加载器加载同一个类，从而引发命名空间污染问题。</li>
-<li><strong>无法卸载类</strong>：由于JVM中的类加载器不支持卸载已经加载的类，因此可能会导致内存泄漏问题。</li>
-</ol>
-<p>为了解决这些问题，Java 9引入了一种新的类加载器架构。</p>
-<h2 id="java-9之后的类加载器"><a class="markdownIt-Anchor" href="#java-9之后的类加载器"></a> Java 9之后的类加载器</h2>
-<p>在Java 9中，JVM中的类加载器被重新设计为：</p>
-<div class="note-large notel-green"><div class="notel-title"><p>Java9类加载器</p>
-</div><div class="notel-content"><ol>
-<li><strong>启动类加载器</strong>：负责加载Java的核心类库，如java.lang包中的类。</li>
-<li><strong>平台类加载器</strong>：负责加载Java扩展库，如javax.*包中的类。</li>
-<li><strong>应用程序类加载器</strong>：负责加载应用程序的类，即我们自己编写的类。</li>
-<li><strong>模块类加载器</strong>：负责加载模块中的类。</li>
-</ol>
- </div></div>
-<p>Java 9中的模块化系统为JVM类加载器带来了一些重大变化，可以解决Java 9之前存在的问题。</p>
-<h3 id="模块化类加载器"><a class="markdownIt-Anchor" href="#模块化类加载器"></a> 模块化类加载器</h3>
-<p>在Java 9中，每个模块都有自己的类加载器，这些类加载器由模块路径（Module Path）上的模块描述符（Module Descriptor）指定。模块描述符是一个文件，它描述了模块的依赖关系和导出的包。模块加载器会按照模块描述符中指定的依赖关系来加载模块，并将其放置在自己的命名空间中。</p>
-<p>模块化类加载器具有以下特点：</p>
-<ol>
-<li><strong>命名空间隔离</strong>：每个模块都有自己的命名空间，避免了命名空间污染问题。</li>
-<li><strong>可卸载性</strong>：由于每个模块都有自己的类加载器，因此可以卸载整个模块，避免了内存泄漏问题。</li>
-</ol>
-<h3 id="模块路径和类路径"><a class="markdownIt-Anchor" href="#模块路径和类路径"></a> 模块路径和类路径</h3>
-<p>在Java 9中，存在两种类路径：</p>
-<ol>
-<li><strong>模块路径（Module Path）</strong>：它用于指定模块所在的路径，其中包括了每个模块的描述符和类文件。模块路径是Java 9中新增的概念，它是实现模块化的关键。</li>
-<li><strong>类路径（Class Path）</strong>：它用于指定非模块化代码所在的路径，其中包括了每个类文件和JAR文件。类路径是Java早期就存在的概念，在Java 9中仍然保留。</li>
-</ol>
-<h2 id="总结"><a class="markdownIt-Anchor" href="#总结"></a> 总结</h2>
-<p>Java 9引入了模块化系统，它将Java代码分解为更小、更简单的组件，并将其打包成模块。每个模块都有自己的依赖关系和导出的API。这种模块化系统使得Java应用程序更加易于开发、维护和部署。</p>
-<p>在Java 9中，类加载器被重新设计为启动类加载器、平台类加载器、应用程序类加载器和模块类加载器。其中，模块类加载器具有命名空间隔离和可卸载性的特点，这些特点可以避免命名空间污染和内存泄漏问题。</p>
-<p>总之，Java 9的类加载器架构是一个重大的变化，它提供了更好的模块化支持，并且解决了Java 9之前存在的一些问题。</p>
-]]></content>
-      <categories>
-        <category>JVM</category>
-        <category>类加载</category>
-      </categories>
-      <tags>
-        <tag>JVM</tag>
-        <tag>类加载器</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>JVM - 类加载过程</title>
-    <url>/posts/82c940cf/</url>
-    <content><![CDATA[<p>在Java中，类的加载是一个非常重要的过程，其负责将类文件从磁盘读取到内存中，并对其进行解析和初始化。JVM类加载过程一共分为以下<span style="border-bottom:2px solid green">三个步骤：加载、连接、初始化。</span></p>
-<p><img  
-                     lazyload
-                     src="/images/loading.svg"
-                     data-src="jvmclassload.png"
-                      alt="classload" 
-                ></p>
-<h2 id="加载"><a class="markdownIt-Anchor" href="#加载"></a> 加载</h2>
-<p><span style="border-bottom:2px solid green"><code>加载</code>是指将类文件从文件系统或者网络中读取到内存当中</span>（<a href="/posts/4f318695/"><code>类加载器</code></a>的功劳），并为之创建一个Class对象。在JVM中，Class对象是用来描述类的，其中包含了类的成员变量、方法等信息。当我们使用new关键字创建对象时，JVM会根据Class对象来实例化该类的对象并返回它。</p>
-<p>在类加载时，JVM采用了<span style="border-bottom:2px solid green"><code>双亲委派模型</code>，即将类的加载任务委派给父类加载器，如果父类加载器无法完成加载任务，才由子类加载器去尝试加载。</span>这种机制可以保证类的唯一性，避免了类的重复加载。</p>
-<h2 id="连接"><a class="markdownIt-Anchor" href="#连接"></a> 连接</h2>
-<p><span style="border-bottom:2px solid green"><code>连接</code>是指将已经读取到内存中的类文件进行校验、准备和解析的过程。</span></p>
-<ol>
-<li><strong>校验（Verification）</strong>：对类文件进行格式的校验，以确保它们符合JVM规范。如果校验失败，则会抛出ClassFormatError异常。</li>
-<li><strong>准备（Preparation）</strong>：为类变量分配内存，并设置默认值。在这个阶段，类变量并没有被初始化，只是分配了内存空间。</li>
-<li><strong>解析（Resolution）</strong>：将符号引用转化为直接引用的过程。在Java中，使用类名来访问一个类时，实际上是使用了符号引用。而在解析阶段，JVM会将其转化为直接引用，即具体的内存地址或偏移量。</li>
-</ol>
-<h2 id="初始化"><a class="markdownIt-Anchor" href="#初始化"></a> 初始化</h2>
-<p><span style="border-bottom:2px solid green"><code>初始化</code>是指执行类构造器方法()的过程。该方法由编译器生成，主要负责将类变量赋初值，以及执行静态代码块等操作。</span></p>
-<p>在执行()方法前，JVM会先执行父类的()方法，保证父类的静态成员变量和静态代码块也得到正确的初始化。</p>
-<p>在实例化对象时，JVM会首先调用父类的构造器方法，然后再调用子类的构造器方法。在执行构造器方法前，JVM会先执行实例变量初始化和非静态代码块。</p>
-<h2 id="双亲委派"><a class="markdownIt-Anchor" href="#双亲委派"></a> 双亲委派</h2>
-<p>双亲委派模型是Java类加载机制的核心。该模型是指当一个类加载器收到类加载请求时，它首先将这个请求转发给它的父类加载器，如果父类加载器无法完成类加载任务，才由自己去尝试加载。</p>
-<p><img  
-                     lazyload
-                     src="/images/loading.svg"
-                     data-src="https://cdn.jsdelivr.net/gh/jitwxs/cdn/blog/posts//202103/20210314105732.png"
-                      alt="ppp" 
-                ></p>
-<p>这种机制可以保证类的唯一性，避免了类的重复加载。例如，我们在JVM中使用String类时，它的加载过程如下所示：</p>
-<ol>
-<li>如果应用程序类加载器在它的类路径中找到了String类，那么它直接返回该Class对象。</li>
-<li>如果应用程序类加载器没有找到String类，那么它将请求转发给扩展类加载器。</li>
-<li>如果扩展类加载器在它的类路径中找到了String类，那么它直接返回该Class对象。</li>
-<li>如果扩展类加载器没有找到String类，那么它将请求转发给启动类加载器。</li>
-<li>启动类加载器在JVM核心类库中找到了String类，并将其返回给扩展类加载器。</li>
-<li>扩展类加载器将String类返回给应用程序类加载器。</li>
-<li>应用程序类加载器将String类返回给JVM。</li>
-</ol>
-<p>由于双亲委派模型的存在，当我们使用自定义类加载器时，可以避免类的重复加载。例如，我们如果想在同一个JVM中加载两个版本的com.example.MyClass类，则可以分别使用两个不同的类加载器来加载这两个版本的类，这样就不会出现类的冲突和覆盖问题。</p>
-<h2 id="总结"><a class="markdownIt-Anchor" href="#总结"></a> 总结</h2>
-<p>JVM的类加载过程是一个非常重要的过程，它负责将类文件从磁盘读取到内存中，并对其进行解析和初始化。在加载时，JVM采用了双亲委派模型，保证了类的唯一性和避免了类的重复加载。在实际开发中，我们可以通过自定义类加载器来实现特定的需求，例如在同一个JVM中加载多个版本的类。</p>
-]]></content>
-      <categories>
-        <category>JVM</category>
-        <category>类加载</category>
-      </categories>
-      <tags>
-        <tag>JVM</tag>
-        <tag>类加载器</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>JVM - 自定义类加载器</title>
-    <url>/posts/f5831f17/</url>
-    <content><![CDATA[<p>在Java中，每个类都被分配一个唯一的类加载器来加载它们。默认情况下，Java使用三个类加载器：引导类加载器、扩展类加载器和系统类加载器。这些类加载器可以处理大多数情况，但有时需要自定义类加载器来加载某些特定的类或资源。本文将介绍如何使用自定义类加载器在运行时加载类。</p>
-<h2 id="获取class对象"><a class="markdownIt-Anchor" href="#获取class对象"></a> 获取Class对象</h2>
-<p>首先，我们需要获取要加载的类的Class对象。这可以通过调用ClassLoader的<code>defineClass</code>方法来完成。以下是一个简单的获取Class对象的示例代码：</p>
-<div class="highlight-container" data-rel="Java"><figure class="iseeu highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">MyClassLoader</span> <span class="keyword">extends</span> <span class="title class_">ClassLoader</span> &#123;</span><br><span class="line">    <span class="keyword">public</span> Class&lt;?&gt; getClass(String name, <span class="type">byte</span>[] bytes) &#123;</span><br><span class="line">        <span class="keyword">return</span> defineClass(name, bytes, <span class="number">0</span>, bytes.length);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></div>
-<p>上述代码中的<code>getClass</code>方法接收两个参数：要加载的类的名称和类字节码数组。然后，该方法调用<code>defineClass</code>方法来创建并返回与给定字节数组相关联的Class对象。</p>
-<h2 id="自定义类加载器"><a class="markdownIt-Anchor" href="#自定义类加载器"></a> 自定义类加载器</h2>
-<h3 id="实现自己的类加载器"><a class="markdownIt-Anchor" href="#实现自己的类加载器"></a> 实现自己的类加载器</h3>
-<p>接下来，我们需要实现自定义类加载器。以下是一个简单的自定义类加载器的实现：</p>
-<div class="highlight-container" data-rel="Java"><figure class="iseeu highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">MyClassLoader</span> <span class="keyword">extends</span> <span class="title class_">ClassLoader</span> &#123;</span><br><span class="line">    <span class="keyword">private</span> String path;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="title function_">MyClassLoader</span><span class="params">(String path)</span> &#123;</span><br><span class="line">        <span class="built_in">this</span>.path = path;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="keyword">protected</span> Class&lt;?&gt; findClass(String name) <span class="keyword">throws</span> ClassNotFoundException &#123;</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            <span class="type">byte</span>[] bytes = loadClassData(name);</span><br><span class="line">            <span class="keyword">return</span> defineClass(name, bytes, <span class="number">0</span>, bytes.length);</span><br><span class="line">        &#125; <span class="keyword">catch</span> (IOException e) &#123;</span><br><span class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> <span class="title class_">ClassNotFoundException</span>(<span class="string">&quot;Class &quot;</span> + name + <span class="string">&quot; not found.&quot;</span>, e);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="type">byte</span>[] loadClassData(String name) <span class="keyword">throws</span> IOException &#123;</span><br><span class="line">        <span class="type">InputStream</span> <span class="variable">stream</span> <span class="operator">=</span> getClass().getClassLoader().getResourceAsStream(path + name.replace(<span class="string">&quot;.&quot;</span>, <span class="string">&quot;/&quot;</span>) + <span class="string">&quot;.class&quot;</span>);</span><br><span class="line">        <span class="type">ByteArrayOutputStream</span> <span class="variable">buffer</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">ByteArrayOutputStream</span>();</span><br><span class="line">        <span class="type">int</span> <span class="variable">data</span> <span class="operator">=</span> stream.read();</span><br><span class="line"></span><br><span class="line">        <span class="keyword">while</span> (data != -<span class="number">1</span>) &#123;</span><br><span class="line">            buffer.write(data);</span><br><span class="line">            data = stream.read();</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        stream.close();</span><br><span class="line">        <span class="keyword">return</span> buffer.toByteArray();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></div>
-<p>上述代码中的自定义类加载器使用了一个路径来指定要加载的类的位置。在<code>findClass</code>方法中，它首先调用<code>loadClassData</code>方法来从文件系统中读取类字节码。然后，它将该字节数组传递给<code>defineClass</code>方法来创建并返回与给定字节数组相关联的Class对象。</p>
-<h3 id="使用自定义的类加载器"><a class="markdownIt-Anchor" href="#使用自定义的类加载器"></a> 使用自定义的类加载器</h3>
-<p>以下是使用我们自定义的类加载器的示例代码：</p>
-<div class="highlight-container" data-rel="Java"><figure class="iseeu highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">Main</span> &#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> Exception &#123;</span><br><span class="line">        <span class="type">MyClassLoader</span> <span class="variable">loader</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">MyClassLoader</span>(<span class="string">&quot;/path/to/classes/&quot;</span>);</span><br><span class="line">        Class&lt;?&gt; clazz = loader.loadClass(<span class="string">&quot;com.example.MyClass&quot;</span>);</span><br><span class="line">        <span class="type">Object</span> <span class="variable">object</span> <span class="operator">=</span> clazz.getDeclaredConstructor().newInstance();</span><br><span class="line">        <span class="type">Method</span> <span class="variable">method</span> <span class="operator">=</span> clazz.getMethod(<span class="string">&quot;hello&quot;</span>);</span><br><span class="line">        method.invoke(object);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">MyClass</span> &#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">hello</span><span class="params">()</span> &#123;</span><br><span class="line">        System.out.println(<span class="string">&quot;Hello, world!&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></div>
-<p>上述代码中的<code>Main</code>类演示了如何使用自定义类加载器在运行时加载类。首先，它创建一个MyClassLoader对象，并使用该对象来加载名为<code>com.example.MyClass</code>的类。然后，它使用反射机制调用<code>hello</code>方法，从而在控制台上输出一条消息。</p>
-<h2 id="总结"><a class="markdownIt-Anchor" href="#总结"></a> 总结</h2>
-<p>通过自定义类加载器，我们可以在运行时加载特定的类或资源。在这个过程中，自定义类加载器会从指定的位置加载字节码，并使用<code>defineClass</code>方法创建Class对象。这种能力可以被用于实现动态加载、模块化和插件系统等高级功能。但是，需要注意的是，自定义类加载器可能会对Java程序的安全性和稳定性产生影响，因此需要谨慎使用。</p>
-]]></content>
-      <categories>
-        <category>JVM</category>
-        <category>类加载</category>
-      </categories>
-      <tags>
-        <tag>JVM</tag>
-        <tag>类加载器</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>JVM 垃圾回收算法</title>
-    <url>/posts/94863c7b/</url>
-    <content><![CDATA[<p>与其他语言相比，Java有着自动内存管理的优势，即由JVM自动进行内存分配和垃圾回收处理。本篇博客将介绍JVM中的垃圾回收算法。</p>
-<h2 id="垃圾回收的基本概念"><a class="markdownIt-Anchor" href="#垃圾回收的基本概念"></a> 垃圾回收的基本概念</h2>
-<p>垃圾回收的目的是释放无用的内存空间以供后续的内存分配使用。JVM中使用垃圾回收器（Garbage Collector）来自动实现这个过程。垃圾回收器会在发现内存中存在无用的对象时，将其所占用的内存空间回收。</p>
-<p>为了实现垃圾回收，需要定义什么是“无用对象”。在JVM中，一个对象被判定为无用对象，当且仅当它满足下列条件：</p>
-<ul>
-<li>该对象没有被引用</li>
-<li>该对象的所有引用均已断开</li>
-</ul>
-<p>垃圾回收算法的目标是尽可能快地识别和回收无用对象，同时保持系统性能的稳定。</p>
-<h2 id="常见垃圾回收算法"><a class="markdownIt-Anchor" href="#常见垃圾回收算法"></a> 常见垃圾回收算法</h2>
-<h3 id="标记-清除算法"><a class="markdownIt-Anchor" href="#标记-清除算法"></a> 标记-清除算法</h3>
-<p><img  
-                     lazyload
-                     src="/images/loading.svg"
-                     data-src="https://luolanmeet.github.io/jvm-note/content/part2/%E5%9E%83%E5%9C%BE%E6%94%B6%E9%9B%86%E5%99%A8/%E5%9E%83%E5%9C%BE%E6%94%B6%E9%9B%86%E7%AE%97%E6%B3%95/img/%E6%A0%87%E8%AE%B0-%E6%B8%85%E9%99%A4%E7%AE%97%E6%B3%95.png"
-                      alt="标记清楚" 
-                ></p>
-<p><code>标记-清除算法</code>是最基本的垃圾回收算法。它分为两个阶段：标记和清除。</p>
-<p>在标记阶段，垃圾回收器遍历堆中的所有对象，并标记出所有被引用的对象。在清除阶段，垃圾回收器将未被标记的对象所占用的内存空间全部回收。</p>
-<p>这个算法的缺点是会产生碎片，因为回收后的内存空间是不连续的。如果始终使用标记-清除算法，那么随着时间的推移，内存空间中的空洞（即碎片）将越来越多，导致内存分配效率降低。</p>
-<h3 id="复制算法"><a class="markdownIt-Anchor" href="#复制算法"></a> 复制算法</h3>
-<p><img  
-                     lazyload
-                     src="/images/loading.svg"
-                     data-src="https://luolanmeet.github.io/jvm-note/content/part2/%E5%9E%83%E5%9C%BE%E6%94%B6%E9%9B%86%E5%99%A8/%E5%9E%83%E5%9C%BE%E6%94%B6%E9%9B%86%E7%AE%97%E6%B3%95/img/%E6%A0%87%E8%AE%B0-%E5%A4%8D%E5%88%B6%E7%AE%97%E6%B3%95.png"
-                      alt="复制算法" 
-                ></p>
-<p><code>复制算法</code>是一种高效的垃圾回收算法。它将堆空间划分为大小相等的两块，每次只使用其中一块。当这一块内存空间用完时，垃圾回收器将已经标记了的存活对象复制到另一块未使用的空间中，然后清除已使用的那一块空间并交换它们的角色。</p>
-<p>复制算法的缺点是需要消耗一半的空间。同时，如果存活对象很多，每次都要进行复制操作，也会带来不小的性能开销。</p>
-<h3 id="标记-整理算法"><a class="markdownIt-Anchor" href="#标记-整理算法"></a> 标记-整理算法</h3>
-<p><img  
-                     lazyload
-                     src="/images/loading.svg"
-                     data-src="https://luolanmeet.github.io/jvm-note/content/part2/%E5%9E%83%E5%9C%BE%E6%94%B6%E9%9B%86%E5%99%A8/%E5%9E%83%E5%9C%BE%E6%94%B6%E9%9B%86%E7%AE%97%E6%B3%95/img/%E6%A0%87%E8%AE%B0-%E6%95%B4%E7%90%86%E7%AE%97%E6%B3%95.png"
-                      alt="整理算法" 
-                ></p>
-<p><code>标记-整理算法</code>是对标记-清除算法的改进。它同样分为两个阶段：标记和整理。</p>
-<p>在标记阶段，垃圾回收器遍历堆中的所有对象，并标记出所有被引用的对象。在整理阶段，垃圾回收器将所有存活对象移到堆的一端，然后清除堆的另外一端上的所有无用对象。</p>
-<p>标记-整理算法通过整理过程来解决标记-清除算法产生的碎片问题，使得内存空间变得连续起来。</p>
-<h3 id="三色标记"><a class="markdownIt-Anchor" href="#三色标记"></a> 三色标记</h3>
-<p><code>三色标记</code>是一种用于 Java 虚拟机（JVM）垃圾回收算法的技术，配合<a href="/posts/6a10d920">可达性分析算法</a>实现垃圾的高效、准确的收集。</p>
-<p>在三色标记中，JVM将内存对象分为三个不同的颜色：白色、灰色和黑色。</p>
-<ul>
-<li><code>白色</code>：表示对象尚未被扫描和标记。</li>
-<li><code>灰色</code>：表示对象已经被扫描，但是它引用的其他对象尚未被扫描和标记。</li>
-<li><code>黑色</code>：表示对象已经被扫描和标记，并且它引用的其他对象也已经被扫描和标记。</li>
-</ul>
-<p>JVM 使用三色标记来跟踪哪些对象可以被安全地回收。当 JVM 进行垃圾回收时，它会从根对象开始遍历所有对象，并将它们标记为灰色或黑色。然后，JVM 会清除所有白色对象，因为这些对象没有任何引用。</p>
-<p>在三色标记算法中，灰色的对象表示悬挂的对象，即其引用的对象尚未被处理。如果某个对象的所有引用都已经被扫描和标记，那么它就会被标记为黑色。</p>
-<p>通过使用三色标记算法，JVM 可以更快地确定哪些对象可以被安全地回收，从而提高了应用程序的性能和可靠性。</p>
-<h3 id="分代收集算法"><a class="markdownIt-Anchor" href="#分代收集算法"></a> 分代收集算法</h3>
-<p><code>分代收集算法</code>是目前主流的垃圾回收算法。它根据对象的存活周期把堆区域分为新生代和老年代两个区域。新生代中的对象通常存活时间较短，而老年代中的对象则存活时间较长。不同区域采用不同的垃圾回收算法。</p>
-<p>新生代通常使用复制算法。它把新生代分为Eden区和两个Survivor区，每次只使用Eden区和其中一个Survivor区，将已经标记了的存活对象复制到另一块未使用的Survivor区中，然后清除Eden区和已使用的Survivor区中的无用对象。</p>
-<p>老年代通常使用标记-整理算法。因为老年代中的对象存活时间较长，所以会产生大量的内存碎片。标记-整理算法通过整理过程来解决这个问题。</p>
-<h2 id="总结"><a class="markdownIt-Anchor" href="#总结"></a> 总结</h2>
-<p>JVM垃圾回收算法包括标记-清除算法、复制算法、标记-整理算法和分代收集算法等。不同的垃圾回收算法适用于不同的场景，需要根据具体情况进行选择。对于Java程序开发人员来说，理解JVM垃圾回收算法对于优化程序性能至关重要。</p>
-]]></content>
-      <categories>
-        <category>JVM</category>
-        <category>GC</category>
-      </categories>
-      <tags>
-        <tag>Java</tag>
-        <tag>JVM</tag>
-        <tag>GC</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>CMS 垃圾回收器</title>
-    <url>/posts/d20aa128/</url>
-    <content><![CDATA[<p>CMS 的全称为 Concurrent Mark Sweep（并发标记清除），是 <code>JDK1.5</code> 版本之后内置的一种垃圾回收器。与其他垃圾回收器不同，CMS 的目标是实现最短的GC停顿时间，即使在大型堆内存的情况下也能保证应用的响应速度和性能。</p>
-<div class="note-large notel-yellow"><div class="notel-title"><p>注意</p>
-</div><div class="notel-content"><p>随着JDK版本的不断升级，从JDK 9开始，CMS收集器已经被标记为“即将被弃用”（Deprecated），而在JDK 14中彻底被删除。原因是CMS收集器存在以下问题：</p>
-<ol>
-<li>空间碎片：由于CMS收集器只能对老年代进行回收，所以会产生大量的空间碎片。这会导致后续的内存分配操作变得困难，甚至可能出现 OutOfMemoryError 错误。</li>
-<li>CPU占用：由于CMS收集器需要与应用程序线程并发工作，所以会占用一些CPU资源，影响应用程序的性能。</li>
-<li>内存泄漏：如果CMS收集器无法回收所有的垃圾，就会导致内存泄漏。</li>
-</ol>
-<p>因此，<a href="/posts/bc8ac7bc/"><code>G1收集器</code></a>逐渐成为了JDK的默认垃圾收集器。G1收集器采用分代回收的思想，可以更好地处理大量对象的分配和释放，避免了CMS收集器的一些缺点。</p>
- </div></div>
-<h2 id="区域划分"><a class="markdownIt-Anchor" href="#区域划分"></a> 区域划分</h2>
-<p>在进行垃圾回收时，它将<span style="border-bottom:2px solid yellow">堆内存</span>划分为多个区域，在不影响应用程序执行的情况下进行垃圾回收。</p>
-<p><img  
-                     lazyload
-                     src="/images/loading.svg"
-                     data-src="cmsmemory.webp"
-                      alt="cms memory" 
-                ></p>
-<div class="note-large notel-green"><div class="notel-title"><p>堆内存的区域划分</p>
-</div><div class="notel-content"><ul>
-<li><code>新生代</code>：包括Eden区和两个Survivor区（From Space和To Space）。当新对象被创建时，它们会首先被分配到Eden区。当Eden区满时，会触发Minor GC。在Minor GC过程中，Eden区和Survivor区中的存活对象会被复制到另一个Survivor区中，并经过一系列复制和清理操作后，存活的对象会被复制到另一个Survivor区中。每次Minor GC后，From Space和To Space会互换角色。（Eden 区 和 两个 Survivor区的大小比例：8:1:1，可以使用 <code>-XX:SurvivorRatio</code> 惊醒调整，默认值为 8）</li>
-<li><code>老年代</code>：存放长时间存活的对象。当Old区满时，会触发Full GC。Full GC会暂停整个JVM，对全局进行垃圾回收。由于Full GC需要暂停整个JVM，因此CMS垃圾回收器总是尽可能地减少Full GC的发生次数。</li>
-</ul>
- </div></div>
-<h2 id="工作原理"><a class="markdownIt-Anchor" href="#工作原理"></a> 工作原理</h2>
-<p>CMS垃圾回收器采用了“标记-清除”算法，其主要过程如下：</p>
-<p><img  
-                     lazyload
-                     src="/images/loading.svg"
-                     data-src="https://icefrozen.github.io/article/java-cms-gc/1552636737931java-cms-gc_.png"
-                      alt="cms" 
-                ></p>
-<ol>
-<li><code>初始标记</code>：暂停所有应用线程，必须短暂暂停以达到<a href="/posts/5a9ba959/">安全点</a>；标记出所有根对象以及直接与其相关的对象；</li>
-<li><code>并发标记</code>：恢复所有应用线程，同时并发地遍历老年代中的所有对象进行标记；</li>
-<li><code>重新标记</code>：暂停所有应用线程，必须短暂暂停以达到<a href="/posts/5a9ba959/">安全点</a>；处理并发标记期间因用户程序继续执行而被遗漏的新生代对象；</li>
-<li><code>并发清除</code>：同时清除标记完成的所有不再使用的对象。</li>
-</ol>
-<h2 id="优缺点"><a class="markdownIt-Anchor" href="#优缺点"></a> 优缺点</h2>
-<div class="note-large notel-green"><div class="notel-title"><p>优点</p>
-</div><div class="notel-content"><ol>
-<li>垃圾回收期间最大程度上减少了应用程序的停顿时间；</li>
-<li>适用于大型堆内存的JVM，CMS在回收大对象时非常高效；</li>
-<li>消耗的CPU资源较少；</li>
-</ol>
- </div></div>
-<div class="note-large notel-red"><div class="notel-title"><p>缺点</p>
-</div><div class="notel-content"><ol>
-<li>运作过程中需要占用一定的内存空间以记录清除信息；</li>
-<li>在进行并发标记和清除的过程中，由于用户线程和垃圾回收线程交错执行，所以会对CPU产生一定压力；</li>
-<li>整个运作过程相对复杂，实现难度较大。</li>
-</ol>
- </div></div>
-<h2 id="使用建议"><a class="markdownIt-Anchor" href="#使用建议"></a> 使用建议</h2>
-<ol>
-<li>应用程序必须运行在64位的JVM上；</li>
-<li>不推荐将老年代的内存分配过小，否则可能频繁触发Full GC；</li>
-<li>避免在快照时间段内生成大量的对象，否则可能导致CMS无法顺利完成垃圾回收操作。</li>
-</ol>
-<h2 id="结论"><a class="markdownIt-Anchor" href="#结论"></a> 结论</h2>
-<p>G1（Garbage First）垃圾收集器是一种用于管理Java虚拟机内存的垃圾回收器，它将堆内存分成大小相等的区域，并根据实际情况自适应调整垃圾回收策略，从而避免全局暂停，提高了响应时间和吞吐量。G1垃圾收集器具有分代收集、并发收集、可预测性和空间利用率等优点，但同时也存在初始标记和最终标记需要STW、物理内存占用等缺点。</p>
-]]></content>
-      <categories>
-        <category>JVM</category>
-        <category>GC</category>
-      </categories>
-      <tags>
-        <tag>Java</tag>
-        <tag>JVM</tag>
-        <tag>GC</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>G1 垃圾收集器</title>
-    <url>/posts/bc8ac7bc/</url>
-    <content><![CDATA[<p>G1 垃圾收集器是一种新型的垃圾收集器，专门针对大堆内存的应用程序进行优化，可以更好地处理大量对象的分配和释放，减少停顿时间，并帮助应用程序提高性能。G1 收集器是在 JDK 7 update 4 版本中首次推出的，在 Java 9 中正式成为默认的垃圾收集器。通过启动参数&quot;<code>-XX:+UseG1GC</code>&quot;来使用 G1 垃圾收集器。</p>
-<h2 id="区域划分"><a class="markdownIt-Anchor" href="#区域划分"></a> 区域划分</h2>
-<p><code>G1（Garbage-First）</code>垃圾收集器，将 Java 堆内存划分为多个大小相等的区域（Region），并对这些区域进行垃圾回收。每个区域的大小通常是1MB到32MB之间，并且可以通过JVM参数 <code>-XX:G1HeapRegionSize</code> 进行调整，默认为 1M。</p>
-<p><img  
-                     lazyload
-                     src="/images/loading.svg"
-                     data-src="https://imgconvert.csdnimg.cn/aHR0cHM6Ly91cGxvYWQtaW1hZ2VzLmppYW5zaHUuaW8vdXBsb2FkX2ltYWdlcy82MjcxMzc2LWNkMDIwOWM0YTNiZWRiNzUucG5n?x-oss-process=image/format,png"
-                      alt="" 
-                ></p>
-<div class="note-large notel-green"><div class="notel-title"><p>堆内存的区域划分</p>
-</div><div class="notel-content"><ul>
-<li>Eden 区：当新对象被创建时，它们会首先被分配到Eden区。Eden区是G1垃圾收集器的年轻代区域。默认情况下，Eden区的大小占整个Java堆内存的5%到10%。</li>
-<li>存活区（Survivor区）：与 CMS 垃圾收集器类似，G1 垃圾收集器还使用了两个 Survivor 区，并且 Survivor 区的大小与 Eden 区的大小相等。当执行年轻代垃圾回收时，存活的对象会被移动到 Survivor 区。默认情况下，Survivo r区的大小占整个 Java 堆内存的5%到10%。</li>
-<li>Old 区：存放长时间存活的对象。G1 垃圾收集器采用了“增量式整理”算法来避免 Full GC 带来的停顿时间过长。默认情况下，Old 区的大小占整个 Java 堆内存的60%到80%。</li>
-<li>Humongous 区：专门用来存储大对象，如果一个对象的大小超过了一个区域的 50%，那么这个对象将直接被分配到 Humongous 区，而不是被分配到 Eden区或 Old 区。对于 Humongous 对象，G1 垃圾收集器将使用“复制”算法进行垃圾回收。</li>
-</ul>
- </div></div>
-<h2 id="工作原理"><a class="markdownIt-Anchor" href="#工作原理"></a> 工作原理</h2>
-<p>G1 垃圾收集器采用“复制和标记整理”两种算法来回收内存，主要工作流程：</p>
-<p><img  
-                     lazyload
-                     src="/images/loading.svg"
-                     data-src="https://imgconvert.csdnimg.cn/aHR0cDovL3BpY3R1cmUudGp0dWxvbmcudG9wL0NNUyVFNiU5NCVCNiVFOSU5QiU4NiVFNSU5OSVBOC5qcGc?x-oss-process=image/format,png"
-                      alt="G1" 
-                ></p>
-<ol>
-<li>初始标记阶段：在此阶段中，G1收集器会标记所有被根对象直接关联的对象，并记录它们的位置和状态。</li>
-<li>并发标记阶段：在此阶段中，G1收集器会并发地处理堆中的对象，找出所有与标记对象直接或间接关联的对象，并标记它们。</li>
-<li>最终标记阶段：在此阶段中，G1收集器会重新暂停应用程序，完成对并发标记过程中可能遗漏的标记的补充，以确保所有存活的对象都已被标记。</li>
-<li>筛选阶段：在此阶段中，G1收集器会基于可回收的内存大小和回收时间预算来确定哪些区域需要被回收，并将这些区域加入回收集。</li>
-<li>清理阶段：在此阶段中，G1收集器会清理回收集中的区域，并将其中的内存返回给Java虚拟机，使其可以再次使用。</li>
-</ol>
-<p>总的来说，G1垃圾收集器通过将堆内存分成多个大小相等的区域，将大型堆的垃圾收集任务分成多个小的垃圾收集任务，从而避免了全局暂停，具有更高的可预测性和可控性。同时，G1垃圾收集器也可以根据应用程序产生的垃圾量自适应调整阶段时间，提高了垃圾回收的效率。</p>
-<h2 id="优缺点"><a class="markdownIt-Anchor" href="#优缺点"></a> 优缺点</h2>
-<div class="note-large notel-green"><div class="notel-title"><p>优点</p>
-</div><div class="notel-content"><ol>
-<li>分代收集：G1垃圾收集器将堆内存分为多个大小相等的区域，并根据它们的特征来进行垃圾回收。这样可以避免全局暂停，提高了响应时间和吞吐量。（<span style="border-bottom: 2px solid green">G1 收集器也引入了&quot;<code>混合模式</code>&quot;的回收策略，将Young GC和部分Full GC结合起来，从而达到更好的性能。</span>）</li>
-<li>并发收集：在并发标记阶段，G1垃圾收集器可以与应用程序并发执行。这意味着应用程序可以在垃圾回收期间继续运行，减少了暂停时间，提高了系统的可用性。</li>
-<li>可预测性：G1垃圾收集器会自动调整垃圾回收策略，以满足应用程序需要的响应时间和吞吐量。这使得应用程序的性能更加稳定和可预测。</li>
-<li>空间利用率：G1垃圾收集器可以更好地利用堆空间，减少了碎片化问题，从而可以更有效地使用可用内存。</li>
-</ol>
- </div></div>
-<div class="note-large notel-red"><div class="notel-title"><p>缺点</p>
-</div><div class="notel-content"><ol>
-<li>初始标记和最终标记仍需STW: 尽管 G1 收集器的大部分工作都是并发的，但在 JVM 执行初始标记和最终标记时仍需要暂停应用程序。这一点可能会导致应用程序在某些情况下出现停顿。</li>
-<li>物理内存占用：G1收集器需要维护大量的数据结构来跟踪堆内存的使用情况，这会对物理内存造成一定的负担。</li>
-<li>相比CMS，在GC过程中会占用更多的CPU时间。</li>
-<li>长时间运行的应用可能会出现某些性能问题，因为G1垃圾收集器不能保证我们的操作不会访问已经被回收的对象（也就是说，它不能保证与CMS相同的延迟）。</li>
-</ol>
- </div></div>
-<h2 id="使用建议"><a class="markdownIt-Anchor" href="#使用建议"></a> 使用建议</h2>
-<ol>
-<li>长期运行的应用程序：对于需要长时间运行的应用程序，使用G1垃圾收集器可以减少暂停时间并提高吞吐量。这是因为G1收集器可以将大型堆分成多个大小相等的区域，并且只回收那些空间最多的区域。</li>
-<li>大型内存项目：由于G1收集器具有更好的内存利用率和更低的碎片化，因此适用于需要大量内存的项目。</li>
-<li>多核处理器：G1收集器在多核处理器上的性能表现更佳。因为它可以以并发方式执行垃圾回收操作，从而使每个核处理器都可以同时处理GC操作和应用程序代码。</li>
-<li>稳定的堆大小：G1收集器的优化需要稳定的堆大小才能发挥最大效益，建议将Xmx值设置为整个堆的90%到95%。</li>
-<li>谨慎使用-XX:MaxGCPauseMillis参数：G1的目标是进行可控制、可预测的垃圾回收，而不是无限制地降低停顿时间。设置过低的 MaxGCPauseMillis 值会导致过多的垃圾回收操作和资源消耗，从而降低垃圾回收的效率和性能。</li>
-<li>监控和调整：使用G1垃圾收集器需要监控应用程序的性能，并根据实际情况进行调整。可以通过JVM参数和工具来调整G1收集器的行为，以达到最佳性能。</li>
-</ol>
-<h2 id="结论"><a class="markdownIt-Anchor" href="#结论"></a> 结论</h2>
-<p>G1 垃圾收集器是一种新型的垃圾收集器，专门针对大堆内存的应用程序进行优化，可以更好地处理大量对象的分配和释放，减少停顿时间，并帮助应用程序提高性能。</p>
-]]></content>
-      <categories>
-        <category>JVM</category>
-        <category>GC</category>
-      </categories>
-      <tags>
-        <tag>Java</tag>
-        <tag>JVM</tag>
-        <tag>GC</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>JVM 安全点</title>
-    <url>/posts/5a9ba959/</url>
-    <content><![CDATA[<p>JVM的安全点（Safepoint）是JVM执行垃圾回收时的一个重要概念。<span style="border-bottom:2px solid green;">在JVM进行垃圾回收操作时，需要保证堆的一致性，因此需要挂起所有运行Java代码的线程并记录它们的状态。这些特定位置就被称为 <em><strong><code>安全点</code></strong></em>。</span>&gt;</p>
-<h2 id="安全点的作用"><a class="markdownIt-Anchor" href="#安全点的作用"></a> 安全点的作用</h2>
-<p>当一个线程处于安全点时，JVM可以确保该线程不会同时访问堆内存中的对象。如果不挂起所有线程，那么这些线程可能正在访问堆内存中的对象。如果同时执行垃圾回收，则这些线程可能同时修改这些对象，导致数据错误或不一致。因此，在进行垃圾回收操作时，必须等待所有线程到达安全点，并将它们挂起，然后才能继续执行垃圾回收操作。</p>
-<h2 id="安全点的触发条件"><a class="markdownIt-Anchor" href="#安全点的触发条件"></a> 安全点的触发条件</h2>
-<div class="note-large notel-yellow"><div class="notel-title"><p>当一个线程处于安全点时，它必须满足以下条件之一</p>
-</div><div class="notel-content"><ol>
-<li>执行Java方法的字节码指令结束或异常抛出；</li>
-<li>执行JNI（Java Native Interface）方法的字节码指令结束或异常抛出；</li>
-<li>执行VM操作（如Thread.sleep）的字节码指令结束或异常抛出。</li>
-</ol>
- </div></div>
-<p>这意味着当一个线程处于安全点时，它一定是上述情况之一。只有在这些情况下，线程才被挂起进行垃圾回收操作。</p>
-<h2 id="安全点的影响"><a class="markdownIt-Anchor" href="#安全点的影响"></a> 安全点的影响</h2>
-<p>当JVM进行垃圾回收操作时，必须等待所有线程到达安全点，并将它们挂起，然后才能继续执行垃圾回收操作。这种等待时间可能会导致一些线程长时间等待，从而导致应用程序响应时间变慢。</p>
-<p>为了减少这种情况的发生，JVM提供了多种垃圾回收算法和垃圾回收器，以便在特定的场景中选择最佳的垃圾回收策略。例如CMS（Concurrent Mark Sweep）垃圾回收器就是在并发标记阶段尽可能减少安全点的数量的一种垃圾回收器。</p>
-<p>此外，我们也可以通过调整线程数、线程优先级、堆内存大小等措施来减少安全点的影响。</p>
-<h2 id="总结"><a class="markdownIt-Anchor" href="#总结"></a> 总结</h2>
-<p>安全点是一个重要的概念，在JVM进行垃圾回收操作时扮演着至关重要的角色。了解安全点的作用、触发条件和影响，对于Java开发者来说是非常重要的。在实际开发中，我们需要根据应用场景选择合适的垃圾回收算法和垃圾回收器，并采取相应的措施来减少安全点的影响，以使应用程序能够达到更好的性能和响应速度。</p>
-]]></content>
-      <categories>
-        <category>JVM</category>
-        <category>GC</category>
-      </categories>
-      <tags>
-        <tag>Java</tag>
-        <tag>JVM</tag>
-        <tag>GC</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>Java 对象的组成</title>
-    <url>/posts/dcb2c325/</url>
-    <content><![CDATA[<p>在JVM中，每个对象都由三个部分组成：对象头、实例变量和对齐填充。</p>
-<h2 id="组成部分"><a class="markdownIt-Anchor" href="#组成部分"></a> 组成部分</h2>
-<div class="note note-green"><p>在JVM中，每个对象都由三个部分组成：对象头、实例变量和对齐填充。</p>
-</div>
-<h3 id="对象头"><a class="markdownIt-Anchor" href="#对象头"></a> 对象头</h3>
-<p>对象头是存储在每个Java对象之前的一段内存空间，用于存储对象的元数据信息，包括以下内容：</p>
-<ul>
-<li>Mark Word：标记字，用于存储锁相关信息、GC状态信息等。</li>
-<li>Class pointer：指向该对象所属类的指针，用于确定对象类型。</li>
-<li>数组长度：如果该对象是数组，则用于存储数组长度。</li>
-</ul>
-<p>对象头的大小取决于平台的位数以及压缩指针技术的使用情况等因素。</p>
-<h3 id="实例变量"><a class="markdownIt-Anchor" href="#实例变量"></a> 实例变量</h3>
-<p>实例变量是对象的成员变量，定义了该对象的属性。它们被存储在紧随对象头之后的内存空间中。实例变量的大小和类型取决于对象所属类中定义的成员变量。</p>
-<h3 id="对齐填充"><a class="markdownIt-Anchor" href="#对齐填充"></a> 对齐填充</h3>
-<p>为了保证对象的大小是8字节的倍数，JVM会在实例变量之后添加一些额外的字节，即对齐填充。这些额外的字节没有任何实际作用，只是为了满足内存对齐的要求。</p>
-<p>对齐填充的大小取决于对象头和实例变量所占用的内存空间。</p>
-<h3 id="实际大小"><a class="markdownIt-Anchor" href="#实际大小"></a> 实际大小</h3>
-<p>总体来说，一个Java对象的实际大小有以下三个部分组成：</p>
-<ol>
-<li>对象头的大小：在不同的JVM实现中，对象头的大小可能会有所不同。</li>
-<li>实例变量的大小：该对象中定义的所有实例变量的大小。</li>
-<li>对齐填充的大小：为了满足内存对齐的要求而添加的额外字节。</li>
-</ol>
-<p>具体的实际大小取决于平台的位数、操作系统的类型以及JVM实现的不同等因素。</p>
-<h2 id="总结"><a class="markdownIt-Anchor" href="#总结"></a> 总结</h2>
-<p>JVM对象由对象头、实例变量和对齐填充三个部分组成。对象头用于存储对象的元数据信息；实例变量定义了该对象的属性；对齐填充用于保证对象大小是8字节的倍数。理解JVM对象的组成对于Java程序开发人员来说是非常重要的，可以帮助他们更好地管理内存资源，提高程序性能。</p>
-]]></content>
-      <categories>
-        <category>JVM</category>
-        <category>Java 对象</category>
-      </categories>
-      <tags>
-        <tag>Java</tag>
-        <tag>JVM</tag>
-        <tag>Java 对象</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>Java 对象是否存活</title>
-    <url>/posts/6a10d920/</url>
-    <content><![CDATA[<p>在JVM中，垃圾回收器会对内存中的对象进行生死判定，将无用的对象回收以释放内存空间。本篇博客将介绍JVM对象生死判定的过程。</p>
-<h2 id="算法"><a class="markdownIt-Anchor" href="#算法"></a> 算法</h2>
-<div class="note note-green"><p>用来判定对象存亡的常用算法有两种：引用计数法、可达性分析算法。</p>
-</div>
-<h3 id="引用计数法"><a class="markdownIt-Anchor" href="#引用计数法"></a> 引用计数法</h3>
-<p>引用计数法是最简单也是最基础的垃圾回收算法之一。该算法通过跟踪每个对象被引用的次数来判断对象是否已经成为垃圾。</p>
-<p>当一个新对象被创建时，其引用计数为1。当其他对象引用该对象时，其对应的引用计数加1。当某个对象的引用计数变为0时，说明该对象已经成为垃圾，可以被回收。</p>
-<p>然而，引用计数法有一个明显的问题：<span style="border-bottom:2px dashed red;">循环引用。如果两个或多个对象之间互相引用，它们的引用计数永远不会变成0，导致垃圾回收器无法将它们回收。</span>因此，引用计数法并不适用于实际的垃圾回收。</p>
-<h3 id="可达性分析算法"><a class="markdownIt-Anchor" href="#可达性分析算法"></a> 可达性分析算法</h3>
-<div class="note note-green"><p>JVM 使用此算法</p>
-</div>
-<p>可达性分析算法是目前主流的垃圾回收算法之一。它基于“GC Roots”的概念来判断对象是否可达。</p>
-<p>在JVM中，GC Roots包括以下几类：</p>
-<ul>
-<li>虚拟机栈（栈帧中的本地变量表）中引用的对象。</li>
-<li>方法区中静态属性引用的对象。</li>
-<li>方法区中常量引用的对象。</li>
-<li>本地方法栈中JNI（Java Native Interface）引用的对象。</li>
-</ul>
-<p>可达性分析算法从GC Roots开始遍历内存中的所有对象，将可以到达的对象标记为“存活”，而未被标记的对象则被视为垃圾。</p>
-<p>可达性分析算法可以有效地处理循环引用问题，并且能够精确地识别出无用对象。</p>
-<h2 id="对象生死判定流程"><a class="markdownIt-Anchor" href="#对象生死判定流程"></a> 对象生死判定流程</h2>
-<p>JVM中的垃圾回收器会周期性地对内存中的对象进行生死判定，以便将无用对象回收。其具体流程如下：</p>
-<ol>
-<li>根据GC Roots开始遍历内存中的所有对象。</li>
-<li>将所有可以到达的对象标记为“存活”。</li>
-<li>将未被标记的对象视为垃圾，进行回收。</li>
-</ol>
-<p>需要注意的是，在进行垃圾回收时，可能会造成一些短暂的系统停顿。这是因为垃圾回收器需要暂停正在执行的程序，并锁定整个堆空间，以便安全地对内存中的对象进行回收。为了减少这种停顿时间，JVM引入了一些优化措施，如并发标记和整理、增量式收集等。</p>
-<h2 id="总结"><a class="markdownIt-Anchor" href="#总结"></a> 总结</h2>
-<p>JVM对象生死判定是垃圾回收机制的重要组成部分。可达性分析算法是目前主流的垃圾回收算法之一，它可以精确地识别出无用对象，并解决循环引用问题。程序员需要了解JVM对象生死判定的过程，以便更好地管理内存资源，提高程序性能。</p>
-]]></content>
-      <categories>
-        <category>JVM</category>
-        <category>Java 对象</category>
-      </categories>
-      <tags>
-        <tag>Java</tag>
-        <tag>JVM</tag>
-        <tag>Java 对象</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>Java 对象的生命周期</title>
-    <url>/posts/dcb2c325/</url>
-    <content><![CDATA[<p>Java虚拟机（JVM）是一种能够在不同平台上运行Java程序的虚拟机。在JVM中，每个对象都有其自己的生命周期。本篇博客将介绍JVM对象的生命周期。</p>
-<h2 id="生命周期阶段"><a class="markdownIt-Anchor" href="#生命周期阶段"></a> 生命周期阶段</h2>
-<div class="note note-green"><p>Java 对象的生命周期的几个阶段，分别为：对象的创建、使用、回收、销毁，下边逐个来进行介绍；</p>
-</div>
-<h3 id="对象的创建"><a class="markdownIt-Anchor" href="#对象的创建"></a> 对象的创建</h3>
-<p>当使用<code>new</code>关键字创建一个对象时，JVM会先检查类是否已经被加载和链接过。如果没有加载，则先进行类的加载和连接操作。然后为该对象分配内存空间，并对分配到的内存空间进行清零赋值，即初始化对象的所有实例变量为默认值。</p>
-<p>接着，JVM会调用对象的构造函数（Constructor），初始化对象的实例变量。如果该类没有显式地定义构造函数，则JVM会提供一个默认的无参构造函数。</p>
-<p>最后，JVM会把对象的引用返回给程序员，以便程序员可以通过该引用来操作该对象。</p>
-<h3 id="对象的使用"><a class="markdownIt-Anchor" href="#对象的使用"></a> 对象的使用</h3>
-<p>在对象创建后，程序员可以通过对象的引用对它进行操作。对象在内存中的位置由对象的引用来确定。当一个对象被使用时，它可能会被传递给其他方法或者被保存在某些数据结构中。</p>
-<h3 id="对象的回收"><a class="markdownIt-Anchor" href="#对象的回收"></a> 对象的回收</h3>
-<p>当一个对象不再被程序员所引用时，该对象就成了垃圾（Garbage）。JVM需要将这些无用的对象从内存中清除，以便后面的内存分配可以使用这些空间。</p>
-<p>JVM中的垃圾回收（Garbage Collection）机制负责回收这些无用对象。当JVM检测到一个对象已经成为垃圾时，它就会自动地将该对象所占用的内存空间释放出来，以便程序后续的内存分配可以使用这些空间。</p>
-<p>在JVM中，垃圾回收是由垃圾回收器（Garbage Collector）来完成的。不同的垃圾回收器采用不同的算法来实现垃圾回收。常见的垃圾回收算法包括标记-清除算法、复制算法、标记-整理算法和分代收集算法等。</p>
-<h3 id="对象的销毁"><a class="markdownIt-Anchor" href="#对象的销毁"></a> 对象的销毁</h3>
-<p>当一个对象被回收后，JVM并不会立即销毁它。相反，JVM会等待垃圾回收器对内存进行整理后，再对垃圾对象进行销毁。销毁一个对象的最终步骤是调用其<code>finalize()</code>方法。该方法是Object类中定义的一个方法，在GC进行回收之前会先调用该方法。</p>
-<p>在Java 9之后，<code>finalize()</code>方法已经被废弃，取而代之的是使用Cleaner API进行资源管理。</p>
-<h2 id="总结"><a class="markdownIt-Anchor" href="#总结"></a> 总结</h2>
-<p>JVM对象的生命周期包括对象的创建、使用、回收和销毁等阶段。理解JVM对象的生命周期对于Java程序开发人员来说是非常重要的，可以帮助他们更好地管理内存资源，提高程序性能。</p>
-]]></content>
-      <categories>
-        <category>JVM</category>
-        <category>Java 对象</category>
-      </categories>
-      <tags>
-        <tag>Java</tag>
-        <tag>JVM</tag>
-        <tag>Java 对象</tag>
+        <tag>HashMap</tag>
       </tags>
   </entry>
   <entry>
