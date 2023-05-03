@@ -339,6 +339,50 @@
       </tags>
   </entry>
   <entry>
+    <title>Nacos 作为配置中心 - springboot</title>
+    <url>/posts/8625c51c/</url>
+    <content><![CDATA[<p>本文将介绍如何在 Springboot 项目中使用Nacos作为配置中心，进行动态配置管理。在此前提下，我们需要先安装Nacos Server，可参考官方文档 <a class="link"   href="https://nacos.io/zh-cn/docs/quick-start.html" >Quick Start <i class="fa-regular fa-arrow-up-right-from-square fa-sm"></i></a>。</p>
+<h2 id="准备工作"><a class="markdownIt-Anchor" href="#准备工作"></a> 准备工作</h2>
+<p>在开始之前，需要完成以下准备工作：</p>
+<ol>
+<li>安装并启动 Nacos Server。</li>
+<li>创建一个 Spring Boot 项目。</li>
+<li>添加必要的依赖：<code>spring-cloud-starter-alibaba-nacos-config</code>。</li>
+</ol>
+<h2 id="添加依赖"><a class="markdownIt-Anchor" href="#添加依赖"></a> 添加依赖</h2>
+<p>在 <code>pom.xml</code> 中添加以下依赖：</p>
+<div class="highlight-container" data-rel="Xml"><figure class="iseeu highlight xml"><table><tr><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>com.alibaba.cloud<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>spring-cloud-starter-alibaba-nacos-config<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">version</span>&gt;</span>$&#123;nacos.version&#125;<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br></pre></td></tr></table></figure></div>
+<h2 id="配置文件"><a class="markdownIt-Anchor" href="#配置文件"></a> 配置文件</h2>
+<p>在 <code>bootstrap.yml</code> 中添加以下配置：</p>
+<div class="highlight-container" data-rel="Yaml"><figure class="iseeu highlight yaml"><table><tr><td class="code"><pre><span class="line"><span class="attr">spring:</span></span><br><span class="line">  <span class="attr">profiles:</span></span><br><span class="line">    <span class="attr">active:</span> <span class="string">dev</span> <span class="comment"># 激活的 profile</span></span><br><span class="line">  <span class="attr">cloud:</span></span><br><span class="line">    <span class="attr">nacos:</span></span><br><span class="line">      <span class="attr">config:</span></span><br><span class="line">        <span class="attr">server-addr:</span> <span class="string">localhost:8848</span> <span class="comment"># Nacos Server 地址</span></span><br><span class="line">        <span class="attr">namespace:</span> <span class="comment"># 命名空间，可选</span></span><br><span class="line">        <span class="attr">group:</span> <span class="string">DEFAULT_GROUP</span> <span class="comment"># 分组，默认为 DEFAULT_GROUP</span></span><br><span class="line">        <span class="attr">prefix:</span> <span class="string">demo-config</span> <span class="comment"># 配置文件前缀</span></span><br><span class="line">        <span class="attr">file-extension:</span> <span class="string">yml</span> <span class="comment"># 配置文件扩展名，可选</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 使用 option 属性配置不同类型和环境的配置文件</span></span><br><span class="line">  <span class="attr">config:</span></span><br><span class="line">    <span class="attr">import:</span></span><br><span class="line">    <span class="bullet">-</span> <span class="string">optional:nacos:$&#123;spring.cloud.nacos.config.prefix&#125;.$&#123;spring.profiles.active&#125;.$&#123;spring.cloud.nacos.config.file-extension&#125;</span></span><br><span class="line">    <span class="bullet">-</span> <span class="string">optional:nacos:$&#123;spring.cloud.nacos.config.prefix&#125;.$&#123;spring.cloud.nacos.config.file-extension&#125;</span></span><br></pre></td></tr></table></figure></div>
+<p>在这个示例中，使用 <code>spring.config.imports</code> 属性的 <code>option</code> 属性来加载不同类型和环境的配置文件。<code>$&#123;spring.cloud.nacos.config.prefix&#125;</code> 表示从 Nacos 中加载的配置文件的前缀，<code>$&#123;spring.profiles.active&#125;</code> 表示当前激活的 profile，<code>$&#123;spring.cloud.nacos.config.file-extension&#125;</code> 表示配置文件的扩展名。</p>
+<p>首先，它会尝试加载 <code>demo-config.dev.yml</code>，如果找不到，则尝试加载 <code>demo-config.yml</code>。</p>
+<h2 id="配置中心"><a class="markdownIt-Anchor" href="#配置中心"></a> 配置中心</h2>
+<p>在 Nacos 控制台中创建一个名为 <code>demo-config.yml</code> 和 <code>demo-config.dev.yml</code> 的配置文件，并添加以下内容：</p>
+<p><strong>demo-config.yml</strong></p>
+<div class="highlight-container" data-rel="Yaml"><figure class="iseeu highlight yaml"><table><tr><td class="code"><pre><span class="line"><span class="attr">name:</span> <span class="string">LoveHeer</span></span><br></pre></td></tr></table></figure></div>
+<p><strong>demo-config.dev.yml</strong></p>
+<div class="highlight-container" data-rel="Yaml"><figure class="iseeu highlight yaml"><table><tr><td class="code"><pre><span class="line"><span class="attr">name:</span> <span class="string">dev-LoveHeer</span></span><br></pre></td></tr></table></figure></div>
+<h2 id="编写代码"><a class="markdownIt-Anchor" href="#编写代码"></a> 编写代码</h2>
+<p>创建一个 <code>DemoController</code>，并添加以下代码：</p>
+<div class="highlight-container" data-rel="Java"><figure class="iseeu highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@RestController</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">DemoController</span> &#123;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Value(&quot;$&#123;name&#125;&quot;)</span></span><br><span class="line">    <span class="keyword">private</span> String name;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@GetMapping(&quot;/hello&quot;)</span></span><br><span class="line">    <span class="keyword">public</span> String <span class="title function_">hello</span><span class="params">()</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="string">&quot;Hello, &quot;</span> + name + <span class="string">&quot;!&quot;</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></div>
+<p>这段代码读取了一个名为 <code>name</code> 的配置，并将其注入到 <code>DemoController</code> 中。</p>
+<div class="note note-warning icon-padding"><i class="note-icon fa-solid fa-exclamation-circle"></i><p>如要实现动态刷新，需要在<code>DemoController</code>上添加 <code>@RefreshScope</code> 注解</p>
+</div>
+<h2 id="运行应用程序"><a class="markdownIt-Anchor" href="#运行应用程序"></a> 运行应用程序</h2>
+<p>现在，我们可以运行 Spring Boot 应用程序并访问 <code>/hello</code> 端点。如果一切顺利，您将看到以下输出：</p>
+<div class="highlight-container" data-rel="Html"><figure class="iseeu highlight html"><table><tr><td class="code"><pre><span class="line">Hello, dev-LoveHeer!</span><br></pre></td></tr></table></figure></div>
+<h2 id="总结"><a class="markdownIt-Anchor" href="#总结"></a> 总结</h2>
+]]></content>
+      <categories>
+        <category>Nacos</category>
+        <category>使用示例</category>
+      </categories>
+      <tags>
+        <tag>Nacos</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>Nacos 服务注册中心-Springcloud</title>
     <url>/posts/e4410d9d/</url>
     <content><![CDATA[<p><a class="link"   href="https://nacos.io/" >Nacos <i class="fa-regular fa-arrow-up-right-from-square fa-sm"></i></a> 是一个开源的动态服务发现、配置管理和服务管理平台。在这篇博文中，使用 Nacos 作为 Spring Boot 的注册中心，并通过 Java 示例来演示。</p>
@@ -378,145 +422,6 @@
       </categories>
       <tags>
         <tag>Nacos</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>Nacos 作为配置中心 - springboot</title>
-    <url>/posts/8625c51c/</url>
-    <content><![CDATA[<p>本文将介绍如何在 Springboot 项目中使用Nacos作为配置中心，进行动态配置管理。在此前提下，我们需要先安装Nacos Server，可参考官方文档 <a class="link"   href="https://nacos.io/zh-cn/docs/quick-start.html" >Quick Start <i class="fa-regular fa-arrow-up-right-from-square fa-sm"></i></a>。</p>
-<h2 id="准备工作"><a class="markdownIt-Anchor" href="#准备工作"></a> 准备工作</h2>
-<p>在开始之前，需要完成以下准备工作：</p>
-<ol>
-<li>安装并启动 Nacos Server。</li>
-<li>创建一个 Spring Boot 项目。</li>
-<li>添加必要的依赖：<code>spring-cloud-starter-alibaba-nacos-config</code>。</li>
-</ol>
-<h2 id="添加依赖"><a class="markdownIt-Anchor" href="#添加依赖"></a> 添加依赖</h2>
-<p>在 <code>pom.xml</code> 中添加以下依赖：</p>
-<div class="highlight-container" data-rel="Xml"><figure class="iseeu highlight xml"><table><tr><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>com.alibaba.cloud<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>spring-cloud-starter-alibaba-nacos-config<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">version</span>&gt;</span>$&#123;nacos.version&#125;<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br></pre></td></tr></table></figure></div>
-<h2 id="配置文件"><a class="markdownIt-Anchor" href="#配置文件"></a> 配置文件</h2>
-<p>在 <code>bootstrap.yml</code> 中添加以下配置：</p>
-<div class="highlight-container" data-rel="Yaml"><figure class="iseeu highlight yaml"><table><tr><td class="code"><pre><span class="line"><span class="attr">spring:</span></span><br><span class="line">  <span class="attr">profiles:</span></span><br><span class="line">    <span class="attr">active:</span> <span class="string">dev</span> <span class="comment"># 激活的 profile</span></span><br><span class="line">  <span class="attr">cloud:</span></span><br><span class="line">    <span class="attr">nacos:</span></span><br><span class="line">      <span class="attr">config:</span></span><br><span class="line">        <span class="attr">server-addr:</span> <span class="string">localhost:8848</span> <span class="comment"># Nacos Server 地址</span></span><br><span class="line">        <span class="attr">namespace:</span> <span class="comment"># 命名空间，可选</span></span><br><span class="line">        <span class="attr">group:</span> <span class="string">DEFAULT_GROUP</span> <span class="comment"># 分组，默认为 DEFAULT_GROUP</span></span><br><span class="line">        <span class="attr">prefix:</span> <span class="string">demo-config</span> <span class="comment"># 配置文件前缀</span></span><br><span class="line">        <span class="attr">file-extension:</span> <span class="string">yml</span> <span class="comment"># 配置文件扩展名，可选</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 使用 option 属性配置不同类型和环境的配置文件</span></span><br><span class="line"><span class="attr">spring.config.imports:</span> </span><br><span class="line">  <span class="bullet">-</span> <span class="string">nacos:$&#123;spring.cloud.nacos.config.prefix&#125;.$&#123;spring.profiles.active&#125;.$&#123;spring.cloud.nacos.config.file-extension&#125;</span></span><br><span class="line">  <span class="bullet">-</span> <span class="string">nacos:$&#123;spring.cloud.nacos.config.prefix&#125;.$&#123;spring.cloud.nacos.config.file-extension&#125;</span></span><br></pre></td></tr></table></figure></div>
-<p>在这个示例中，使用 <code>spring.config.imports</code> 属性的 <code>option</code> 属性来加载不同类型和环境的配置文件。<code>$&#123;spring.cloud.nacos.config.prefix&#125;</code> 表示从 Nacos 中加载的配置文件的前缀，<code>$&#123;spring.profiles.active&#125;</code> 表示当前激活的 profile，<code>$&#123;spring.cloud.nacos.config.file-extension&#125;</code> 表示配置文件的扩展名。</p>
-<p>首先，它会尝试加载 <code>demo-config.dev.yml</code>，如果找不到，则尝试加载 <code>demo-config.yml</code>。</p>
-<h2 id="配置中心"><a class="markdownIt-Anchor" href="#配置中心"></a> 配置中心</h2>
-<p>在 Nacos 控制台中创建一个名为 <code>demo-config.yml</code> 和 <code>demo-config.dev.yml</code> 的配置文件，并添加以下内容：</p>
-<p><strong>demo-config.yml</strong></p>
-<div class="highlight-container" data-rel="Yaml"><figure class="iseeu highlight yaml"><table><tr><td class="code"><pre><span class="line"><span class="attr">name:</span> <span class="string">LoveHeer</span></span><br></pre></td></tr></table></figure></div>
-<p><strong>demo-config.dev.yml</strong></p>
-<div class="highlight-container" data-rel="Yaml"><figure class="iseeu highlight yaml"><table><tr><td class="code"><pre><span class="line"><span class="attr">name:</span> <span class="string">dev-LoveHeer</span></span><br></pre></td></tr></table></figure></div>
-<h2 id="编写代码"><a class="markdownIt-Anchor" href="#编写代码"></a> 编写代码</h2>
-<p>创建一个 <code>DemoController</code>，并添加以下代码：</p>
-<div class="highlight-container" data-rel="Java"><figure class="iseeu highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@RestController</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">DemoController</span> &#123;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Value(&quot;$&#123;name&#125;&quot;)</span></span><br><span class="line">    <span class="keyword">private</span> String name;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@GetMapping(&quot;/hello&quot;)</span></span><br><span class="line">    <span class="keyword">public</span> String <span class="title function_">hello</span><span class="params">()</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="string">&quot;Hello, &quot;</span> + name + <span class="string">&quot;!&quot;</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></div>
-<p>这段代码读取了一个名为 <code>name</code> 的配置，并将其注入到 <code>DemoController</code> 中。</p>
-<div class="note note-warning icon-padding"><i class="note-icon fa-solid fa-exclamation-circle"></i><p>如要实现动态刷新，需要在<code>DemoController</code>上添加 <code>@RefreshScope</code> 注解</p>
-</div>
-<h2 id="运行应用程序"><a class="markdownIt-Anchor" href="#运行应用程序"></a> 运行应用程序</h2>
-<p>现在，我们可以运行 Spring Boot 应用程序并访问 <code>/hello</code> 端点。如果一切顺利，您将看到以下输出：</p>
-<div class="highlight-container" data-rel="Html"><figure class="iseeu highlight html"><table><tr><td class="code"><pre><span class="line">Hello, dev-LoveHeer!</span><br></pre></td></tr></table></figure></div>
-<h2 id="总结"><a class="markdownIt-Anchor" href="#总结"></a> 总结</h2>
-]]></content>
-      <categories>
-        <category>Nacos</category>
-        <category>使用示例</category>
-      </categories>
-      <tags>
-        <tag>Nacos</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>ShardingSphereJdbc 执行流程</title>
-    <url>/posts/61dead18/</url>
-    <content><![CDATA[<p>ShardingSphere是一种分布式数据库中间件，为了方便数据分片而设计，ShardingSphere-JDBC5是其中的一个子项目。它提供了对JDBC的扩展，允许在单个逻辑数据源上实现数据分片。</p>
-<h2 id="执行流程"><a class="markdownIt-Anchor" href="#执行流程"></a> 执行流程</h2>
-<p>ShardingSphere-JDBC主要由两部分组成：客户端和服务端。客户端的作用是将SQL解析后分发给不同的服务节点，服务端负责处理请求并返回结果。下面是执行流程图：</p>
-<pre class="mermaid">graph TD;
-    User[用户] --> Application(应用)
-    
-    subgraph ShardingSphereJDBC执行流程 
-    Application -- 发起SQL请求 --> Proxy(Proxy) 
-    
-    Proxy -- 解析SQL --> Router(Router) 
-    Proxy -- 执行SQL --> Executor(Executor) 
-    
-    Router -- 分片规则解析 --> ShardingRule(Sharding Rule) 
-    Router -- 路由 --> DataSourceRouter(DataSource Router) 
-    
-    DataSourceRouter -- 数据源选择 --> DataSource1(数据源1) 
-    DataSourceRouter -- 数据源选择 --> DataSource2(数据源2) 
-    
-    DataSource1 -- 执行SQL --> Database1(Database1) 
-    DataSource2 -- 执行SQL --> Database2(Database2) 
-    
-    Database1 -- 返回结果 --> Executor 
-    Database2 -- 返回结果 --> Executor 
-    
-    Executor -- 结果聚合 --> Proxy 
-    Proxy -- 返回结果 --> Application
-    end</pre>
-<p>以上是整个执行流程，下面将详细介绍每一步的内容。</p>
-<h3 id="解析sql"><a class="markdownIt-Anchor" href="#解析sql"></a> 解析SQL</h3>
-<p>首先，客户端需要先解析用户提交的SQL语句，这里使用的是JSqlParser这个库。该库能够将SQL语句解析成一个AST（抽象语法树），然后我们可以从AST中提取出所有的表名、列名、操作符等信息。</p>
-<h3 id="获取分片规则"><a class="markdownIt-Anchor" href="#获取分片规则"></a> 获取分片规则</h3>
-<p>接下来，客户端需要获取分片规则。分片规则是由用户在配置文件中设置的，它指定了数据的分片方式，比如按照ID值进行分片，或者按照日期进行分片。客户端会将这些规则发送给服务端，以便服务端能够正确地处理请求。</p>
-<h3 id="生成分片执行计划"><a class="markdownIt-Anchor" href="#生成分片执行计划"></a> 生成分片执行计划</h3>
-<p>有了分片规则之后，客户端就可以根据每一条SQL语句生成一个分片执行计划了。执行计划包含了每个分片节点需要执行的SQL语句以及对应的参数值。这里使用了一个叫做ShardingEngine的核心类来生成执行计划。</p>
-<h3 id="执行sql"><a class="markdownIt-Anchor" href="#执行sql"></a> 执行SQL</h3>
-<p>客户端将执行计划发送到服务端之后，服务端就可以开始执行SQL语句了。服务端会根据执行计划中指定的SQL语句和参数值在对应的数据库节点上执行查询操作，并将结果返回给客户端。</p>
-<h3 id="合并结果"><a class="markdownIt-Anchor" href="#合并结果"></a> 合并结果</h3>
-<p>由于数据被分散到了多个节点上，所以服务端在执行SQL语句之后，需要将结果合并成一个整体的结果集。这里采用了JDBC的ResultSet接口来实现结果集的合并操作。</p>
-<h2 id="总结"><a class="markdownIt-Anchor" href="#总结"></a> 总结</h2>
-<p>ShardingSphere-JDBC5是一个非常实用的分布式数据库中间件，它能够帮助我们快速地实现数据分片，提高查询性能和吞吐量。整个项目架构清晰，核心类也比较简单易懂。使用ShardingSphere可以让我们更加专注于业务开发，而不需要过多地关注底层的数据分片实现细节。</p>
-]]></content>
-      <categories>
-        <category>ShardingSphere</category>
-        <category>ShardingSphereJdbc</category>
-      </categories>
-      <tags>
-        <tag>ShardingSphere</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>Springboot2.7集成ShardingSphereJdbc5.1.1</title>
-    <url>/posts/db89d0f7/</url>
-    <content><![CDATA[<p>ShardingSphere是一个开源的分布式数据库中间件，它支持多种关系型数据库，例如MySQL、Oracle、SQL Server等。在本篇博客中，将介绍如何使用Spring Boot 2.7集成ShardingSphere-jdbc5.1.1，并提供相应的配置文件和Java代码演示。</p>
-<h2 id="环境准备"><a class="markdownIt-Anchor" href="#环境准备"></a> 环境准备</h2>
-<ul>
-<li>JDK 1.8+</li>
-<li>Maven</li>
-<li>MySQL数据库</li>
-<li>Springboot 2.7.4</li>
-<li>ShardingSphere-Jdbc-5.1.1</li>
-</ul>
-<h2 id="添加依赖"><a class="markdownIt-Anchor" href="#添加依赖"></a> 添加依赖</h2>
-<p>在pom.xml文件中添加以下依赖：</p>
-<div class="highlight-container" data-rel="Xml"><figure class="iseeu highlight xml"><table><tr><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.apache.shardingsphere<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>shardingsphere-jdbc-core-spring-boot-starter<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">version</span>&gt;</span>5.1.1<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br></pre></td></tr></table></figure></div>
-<h2 id="配置数据源和分片规则"><a class="markdownIt-Anchor" href="#配置数据源和分片规则"></a> 配置数据源和分片规则</h2>
-<p>在application.yml文件中添加以下配置：</p>
-<div class="highlight-container" data-rel="Yaml"><figure class="iseeu highlight yaml"><table><tr><td class="code"><pre><span class="line"><span class="attr">spring:</span></span><br><span class="line">  <span class="attr">shardingsphere:</span></span><br><span class="line">    <span class="attr">mode:</span></span><br><span class="line">      <span class="comment"># 内存模式</span></span><br><span class="line">      <span class="attr">type:</span> <span class="string">Memory</span></span><br><span class="line">    <span class="attr">props:</span></span><br><span class="line">      <span class="comment"># 打印SQl</span></span><br><span class="line">      <span class="attr">sql-show:</span> <span class="literal">true</span></span><br><span class="line">    <span class="attr">datasource:</span></span><br><span class="line">      <span class="attr">names:</span> <span class="string">ds0,ds1</span></span><br><span class="line">      <span class="attr">ds0:</span></span><br><span class="line">        <span class="attr">type:</span> <span class="string">com.zaxxer.hikari.HikariDataSource</span></span><br><span class="line">        <span class="attr">driver-class-name:</span> <span class="string">com.mysql.jdbc.Driver</span></span><br><span class="line">        <span class="attr">jdbc-url:</span> <span class="string">jdbc:mysql://localhost:3306/ds0</span></span><br><span class="line">        <span class="attr">username:</span> <span class="string">root</span></span><br><span class="line">        <span class="attr">password:</span> <span class="string">root</span></span><br><span class="line">      <span class="attr">ds1:</span></span><br><span class="line">        <span class="attr">type:</span> <span class="string">com.zaxxer.hikari.HikariDataSource</span></span><br><span class="line">        <span class="attr">driver-class-name:</span> <span class="string">com.mysql.jdbc.Driver</span></span><br><span class="line">        <span class="attr">jdbc-url:</span> <span class="string">jdbc:mysql://localhost:3306/ds1</span></span><br><span class="line">        <span class="attr">username:</span> <span class="string">root</span></span><br><span class="line">        <span class="attr">password:</span> <span class="string">root</span></span><br><span class="line">    <span class="attr">rules:</span></span><br><span class="line">      <span class="attr">sharding:</span></span><br><span class="line">        <span class="attr">tables:</span></span><br><span class="line">          <span class="attr">t_user:</span></span><br><span class="line">            <span class="attr">actual-data-nodes:</span> <span class="string">ds$-&gt;&#123;0..1&#125;.t_user$-&gt;&#123;0..1&#125;</span></span><br><span class="line">            <span class="comment"># 主键生成策略</span></span><br><span class="line">            <span class="attr">key-generate-strategy:</span></span><br><span class="line">              <span class="comment"># 分布式序列列名称</span></span><br><span class="line">              <span class="attr">column:</span> <span class="string">id</span></span><br><span class="line">              <span class="comment"># 分布式序列算法名称</span></span><br><span class="line">              <span class="attr">key-generator-name:</span> <span class="string">alg_snowflake</span></span><br><span class="line">            <span class="comment"># 分库策略</span></span><br><span class="line">            <span class="attr">database-strategy:</span></span><br><span class="line">              <span class="attr">standard:</span></span><br><span class="line">                <span class="comment"># 分片算法名称</span></span><br><span class="line">                <span class="attr">sharding-algorithm-name:</span> <span class="string">alg_inline_userid</span></span><br><span class="line">                <span class="comment"># 分片列名称</span></span><br><span class="line">                <span class="attr">sharding-column:</span> <span class="string">id</span></span><br><span class="line">            <span class="comment"># 分表策略</span></span><br><span class="line">            <span class="attr">table-strategy:</span></span><br><span class="line">              <span class="attr">standard:</span></span><br><span class="line">                <span class="comment"># 分片算法名称</span></span><br><span class="line">                <span class="attr">sharding-algorithm-name:</span> <span class="string">alg_hash_mod</span></span><br><span class="line">                <span class="comment"># 分片列名称</span></span><br><span class="line">                <span class="attr">sharding-column:</span> <span class="string">id</span></span><br><span class="line">        <span class="comment"># 分片算法配置</span></span><br><span class="line">        <span class="attr">sharding-algorithms:</span></span><br><span class="line">          <span class="comment"># 行表达式分片算法</span></span><br><span class="line">          <span class="attr">alg_inline_userid:</span></span><br><span class="line">            <span class="attr">props:</span></span><br><span class="line">              <span class="comment"># 分片算法属性配置</span></span><br><span class="line">              <span class="attr">algorithm-expression:</span> <span class="string">ds$-&gt;&#123;id</span> <span class="string">%</span> <span class="number">2</span><span class="string">&#125;</span></span><br><span class="line">            <span class="comment"># 分片算法类型</span></span><br><span class="line">            <span class="attr">type:</span> <span class="string">INLINE</span></span><br><span class="line">          <span class="attr">alg_mod:</span></span><br><span class="line">            <span class="attr">props:</span></span><br><span class="line">              <span class="comment"># 分片算法属性配置</span></span><br><span class="line">              <span class="attr">sharding-count:</span> <span class="number">2</span></span><br><span class="line">            <span class="comment"># 取模分片算法</span></span><br><span class="line">            <span class="attr">type:</span> <span class="string">MOD</span></span><br><span class="line">          <span class="attr">alg_hash_mod:</span></span><br><span class="line">            <span class="attr">props:</span></span><br><span class="line">              <span class="comment"># 分片算法属性配置</span></span><br><span class="line">              <span class="attr">sharding-count:</span> <span class="number">2</span></span><br><span class="line">            <span class="comment"># 分片算法类型</span></span><br><span class="line">            <span class="attr">type:</span> <span class="string">HASH_MOD</span></span><br><span class="line">        <span class="attr">key-generators:</span></span><br><span class="line">          <span class="comment"># 分布式序列算法配置</span></span><br><span class="line">          <span class="attr">alg_snowflake:</span></span><br><span class="line">            <span class="comment"># 分布式序列算法类型</span></span><br><span class="line">            <span class="attr">type:</span> <span class="string">SNOWFLAKE</span></span><br></pre></td></tr></table></figure></div>
-<p>这里我们配置了两个数据源（ds0和ds1），并且对user表进行了分片，根据id字段对表进行水平分割。具体细节可以参考<a class="link"   href="https://shardingsphere.apache.org/document/5.1.1/cn/user-manual/shardingsphere-jdbc/" >官方文档 <i class="fa-regular fa-arrow-up-right-from-square fa-sm"></i></a>。</p>
-<h2 id="java代码演示"><a class="markdownIt-Anchor" href="#java代码演示"></a> Java代码演示</h2>
-<p>在代码中注入ShardingSphere数据源，在使用的时候直接使用即可，和平常的数据源在使用上并无两样。例如 JdbcTemplate：</p>
-<div class="highlight-container" data-rel="Java"><figure class="iseeu highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@Service</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">UserServiceImpl</span> <span class="keyword">implements</span> <span class="title class_">UserService</span> &#123;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Autowired</span></span><br><span class="line">    <span class="keyword">private</span> JdbcTemplate jdbcTemplate;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">addUser</span><span class="params">(User user)</span> &#123;</span><br><span class="line">        <span class="type">String</span> <span class="variable">sql</span> <span class="operator">=</span> <span class="string">&quot;INSERT INTO user(name, age) VALUES(?, ?)&quot;</span>;</span><br><span class="line">        Object[] params = <span class="keyword">new</span> <span class="title class_">Object</span>[]&#123;user.getName(), user.getAge()&#125;;</span><br><span class="line">        jdbcTemplate.update(sql, params);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="keyword">public</span> List&lt;User&gt; <span class="title function_">getAllUsers</span><span class="params">()</span> &#123;</span><br><span class="line">        <span class="type">String</span> <span class="variable">sql</span> <span class="operator">=</span> <span class="string">&quot;SELECT id, name, age FROM user&quot;</span>;</span><br><span class="line">        <span class="keyword">return</span> jdbcTemplate.query(sql, <span class="keyword">new</span> <span class="title class_">BeanPropertyRowMapper</span>&lt;&gt;(User.class));</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="keyword">public</span> User <span class="title function_">getUserById</span><span class="params">(Long id)</span> &#123;</span><br><span class="line">        <span class="type">String</span> <span class="variable">sql</span> <span class="operator">=</span> <span class="string">&quot;SELECT id, name, age FROM user WHERE id=?&quot;</span>;</span><br><span class="line">        Object[] params = <span class="keyword">new</span> <span class="title class_">Object</span>[]&#123;id&#125;;</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            <span class="keyword">return</span> jdbcTemplate.queryForObject(sql, params, <span class="keyword">new</span> <span class="title class_">BeanPropertyRowMapper</span>&lt;&gt;(User.class));</span><br><span class="line">        &#125; <span class="keyword">catch</span> (EmptyResultDataAccessException ex) &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="literal">null</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">deleteUserById</span><span class="params">(Long id)</span> &#123;</span><br><span class="line">        <span class="type">String</span> <span class="variable">sql</span> <span class="operator">=</span> <span class="string">&quot;DELETE FROM user WHERE id=?&quot;</span>;</span><br><span class="line">        Object[] params = <span class="keyword">new</span> <span class="title class_">Object</span>[]&#123;id&#125;;</span><br><span class="line">        jdbcTemplate.update(sql, params);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></div>
-<div class="note-large notel-yellow"><div class="notel-title"><p>在与<code>Springboot3+</code>整合时注意</p>
-</div><div class="notel-content"><ol>
-<li>我用Springboot3 在和 5.1.1版本整合时出现了数据源注入失败的问题，经过断点调试发现Springboot3在启动时没有加载shardingSphere5.1.1的自动装配类<code>ShardingSphereAutoConfiguration</code>，所以要在Springboot启动类上加上<code>ShardingSphereAutoConfiguration</code>的路径，以便Springboot3启动时加载。如：</li>
-</ol>
-<div class="highlight-container" data-rel="Java"><figure class="iseeu highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@SpringBootApplication(scanBasePackages = &#123;</span></span><br><span class="line"><span class="meta">        &quot;love.heer.example.shardingspherejdbc&quot;,</span></span><br><span class="line"><span class="meta">        &quot;org.apache.shardingsphere&quot;  // ShardingSphereAutoConfiguration 的源路径</span></span><br><span class="line"><span class="meta">&#125;)</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">ShardingSphereJdbcDemoApp</span> &#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> &#123;</span><br><span class="line">        SpringApplication.run(ShardingSphereJdbcDemoApp.class, args);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></div>
-<ol start="2">
-<li>Springboot 3+ 最佳整合方式，还是使用最新版本的ShardingSphere来进行整合，新版本的整合方法也进行了调整，详情可见<a class="link"   href="https://shardingsphere.apache.org/document/current/cn/quick-start/shardingsphere-jdbc-quick-start/" >官方文档 <i class="fa-regular fa-arrow-up-right-from-square fa-sm"></i></a>。</li>
-</ol>
- </div></div>
-<h2 id="总结"><a class="markdownIt-Anchor" href="#总结"></a> 总结</h2>
-<p>在本篇博客中，介绍了如何使用Spring Boot 2.7集成ShardingSphere-jdbc5.1.1，并提供了相应的配置文件和Java代码演示，<strong>配置文件比较重要，配置对应的属性时要细心点</strong>。ShardingSphere是一个非常强大的分布式数据库中间件，可以帮助我们处理高并发的数据访问问题。</p>
-]]></content>
-      <categories>
-        <category>ShardingSphere</category>
-        <category>ShardingSphereJdbc</category>
-      </categories>
-      <tags>
-        <tag>ShardingSphere</tag>
-        <tag>Springboot</tag>
       </tags>
   </entry>
   <entry>
@@ -785,6 +690,200 @@
       </tags>
   </entry>
   <entry>
+    <title>Springboot2.7集成ShardingSphereJdbc5.1.1</title>
+    <url>/posts/db89d0f7/</url>
+    <content><![CDATA[<p>ShardingSphere是一个开源的分布式数据库中间件，它支持多种关系型数据库，例如MySQL、Oracle、SQL Server等。在本篇博客中，将介绍如何使用Spring Boot 2.7集成ShardingSphere-jdbc5.1.1，并提供相应的配置文件和Java代码演示。</p>
+<h2 id="环境准备"><a class="markdownIt-Anchor" href="#环境准备"></a> 环境准备</h2>
+<ul>
+<li>JDK 1.8+</li>
+<li>Maven</li>
+<li>MySQL数据库</li>
+<li>Springboot 2.7.4</li>
+<li>ShardingSphere-Jdbc-5.1.1</li>
+</ul>
+<h2 id="添加依赖"><a class="markdownIt-Anchor" href="#添加依赖"></a> 添加依赖</h2>
+<p>在pom.xml文件中添加以下依赖：</p>
+<div class="highlight-container" data-rel="Xml"><figure class="iseeu highlight xml"><table><tr><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.apache.shardingsphere<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>shardingsphere-jdbc-core-spring-boot-starter<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">version</span>&gt;</span>5.1.1<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br></pre></td></tr></table></figure></div>
+<h2 id="配置数据源和分片规则"><a class="markdownIt-Anchor" href="#配置数据源和分片规则"></a> 配置数据源和分片规则</h2>
+<p>在application.yml文件中添加以下配置：</p>
+<div class="highlight-container" data-rel="Yaml"><figure class="iseeu highlight yaml"><table><tr><td class="code"><pre><span class="line"><span class="attr">spring:</span></span><br><span class="line">  <span class="attr">shardingsphere:</span></span><br><span class="line">    <span class="attr">mode:</span></span><br><span class="line">      <span class="comment"># 内存模式</span></span><br><span class="line">      <span class="attr">type:</span> <span class="string">Memory</span></span><br><span class="line">    <span class="attr">props:</span></span><br><span class="line">      <span class="comment"># 打印SQl</span></span><br><span class="line">      <span class="attr">sql-show:</span> <span class="literal">true</span></span><br><span class="line">    <span class="attr">datasource:</span></span><br><span class="line">      <span class="attr">names:</span> <span class="string">ds0,ds1</span></span><br><span class="line">      <span class="attr">ds0:</span></span><br><span class="line">        <span class="attr">type:</span> <span class="string">com.zaxxer.hikari.HikariDataSource</span></span><br><span class="line">        <span class="attr">driver-class-name:</span> <span class="string">com.mysql.jdbc.Driver</span></span><br><span class="line">        <span class="attr">jdbc-url:</span> <span class="string">jdbc:mysql://localhost:3306/ds0</span></span><br><span class="line">        <span class="attr">username:</span> <span class="string">root</span></span><br><span class="line">        <span class="attr">password:</span> <span class="string">root</span></span><br><span class="line">      <span class="attr">ds1:</span></span><br><span class="line">        <span class="attr">type:</span> <span class="string">com.zaxxer.hikari.HikariDataSource</span></span><br><span class="line">        <span class="attr">driver-class-name:</span> <span class="string">com.mysql.jdbc.Driver</span></span><br><span class="line">        <span class="attr">jdbc-url:</span> <span class="string">jdbc:mysql://localhost:3306/ds1</span></span><br><span class="line">        <span class="attr">username:</span> <span class="string">root</span></span><br><span class="line">        <span class="attr">password:</span> <span class="string">root</span></span><br><span class="line">    <span class="attr">rules:</span></span><br><span class="line">      <span class="attr">sharding:</span></span><br><span class="line">        <span class="attr">tables:</span></span><br><span class="line">          <span class="attr">t_user:</span></span><br><span class="line">            <span class="attr">actual-data-nodes:</span> <span class="string">ds$-&gt;&#123;0..1&#125;.t_user$-&gt;&#123;0..1&#125;</span></span><br><span class="line">            <span class="comment"># 主键生成策略</span></span><br><span class="line">            <span class="attr">key-generate-strategy:</span></span><br><span class="line">              <span class="comment"># 分布式序列列名称</span></span><br><span class="line">              <span class="attr">column:</span> <span class="string">id</span></span><br><span class="line">              <span class="comment"># 分布式序列算法名称</span></span><br><span class="line">              <span class="attr">key-generator-name:</span> <span class="string">alg_snowflake</span></span><br><span class="line">            <span class="comment"># 分库策略</span></span><br><span class="line">            <span class="attr">database-strategy:</span></span><br><span class="line">              <span class="attr">standard:</span></span><br><span class="line">                <span class="comment"># 分片算法名称</span></span><br><span class="line">                <span class="attr">sharding-algorithm-name:</span> <span class="string">alg_inline_userid</span></span><br><span class="line">                <span class="comment"># 分片列名称</span></span><br><span class="line">                <span class="attr">sharding-column:</span> <span class="string">id</span></span><br><span class="line">            <span class="comment"># 分表策略</span></span><br><span class="line">            <span class="attr">table-strategy:</span></span><br><span class="line">              <span class="attr">standard:</span></span><br><span class="line">                <span class="comment"># 分片算法名称</span></span><br><span class="line">                <span class="attr">sharding-algorithm-name:</span> <span class="string">alg_hash_mod</span></span><br><span class="line">                <span class="comment"># 分片列名称</span></span><br><span class="line">                <span class="attr">sharding-column:</span> <span class="string">id</span></span><br><span class="line">        <span class="comment"># 分片算法配置</span></span><br><span class="line">        <span class="attr">sharding-algorithms:</span></span><br><span class="line">          <span class="comment"># 行表达式分片算法</span></span><br><span class="line">          <span class="attr">alg_inline_userid:</span></span><br><span class="line">            <span class="attr">props:</span></span><br><span class="line">              <span class="comment"># 分片算法属性配置</span></span><br><span class="line">              <span class="attr">algorithm-expression:</span> <span class="string">ds$-&gt;&#123;id</span> <span class="string">%</span> <span class="number">2</span><span class="string">&#125;</span></span><br><span class="line">            <span class="comment"># 分片算法类型</span></span><br><span class="line">            <span class="attr">type:</span> <span class="string">INLINE</span></span><br><span class="line">          <span class="attr">alg_mod:</span></span><br><span class="line">            <span class="attr">props:</span></span><br><span class="line">              <span class="comment"># 分片算法属性配置</span></span><br><span class="line">              <span class="attr">sharding-count:</span> <span class="number">2</span></span><br><span class="line">            <span class="comment"># 取模分片算法</span></span><br><span class="line">            <span class="attr">type:</span> <span class="string">MOD</span></span><br><span class="line">          <span class="attr">alg_hash_mod:</span></span><br><span class="line">            <span class="attr">props:</span></span><br><span class="line">              <span class="comment"># 分片算法属性配置</span></span><br><span class="line">              <span class="attr">sharding-count:</span> <span class="number">2</span></span><br><span class="line">            <span class="comment"># 分片算法类型</span></span><br><span class="line">            <span class="attr">type:</span> <span class="string">HASH_MOD</span></span><br><span class="line">        <span class="attr">key-generators:</span></span><br><span class="line">          <span class="comment"># 分布式序列算法配置</span></span><br><span class="line">          <span class="attr">alg_snowflake:</span></span><br><span class="line">            <span class="comment"># 分布式序列算法类型</span></span><br><span class="line">            <span class="attr">type:</span> <span class="string">SNOWFLAKE</span></span><br></pre></td></tr></table></figure></div>
+<p>这里我们配置了两个数据源（ds0和ds1），并且对user表进行了分片，根据id字段对表进行水平分割。具体细节可以参考<a class="link"   href="https://shardingsphere.apache.org/document/5.1.1/cn/user-manual/shardingsphere-jdbc/" >官方文档 <i class="fa-regular fa-arrow-up-right-from-square fa-sm"></i></a>。</p>
+<h2 id="java代码演示"><a class="markdownIt-Anchor" href="#java代码演示"></a> Java代码演示</h2>
+<p>在代码中注入ShardingSphere数据源，在使用的时候直接使用即可，和平常的数据源在使用上并无两样。例如 JdbcTemplate：</p>
+<div class="highlight-container" data-rel="Java"><figure class="iseeu highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@Service</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">UserServiceImpl</span> <span class="keyword">implements</span> <span class="title class_">UserService</span> &#123;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Autowired</span></span><br><span class="line">    <span class="keyword">private</span> JdbcTemplate jdbcTemplate;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">addUser</span><span class="params">(User user)</span> &#123;</span><br><span class="line">        <span class="type">String</span> <span class="variable">sql</span> <span class="operator">=</span> <span class="string">&quot;INSERT INTO user(name, age) VALUES(?, ?)&quot;</span>;</span><br><span class="line">        Object[] params = <span class="keyword">new</span> <span class="title class_">Object</span>[]&#123;user.getName(), user.getAge()&#125;;</span><br><span class="line">        jdbcTemplate.update(sql, params);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="keyword">public</span> List&lt;User&gt; <span class="title function_">getAllUsers</span><span class="params">()</span> &#123;</span><br><span class="line">        <span class="type">String</span> <span class="variable">sql</span> <span class="operator">=</span> <span class="string">&quot;SELECT id, name, age FROM user&quot;</span>;</span><br><span class="line">        <span class="keyword">return</span> jdbcTemplate.query(sql, <span class="keyword">new</span> <span class="title class_">BeanPropertyRowMapper</span>&lt;&gt;(User.class));</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="keyword">public</span> User <span class="title function_">getUserById</span><span class="params">(Long id)</span> &#123;</span><br><span class="line">        <span class="type">String</span> <span class="variable">sql</span> <span class="operator">=</span> <span class="string">&quot;SELECT id, name, age FROM user WHERE id=?&quot;</span>;</span><br><span class="line">        Object[] params = <span class="keyword">new</span> <span class="title class_">Object</span>[]&#123;id&#125;;</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            <span class="keyword">return</span> jdbcTemplate.queryForObject(sql, params, <span class="keyword">new</span> <span class="title class_">BeanPropertyRowMapper</span>&lt;&gt;(User.class));</span><br><span class="line">        &#125; <span class="keyword">catch</span> (EmptyResultDataAccessException ex) &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="literal">null</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">deleteUserById</span><span class="params">(Long id)</span> &#123;</span><br><span class="line">        <span class="type">String</span> <span class="variable">sql</span> <span class="operator">=</span> <span class="string">&quot;DELETE FROM user WHERE id=?&quot;</span>;</span><br><span class="line">        Object[] params = <span class="keyword">new</span> <span class="title class_">Object</span>[]&#123;id&#125;;</span><br><span class="line">        jdbcTemplate.update(sql, params);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></div>
+<div class="note-large notel-yellow"><div class="notel-title"><p>在与<code>Springboot3+</code>整合时注意</p>
+</div><div class="notel-content"><ol>
+<li>我用Springboot3 在和 5.1.1版本整合时出现了数据源注入失败的问题，经过断点调试发现Springboot3在启动时没有加载shardingSphere5.1.1的自动装配类<code>ShardingSphereAutoConfiguration</code>，所以要在Springboot启动类上加上<code>ShardingSphereAutoConfiguration</code>的路径，以便Springboot3启动时加载。如：</li>
+</ol>
+<div class="highlight-container" data-rel="Java"><figure class="iseeu highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@SpringBootApplication(scanBasePackages = &#123;</span></span><br><span class="line"><span class="meta">        &quot;love.heer.example.shardingspherejdbc&quot;,</span></span><br><span class="line"><span class="meta">        &quot;org.apache.shardingsphere&quot;  // ShardingSphereAutoConfiguration 的源路径</span></span><br><span class="line"><span class="meta">&#125;)</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">ShardingSphereJdbcDemoApp</span> &#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> &#123;</span><br><span class="line">        SpringApplication.run(ShardingSphereJdbcDemoApp.class, args);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></div>
+<ol start="2">
+<li>Springboot 3+ 最佳整合方式，还是使用最新版本的ShardingSphere来进行整合，新版本的整合方法也进行了调整，详情可见<a class="link"   href="https://shardingsphere.apache.org/document/current/cn/quick-start/shardingsphere-jdbc-quick-start/" >官方文档 <i class="fa-regular fa-arrow-up-right-from-square fa-sm"></i></a>。</li>
+</ol>
+ </div></div>
+<h2 id="总结"><a class="markdownIt-Anchor" href="#总结"></a> 总结</h2>
+<p>在本篇博客中，介绍了如何使用Spring Boot 2.7集成ShardingSphere-jdbc5.1.1，并提供了相应的配置文件和Java代码演示，<strong>配置文件比较重要，配置对应的属性时要细心点</strong>。ShardingSphere是一个非常强大的分布式数据库中间件，可以帮助我们处理高并发的数据访问问题。</p>
+]]></content>
+      <categories>
+        <category>ShardingSphere</category>
+        <category>ShardingSphereJdbc</category>
+      </categories>
+      <tags>
+        <tag>ShardingSphere</tag>
+        <tag>Springboot</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>ShardingSphereJdbc 执行流程</title>
+    <url>/posts/61dead18/</url>
+    <content><![CDATA[<p>ShardingSphere是一种分布式数据库中间件，为了方便数据分片而设计，ShardingSphere-JDBC5是其中的一个子项目。它提供了对JDBC的扩展，允许在单个逻辑数据源上实现数据分片。</p>
+<h2 id="执行流程"><a class="markdownIt-Anchor" href="#执行流程"></a> 执行流程</h2>
+<p>ShardingSphere-JDBC主要由两部分组成：客户端和服务端。客户端的作用是将SQL解析后分发给不同的服务节点，服务端负责处理请求并返回结果。下面是执行流程图：</p>
+<pre class="mermaid">graph TD;
+    User[用户] --> Application(应用)
+    
+    subgraph ShardingSphereJDBC执行流程 
+    Application -- 发起SQL请求 --> Proxy(Proxy) 
+    
+    Proxy -- 解析SQL --> Router(Router) 
+    Proxy -- 执行SQL --> Executor(Executor) 
+    
+    Router -- 分片规则解析 --> ShardingRule(Sharding Rule) 
+    Router -- 路由 --> DataSourceRouter(DataSource Router) 
+    
+    DataSourceRouter -- 数据源选择 --> DataSource1(数据源1) 
+    DataSourceRouter -- 数据源选择 --> DataSource2(数据源2) 
+    
+    DataSource1 -- 执行SQL --> Database1(Database1) 
+    DataSource2 -- 执行SQL --> Database2(Database2) 
+    
+    Database1 -- 返回结果 --> Executor 
+    Database2 -- 返回结果 --> Executor 
+    
+    Executor -- 结果聚合 --> Proxy 
+    Proxy -- 返回结果 --> Application
+    end</pre>
+<p>以上是整个执行流程，下面将详细介绍每一步的内容。</p>
+<h3 id="解析sql"><a class="markdownIt-Anchor" href="#解析sql"></a> 解析SQL</h3>
+<p>首先，客户端需要先解析用户提交的SQL语句，这里使用的是JSqlParser这个库。该库能够将SQL语句解析成一个AST（抽象语法树），然后我们可以从AST中提取出所有的表名、列名、操作符等信息。</p>
+<h3 id="获取分片规则"><a class="markdownIt-Anchor" href="#获取分片规则"></a> 获取分片规则</h3>
+<p>接下来，客户端需要获取分片规则。分片规则是由用户在配置文件中设置的，它指定了数据的分片方式，比如按照ID值进行分片，或者按照日期进行分片。客户端会将这些规则发送给服务端，以便服务端能够正确地处理请求。</p>
+<h3 id="生成分片执行计划"><a class="markdownIt-Anchor" href="#生成分片执行计划"></a> 生成分片执行计划</h3>
+<p>有了分片规则之后，客户端就可以根据每一条SQL语句生成一个分片执行计划了。执行计划包含了每个分片节点需要执行的SQL语句以及对应的参数值。这里使用了一个叫做ShardingEngine的核心类来生成执行计划。</p>
+<h3 id="执行sql"><a class="markdownIt-Anchor" href="#执行sql"></a> 执行SQL</h3>
+<p>客户端将执行计划发送到服务端之后，服务端就可以开始执行SQL语句了。服务端会根据执行计划中指定的SQL语句和参数值在对应的数据库节点上执行查询操作，并将结果返回给客户端。</p>
+<h3 id="合并结果"><a class="markdownIt-Anchor" href="#合并结果"></a> 合并结果</h3>
+<p>由于数据被分散到了多个节点上，所以服务端在执行SQL语句之后，需要将结果合并成一个整体的结果集。这里采用了JDBC的ResultSet接口来实现结果集的合并操作。</p>
+<h2 id="总结"><a class="markdownIt-Anchor" href="#总结"></a> 总结</h2>
+<p>ShardingSphere-JDBC5是一个非常实用的分布式数据库中间件，它能够帮助我们快速地实现数据分片，提高查询性能和吞吐量。整个项目架构清晰，核心类也比较简单易懂。使用ShardingSphere可以让我们更加专注于业务开发，而不需要过多地关注底层的数据分片实现细节。</p>
+]]></content>
+      <categories>
+        <category>ShardingSphere</category>
+        <category>ShardingSphereJdbc</category>
+      </categories>
+      <tags>
+        <tag>ShardingSphere</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Java17环境配置- MacOS</title>
+    <url>/posts/21377094/</url>
+    <content><![CDATA[<p>Java 17 是一种新版本的Java开发环境，使用 Java 17 进行程序开发时需要在计算机上安装 Java 17 环境。本文将介绍如何在 MacOS 中配置 Java 17环境。</p>
+<h2 id="macos系统中配置java-17环境"><a class="markdownIt-Anchor" href="#macos系统中配置java-17环境"></a> MacOS系统中配置Java 17环境：</h2>
+<h3 id="1-下载java-17安装包"><a class="markdownIt-Anchor" href="#1-下载java-17安装包"></a> 1. 下载Java 17安装包。</h3>
+<p>在<a class="link"   href="https://www.oracle.com/java/technologies/javase/jdk17-archive-downloads.html" >Oracle官网 <i class="fa-regular fa-arrow-up-right-from-square fa-sm"></i></a>上下载 Java 17<br />
+的安装包，选择与MacOS系统相应的版本。</p>
+<h3 id="2-安装-java-17"><a class="markdownIt-Anchor" href="#2-安装-java-17"></a> 2. 安装 Java 17。</h3>
+<p>双击下载好的 Java 17 安装包，按照步骤进行安装即可。</p>
+<h3 id="3-配置环境变量"><a class="markdownIt-Anchor" href="#3-配置环境变量"></a> 3. 配置环境变量。</h3>
+<div class="tabs" id="tab-first-unique-01"><ul class="nav-tabs"><li class="tab active"><a class="#first-unique-01-1">macOS 10.15+（zsh）</a></li><li class="tab"><a class="#first-unique-01-2">macOS 10.15之前（bash）</a></li></ul><div class="tab-content"><div class="tab-pane active" id="first-unique-01-1"><ol>
+<li>
+<p>打开<i class="fa-solid fa-rectangle-terminal"></i><code>Terminal</code>（中文叫<code>终端</code>）应用程序。</p>
+</li>
+<li>
+<p>在命令行输入以下命令，编辑<code>~/.zshrc</code>文件：</p>
+<div class="highlight-container" data-rel="Shell"><figure class="iseeu highlight shell"><table><tr><td class="code"><pre><span class="line">nano ~/.zshrc </span><br></pre></td></tr></table></figure></div>
+</li>
+<li>
+<p>在文件的最后，加入如下信息</p>
+<div class="highlight-container" data-rel="Shell"><figure class="iseeu highlight shell"><table><tr><td class="code"><pre><span class="line">export PATH=&quot;/Library/Java/JavaVirtualMachines/jdk-17.jdk/Contents/Home/bin:$PATH&quot;</span><br></pre></td></tr></table></figure></div>
+</li>
+<li>
+<p>按下“Ctrl+X”键，选择“Y”保存文件并按“Enter”键退出编辑。</p>
+</li>
+<li>
+<p>执行以下命令让修改后的环境变量生效：</p>
+<div class="highlight-container" data-rel="Shell"><figure class="iseeu highlight shell"><table><tr><td class="code"><pre><span class="line">source ~/.zshrc</span><br></pre></td></tr></table></figure></div>
+</li>
+<li>
+<p>验证Java 17是否配置成功。</p>
+<div class="highlight-container" data-rel="Shell"><figure class="iseeu highlight shell"><table><tr><td class="code"><pre><span class="line">java -version</span><br><span class="line"></span><br><span class="line">java version &quot;17.0.1&quot; 2021-01-17 LTS</span><br><span class="line">Java(TM) SE Runtime Environment (build 17.0.1+9-LTS-190)</span><br><span class="line">Java HotSpot(TM) 64-Bit Server VM (build 17.0.1+9-LTS-190, mixed mode, sharing)</span><br></pre></td></tr></table></figure></div>
+</li>
+</ol></div><div class="tab-pane" id="first-unique-01-2"><ol>
+<li>
+<p>打开<i class="fa-solid fa-rectangle-terminal"></i><code>Terminal</code>（中文叫<code>终端</code>）应用程序。</p>
+</li>
+<li>
+<p>在命令行输入以下命令，编辑<code>~/.bash_profile</code>文件：</p>
+<div class="highlight-container" data-rel="Shell"><figure class="iseeu highlight shell"><table><tr><td class="code"><pre><span class="line">nano ~/.bash_profile</span><br></pre></td></tr></table></figure></div>
+</li>
+<li>
+<p>在文件的最后，加入如下信息</p>
+<div class="highlight-container" data-rel="Shell"><figure class="iseeu highlight shell"><table><tr><td class="code"><pre><span class="line">export PATH=&quot;/Library/Java/JavaVirtualMachines/jdk-17.jdk/Contents/Home/bin:$PATH&quot;</span><br></pre></td></tr></table></figure></div>
+</li>
+<li>
+<p>按下“Ctrl+X”键，选择“Y”保存文件并按“Enter”键退出编辑。</p>
+</li>
+<li>
+<p>执行以下命令让修改后的环境变量生效：</p>
+<div class="highlight-container" data-rel="Shell"><figure class="iseeu highlight shell"><table><tr><td class="code"><pre><span class="line">source ~/.bash_profile</span><br></pre></td></tr></table></figure></div>
+</li>
+<li>
+<p>验证Java 17是否配置成功。</p>
+<div class="highlight-container" data-rel="Shell"><figure class="iseeu highlight shell"><table><tr><td class="code"><pre><span class="line">java -version</span><br><span class="line"></span><br><span class="line">java version &quot;17.0.1&quot; 2021-01-17 LTS</span><br><span class="line">Java(TM) SE Runtime Environment (build 17.0.1+9-LTS-190)</span><br><span class="line">Java HotSpot(TM) 64-Bit Server VM (build 17.0.1+9-LTS-190, mixed mode, sharing)</span><br></pre></td></tr></table></figure></div>
+</li>
+</ol></div></div></div>
+<h3 id="4-配置完成"><a class="markdownIt-Anchor" href="#4-配置完成"></a> 4. 配置完成</h3>
+<p>经过上诉步骤操作完成后，我们就可以子啊本地计算机进行Java程序的开发了。</p>
+]]></content>
+      <categories>
+        <category>Java</category>
+        <category>Java 环境</category>
+      </categories>
+      <tags>
+        <tag>Java</tag>
+        <tag>Java 环境配置</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>ThreadLocal 基础使用</title>
+    <url>/posts/151f44ae/</url>
+    <content><![CDATA[<p>在Java多线程编程中，<code>ThreadLocal</code>类是一个非常有用的工具，它能够帮助我们轻松地实现线程本地存储。在本文中，我们将深入探讨<code>ThreadLocal</code>的实现原理和如何正确使用它。</p>
+<h2 id="threadlocal"><a class="markdownIt-Anchor" href="#threadlocal"></a> ThreadLocal</h2>
+<p>首先，我们来了解一下什么是ThreadLocal。简单来说，<code>ThreadLocal</code>是一种线程本地存储机制，它为每个线程提供了一个独立的变量副本，使得每个线程都可以独立地改变自己的副本，而不会影响其他线程的副本。</p>
+<h2 id="实现原理"><a class="markdownIt-Anchor" href="#实现原理"></a> 实现原理</h2>
+<p>下面我们来看一下<code>ThreadLocal</code>的实现原理。<code>ThreadLocal</code>本质上是一个 Map，其中 Key 是当前线程的引用，Value 是要存储的对象。由于每个线程的引用都是唯一的，因此每个线程都可以通过自己的引用获取到对应的值，而不会与其他线程发生干扰。</p>
+<p>具体实现方式是，在每个线程内部都有一个 ThreadLocalMap 对象，这个 Map 对象的 Key 就是 ThreadLocal 对象本身，而 Value 则是要存储的对象。当调用<code>ThreadLocal</code>的<code>get()</code>方法时，线程会先获取自己的 ThreadLocalMap 对象，然后以<code>ThreadLocal</code>对象为Key从Map中获取对应的值。</p>
+<h2 id="正确使用方式"><a class="markdownIt-Anchor" href="#正确使用方式"></a> 正确使用方式</h2>
+<p>虽然<code>ThreadLocal</code>是一个有用的工具，但也需要注意一些问题。下面是一些在使用<code>ThreadLocal</code>时需要遵循的最佳实践：</p>
+<h3 id="避免内存泄漏"><a class="markdownIt-Anchor" href="#避免内存泄漏"></a> 避免内存泄漏</h3>
+<p>由于Java中的线程是不会自动销毁的，如果我们在使用<code>ThreadLocal</code>时不注意清理，就可能导致内存泄漏。因此，在每个线程结束时都需要手动调用<code>ThreadLocal</code>的<code>remove()</code>方法，以便释放其占用的内存资源。</p>
+<h3 id="谨慎使用inheritablethreadlocal"><a class="markdownIt-Anchor" href="#谨慎使用inheritablethreadlocal"></a> 谨慎使用InheritableThreadLocal</h3>
+<p><code>InheritableThreadLocal</code>是<code>ThreadLocal</code>的一个子类，它允许子线程继承父线程的本地变量。但是，在使用<code>InheritableThreadLocal</code>时需要特别小心，因为它可能会导致父线程和子线程之间产生相互依赖的问题。因此，在使用<code>InheritableThreadLocal</code>时需要非常小心，并且需要充分了解它的实现原理和使用方式。</p>
+<h3 id="不要滥用threadlocal"><a class="markdownIt-Anchor" href="#不要滥用threadlocal"></a> 不要滥用ThreadLocal</h3>
+<p>尽管<code>ThreadLocal</code>是一个很方便的工具，但并不意味着可以滥用它。在多线程编程中，应该尽量避免使用全局变量和静态变量，而是尽可能地使用局部变量和方法参数。只有在确实有必要使用<code>ThreadLocal</code>时才应该这样做。</p>
+<h2 id="总结"><a class="markdownIt-Anchor" href="#总结"></a> 总结</h2>
+<p><code>ThreadLocal</code>是Java多线程编程中一个非常有用的工具，它可以轻松地实现线程本地存储。在正确使用<code>ThreadLocal</code>时，需要遵循一些最佳实践，以避免在项目中埋下坑。</p>
+]]></content>
+      <categories>
+        <category>Java</category>
+        <category>ThreadLocal</category>
+      </categories>
+      <tags>
+        <tag>Java</tag>
+        <tag>ThreadLocal</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>HashMap - 基本原理</title>
     <url>/posts/fcb831a5/</url>
     <content><![CDATA[<p>HashMap是Java中最常用的数据结构之一，它将键映射到值，允许我们通过Key来快速检索和获取Value。在Java 8中，HashMap进行了一些优化和改进，以提高性能和减少冲突。本文将介绍Java8 HashMap的基本原理和实现方式。</p>
@@ -965,105 +1064,6 @@
       </tags>
   </entry>
   <entry>
-    <title>ThreadLocal 基础使用</title>
-    <url>/posts/151f44ae/</url>
-    <content><![CDATA[<p>在Java多线程编程中，<code>ThreadLocal</code>类是一个非常有用的工具，它能够帮助我们轻松地实现线程本地存储。在本文中，我们将深入探讨<code>ThreadLocal</code>的实现原理和如何正确使用它。</p>
-<h2 id="threadlocal"><a class="markdownIt-Anchor" href="#threadlocal"></a> ThreadLocal</h2>
-<p>首先，我们来了解一下什么是ThreadLocal。简单来说，<code>ThreadLocal</code>是一种线程本地存储机制，它为每个线程提供了一个独立的变量副本，使得每个线程都可以独立地改变自己的副本，而不会影响其他线程的副本。</p>
-<h2 id="实现原理"><a class="markdownIt-Anchor" href="#实现原理"></a> 实现原理</h2>
-<p>下面我们来看一下<code>ThreadLocal</code>的实现原理。<code>ThreadLocal</code>本质上是一个 Map，其中 Key 是当前线程的引用，Value 是要存储的对象。由于每个线程的引用都是唯一的，因此每个线程都可以通过自己的引用获取到对应的值，而不会与其他线程发生干扰。</p>
-<p>具体实现方式是，在每个线程内部都有一个 ThreadLocalMap 对象，这个 Map 对象的 Key 就是 ThreadLocal 对象本身，而 Value 则是要存储的对象。当调用<code>ThreadLocal</code>的<code>get()</code>方法时，线程会先获取自己的 ThreadLocalMap 对象，然后以<code>ThreadLocal</code>对象为Key从Map中获取对应的值。</p>
-<h2 id="正确使用方式"><a class="markdownIt-Anchor" href="#正确使用方式"></a> 正确使用方式</h2>
-<p>虽然<code>ThreadLocal</code>是一个有用的工具，但也需要注意一些问题。下面是一些在使用<code>ThreadLocal</code>时需要遵循的最佳实践：</p>
-<h3 id="避免内存泄漏"><a class="markdownIt-Anchor" href="#避免内存泄漏"></a> 避免内存泄漏</h3>
-<p>由于Java中的线程是不会自动销毁的，如果我们在使用<code>ThreadLocal</code>时不注意清理，就可能导致内存泄漏。因此，在每个线程结束时都需要手动调用<code>ThreadLocal</code>的<code>remove()</code>方法，以便释放其占用的内存资源。</p>
-<h3 id="谨慎使用inheritablethreadlocal"><a class="markdownIt-Anchor" href="#谨慎使用inheritablethreadlocal"></a> 谨慎使用InheritableThreadLocal</h3>
-<p><code>InheritableThreadLocal</code>是<code>ThreadLocal</code>的一个子类，它允许子线程继承父线程的本地变量。但是，在使用<code>InheritableThreadLocal</code>时需要特别小心，因为它可能会导致父线程和子线程之间产生相互依赖的问题。因此，在使用<code>InheritableThreadLocal</code>时需要非常小心，并且需要充分了解它的实现原理和使用方式。</p>
-<h3 id="不要滥用threadlocal"><a class="markdownIt-Anchor" href="#不要滥用threadlocal"></a> 不要滥用ThreadLocal</h3>
-<p>尽管<code>ThreadLocal</code>是一个很方便的工具，但并不意味着可以滥用它。在多线程编程中，应该尽量避免使用全局变量和静态变量，而是尽可能地使用局部变量和方法参数。只有在确实有必要使用<code>ThreadLocal</code>时才应该这样做。</p>
-<h2 id="总结"><a class="markdownIt-Anchor" href="#总结"></a> 总结</h2>
-<p><code>ThreadLocal</code>是Java多线程编程中一个非常有用的工具，它可以轻松地实现线程本地存储。在正确使用<code>ThreadLocal</code>时，需要遵循一些最佳实践，以避免在项目中埋下坑。</p>
-]]></content>
-      <categories>
-        <category>Java</category>
-        <category>ThreadLocal</category>
-      </categories>
-      <tags>
-        <tag>Java</tag>
-        <tag>ThreadLocal</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>Java17环境配置- MacOS</title>
-    <url>/posts/21377094/</url>
-    <content><![CDATA[<p>Java 17 是一种新版本的Java开发环境，使用 Java 17 进行程序开发时需要在计算机上安装 Java 17 环境。本文将介绍如何在 MacOS 中配置 Java 17环境。</p>
-<h2 id="macos系统中配置java-17环境"><a class="markdownIt-Anchor" href="#macos系统中配置java-17环境"></a> MacOS系统中配置Java 17环境：</h2>
-<h3 id="1-下载java-17安装包"><a class="markdownIt-Anchor" href="#1-下载java-17安装包"></a> 1. 下载Java 17安装包。</h3>
-<p>在<a class="link"   href="https://www.oracle.com/java/technologies/javase/jdk17-archive-downloads.html" >Oracle官网 <i class="fa-regular fa-arrow-up-right-from-square fa-sm"></i></a>上下载 Java 17<br />
-的安装包，选择与MacOS系统相应的版本。</p>
-<h3 id="2-安装-java-17"><a class="markdownIt-Anchor" href="#2-安装-java-17"></a> 2. 安装 Java 17。</h3>
-<p>双击下载好的 Java 17 安装包，按照步骤进行安装即可。</p>
-<h3 id="3-配置环境变量"><a class="markdownIt-Anchor" href="#3-配置环境变量"></a> 3. 配置环境变量。</h3>
-<div class="tabs" id="tab-first-unique-01"><ul class="nav-tabs"><li class="tab active"><a class="#first-unique-01-1">macOS 10.15+（zsh）</a></li><li class="tab"><a class="#first-unique-01-2">macOS 10.15之前（bash）</a></li></ul><div class="tab-content"><div class="tab-pane active" id="first-unique-01-1"><ol>
-<li>
-<p>打开<i class="fa-solid fa-rectangle-terminal"></i><code>Terminal</code>（中文叫<code>终端</code>）应用程序。</p>
-</li>
-<li>
-<p>在命令行输入以下命令，编辑<code>~/.zshrc</code>文件：</p>
-<div class="highlight-container" data-rel="Shell"><figure class="iseeu highlight shell"><table><tr><td class="code"><pre><span class="line">nano ~/.zshrc </span><br></pre></td></tr></table></figure></div>
-</li>
-<li>
-<p>在文件的最后，加入如下信息</p>
-<div class="highlight-container" data-rel="Shell"><figure class="iseeu highlight shell"><table><tr><td class="code"><pre><span class="line">export PATH=&quot;/Library/Java/JavaVirtualMachines/jdk-17.jdk/Contents/Home/bin:$PATH&quot;</span><br></pre></td></tr></table></figure></div>
-</li>
-<li>
-<p>按下“Ctrl+X”键，选择“Y”保存文件并按“Enter”键退出编辑。</p>
-</li>
-<li>
-<p>执行以下命令让修改后的环境变量生效：</p>
-<div class="highlight-container" data-rel="Shell"><figure class="iseeu highlight shell"><table><tr><td class="code"><pre><span class="line">source ~/.zshrc</span><br></pre></td></tr></table></figure></div>
-</li>
-<li>
-<p>验证Java 17是否配置成功。</p>
-<div class="highlight-container" data-rel="Shell"><figure class="iseeu highlight shell"><table><tr><td class="code"><pre><span class="line">java -version</span><br><span class="line"></span><br><span class="line">java version &quot;17.0.1&quot; 2021-01-17 LTS</span><br><span class="line">Java(TM) SE Runtime Environment (build 17.0.1+9-LTS-190)</span><br><span class="line">Java HotSpot(TM) 64-Bit Server VM (build 17.0.1+9-LTS-190, mixed mode, sharing)</span><br></pre></td></tr></table></figure></div>
-</li>
-</ol></div><div class="tab-pane" id="first-unique-01-2"><ol>
-<li>
-<p>打开<i class="fa-solid fa-rectangle-terminal"></i><code>Terminal</code>（中文叫<code>终端</code>）应用程序。</p>
-</li>
-<li>
-<p>在命令行输入以下命令，编辑<code>~/.bash_profile</code>文件：</p>
-<div class="highlight-container" data-rel="Shell"><figure class="iseeu highlight shell"><table><tr><td class="code"><pre><span class="line">nano ~/.bash_profile</span><br></pre></td></tr></table></figure></div>
-</li>
-<li>
-<p>在文件的最后，加入如下信息</p>
-<div class="highlight-container" data-rel="Shell"><figure class="iseeu highlight shell"><table><tr><td class="code"><pre><span class="line">export PATH=&quot;/Library/Java/JavaVirtualMachines/jdk-17.jdk/Contents/Home/bin:$PATH&quot;</span><br></pre></td></tr></table></figure></div>
-</li>
-<li>
-<p>按下“Ctrl+X”键，选择“Y”保存文件并按“Enter”键退出编辑。</p>
-</li>
-<li>
-<p>执行以下命令让修改后的环境变量生效：</p>
-<div class="highlight-container" data-rel="Shell"><figure class="iseeu highlight shell"><table><tr><td class="code"><pre><span class="line">source ~/.bash_profile</span><br></pre></td></tr></table></figure></div>
-</li>
-<li>
-<p>验证Java 17是否配置成功。</p>
-<div class="highlight-container" data-rel="Shell"><figure class="iseeu highlight shell"><table><tr><td class="code"><pre><span class="line">java -version</span><br><span class="line"></span><br><span class="line">java version &quot;17.0.1&quot; 2021-01-17 LTS</span><br><span class="line">Java(TM) SE Runtime Environment (build 17.0.1+9-LTS-190)</span><br><span class="line">Java HotSpot(TM) 64-Bit Server VM (build 17.0.1+9-LTS-190, mixed mode, sharing)</span><br></pre></td></tr></table></figure></div>
-</li>
-</ol></div></div></div>
-<h3 id="4-配置完成"><a class="markdownIt-Anchor" href="#4-配置完成"></a> 4. 配置完成</h3>
-<p>经过上诉步骤操作完成后，我们就可以子啊本地计算机进行Java程序的开发了。</p>
-]]></content>
-      <categories>
-        <category>Java</category>
-        <category>Java 环境</category>
-      </categories>
-      <tags>
-        <tag>Java</tag>
-        <tag>Java 环境配置</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>JVM - 类加载器</title>
     <url>/posts/4f318695/</url>
     <content><![CDATA[<p>JVM（Java Virtual Machine）是Java程序的运行环境，它能够将Java代码转换成可执行的字节码，并在不同平台上运行。在JVM中，类加载器（Class Loader）负责将Java字节码加载到JVM中。</p>
@@ -1112,35 +1112,6 @@
 <p>Java 9引入了模块化系统，它将Java代码分解为更小、更简单的组件，并将其打包成模块。每个模块都有自己的依赖关系和导出的API。这种模块化系统使得Java应用程序更加易于开发、维护和部署。</p>
 <p>在Java 9中，类加载器被重新设计为启动类加载器、平台类加载器、应用程序类加载器和模块类加载器。其中，模块类加载器具有命名空间隔离和可卸载性的特点，这些特点可以避免命名空间污染和内存泄漏问题。</p>
 <p>总之，Java 9的类加载器架构是一个重大的变化，它提供了更好的模块化支持，并且解决了Java 9之前存在的一些问题。</p>
-]]></content>
-      <categories>
-        <category>JVM</category>
-        <category>类加载</category>
-      </categories>
-      <tags>
-        <tag>JVM</tag>
-        <tag>类加载器</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>JVM - 自定义类加载器</title>
-    <url>/posts/f5831f17/</url>
-    <content><![CDATA[<p>在Java中，每个类都被分配一个唯一的类加载器来加载它们。默认情况下，Java使用三个类加载器：引导类加载器、扩展类加载器和系统类加载器。这些类加载器可以处理大多数情况，但有时需要自定义类加载器来加载某些特定的类或资源。本文将介绍如何使用自定义类加载器在运行时加载类。</p>
-<h2 id="获取class对象"><a class="markdownIt-Anchor" href="#获取class对象"></a> 获取Class对象</h2>
-<p>首先，我们需要获取要加载的类的Class对象。这可以通过调用ClassLoader的<code>defineClass</code>方法来完成。以下是一个简单的获取Class对象的示例代码：</p>
-<div class="highlight-container" data-rel="Java"><figure class="iseeu highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">MyClassLoader</span> <span class="keyword">extends</span> <span class="title class_">ClassLoader</span> &#123;</span><br><span class="line">    <span class="keyword">public</span> Class&lt;?&gt; getClass(String name, <span class="type">byte</span>[] bytes) &#123;</span><br><span class="line">        <span class="keyword">return</span> defineClass(name, bytes, <span class="number">0</span>, bytes.length);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></div>
-<p>上述代码中的<code>getClass</code>方法接收两个参数：要加载的类的名称和类字节码数组。然后，该方法调用<code>defineClass</code>方法来创建并返回与给定字节数组相关联的Class对象。</p>
-<h2 id="自定义类加载器"><a class="markdownIt-Anchor" href="#自定义类加载器"></a> 自定义类加载器</h2>
-<h3 id="实现自己的类加载器"><a class="markdownIt-Anchor" href="#实现自己的类加载器"></a> 实现自己的类加载器</h3>
-<p>接下来，我们需要实现自定义类加载器。以下是一个简单的自定义类加载器的实现：</p>
-<div class="highlight-container" data-rel="Java"><figure class="iseeu highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">MyClassLoader</span> <span class="keyword">extends</span> <span class="title class_">ClassLoader</span> &#123;</span><br><span class="line">    <span class="keyword">private</span> String path;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="title function_">MyClassLoader</span><span class="params">(String path)</span> &#123;</span><br><span class="line">        <span class="built_in">this</span>.path = path;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="keyword">protected</span> Class&lt;?&gt; findClass(String name) <span class="keyword">throws</span> ClassNotFoundException &#123;</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            <span class="type">byte</span>[] bytes = loadClassData(name);</span><br><span class="line">            <span class="keyword">return</span> defineClass(name, bytes, <span class="number">0</span>, bytes.length);</span><br><span class="line">        &#125; <span class="keyword">catch</span> (IOException e) &#123;</span><br><span class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> <span class="title class_">ClassNotFoundException</span>(<span class="string">&quot;Class &quot;</span> + name + <span class="string">&quot; not found.&quot;</span>, e);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="type">byte</span>[] loadClassData(String name) <span class="keyword">throws</span> IOException &#123;</span><br><span class="line">        <span class="type">InputStream</span> <span class="variable">stream</span> <span class="operator">=</span> getClass().getClassLoader().getResourceAsStream(path + name.replace(<span class="string">&quot;.&quot;</span>, <span class="string">&quot;/&quot;</span>) + <span class="string">&quot;.class&quot;</span>);</span><br><span class="line">        <span class="type">ByteArrayOutputStream</span> <span class="variable">buffer</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">ByteArrayOutputStream</span>();</span><br><span class="line">        <span class="type">int</span> <span class="variable">data</span> <span class="operator">=</span> stream.read();</span><br><span class="line"></span><br><span class="line">        <span class="keyword">while</span> (data != -<span class="number">1</span>) &#123;</span><br><span class="line">            buffer.write(data);</span><br><span class="line">            data = stream.read();</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        stream.close();</span><br><span class="line">        <span class="keyword">return</span> buffer.toByteArray();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></div>
-<p>上述代码中的自定义类加载器使用了一个路径来指定要加载的类的位置。在<code>findClass</code>方法中，它首先调用<code>loadClassData</code>方法来从文件系统中读取类字节码。然后，它将该字节数组传递给<code>defineClass</code>方法来创建并返回与给定字节数组相关联的Class对象。</p>
-<h3 id="使用自定义的类加载器"><a class="markdownIt-Anchor" href="#使用自定义的类加载器"></a> 使用自定义的类加载器</h3>
-<p>以下是使用我们自定义的类加载器的示例代码：</p>
-<div class="highlight-container" data-rel="Java"><figure class="iseeu highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">Main</span> &#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> Exception &#123;</span><br><span class="line">        <span class="type">MyClassLoader</span> <span class="variable">loader</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">MyClassLoader</span>(<span class="string">&quot;/path/to/classes/&quot;</span>);</span><br><span class="line">        Class&lt;?&gt; clazz = loader.loadClass(<span class="string">&quot;com.example.MyClass&quot;</span>);</span><br><span class="line">        <span class="type">Object</span> <span class="variable">object</span> <span class="operator">=</span> clazz.getDeclaredConstructor().newInstance();</span><br><span class="line">        <span class="type">Method</span> <span class="variable">method</span> <span class="operator">=</span> clazz.getMethod(<span class="string">&quot;hello&quot;</span>);</span><br><span class="line">        method.invoke(object);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">MyClass</span> &#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">hello</span><span class="params">()</span> &#123;</span><br><span class="line">        System.out.println(<span class="string">&quot;Hello, world!&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></div>
-<p>上述代码中的<code>Main</code>类演示了如何使用自定义类加载器在运行时加载类。首先，它创建一个MyClassLoader对象，并使用该对象来加载名为<code>com.example.MyClass</code>的类。然后，它使用反射机制调用<code>hello</code>方法，从而在控制台上输出一条消息。</p>
-<h2 id="总结"><a class="markdownIt-Anchor" href="#总结"></a> 总结</h2>
-<p>通过自定义类加载器，我们可以在运行时加载特定的类或资源。在这个过程中，自定义类加载器会从指定的位置加载字节码，并使用<code>defineClass</code>方法创建Class对象。这种能力可以被用于实现动态加载、模块化和插件系统等高级功能。但是，需要注意的是，自定义类加载器可能会对Java程序的安全性和稳定性产生影响，因此需要谨慎使用。</p>
 ]]></content>
       <categories>
         <category>JVM</category>
@@ -1240,6 +1211,35 @@
       </tags>
   </entry>
   <entry>
+    <title>JVM - 自定义类加载器</title>
+    <url>/posts/f5831f17/</url>
+    <content><![CDATA[<p>在Java中，每个类都被分配一个唯一的类加载器来加载它们。默认情况下，Java使用三个类加载器：引导类加载器、扩展类加载器和系统类加载器。这些类加载器可以处理大多数情况，但有时需要自定义类加载器来加载某些特定的类或资源。本文将介绍如何使用自定义类加载器在运行时加载类。</p>
+<h2 id="获取class对象"><a class="markdownIt-Anchor" href="#获取class对象"></a> 获取Class对象</h2>
+<p>首先，我们需要获取要加载的类的Class对象。这可以通过调用ClassLoader的<code>defineClass</code>方法来完成。以下是一个简单的获取Class对象的示例代码：</p>
+<div class="highlight-container" data-rel="Java"><figure class="iseeu highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">MyClassLoader</span> <span class="keyword">extends</span> <span class="title class_">ClassLoader</span> &#123;</span><br><span class="line">    <span class="keyword">public</span> Class&lt;?&gt; getClass(String name, <span class="type">byte</span>[] bytes) &#123;</span><br><span class="line">        <span class="keyword">return</span> defineClass(name, bytes, <span class="number">0</span>, bytes.length);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></div>
+<p>上述代码中的<code>getClass</code>方法接收两个参数：要加载的类的名称和类字节码数组。然后，该方法调用<code>defineClass</code>方法来创建并返回与给定字节数组相关联的Class对象。</p>
+<h2 id="自定义类加载器"><a class="markdownIt-Anchor" href="#自定义类加载器"></a> 自定义类加载器</h2>
+<h3 id="实现自己的类加载器"><a class="markdownIt-Anchor" href="#实现自己的类加载器"></a> 实现自己的类加载器</h3>
+<p>接下来，我们需要实现自定义类加载器。以下是一个简单的自定义类加载器的实现：</p>
+<div class="highlight-container" data-rel="Java"><figure class="iseeu highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">MyClassLoader</span> <span class="keyword">extends</span> <span class="title class_">ClassLoader</span> &#123;</span><br><span class="line">    <span class="keyword">private</span> String path;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="title function_">MyClassLoader</span><span class="params">(String path)</span> &#123;</span><br><span class="line">        <span class="built_in">this</span>.path = path;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="keyword">protected</span> Class&lt;?&gt; findClass(String name) <span class="keyword">throws</span> ClassNotFoundException &#123;</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            <span class="type">byte</span>[] bytes = loadClassData(name);</span><br><span class="line">            <span class="keyword">return</span> defineClass(name, bytes, <span class="number">0</span>, bytes.length);</span><br><span class="line">        &#125; <span class="keyword">catch</span> (IOException e) &#123;</span><br><span class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> <span class="title class_">ClassNotFoundException</span>(<span class="string">&quot;Class &quot;</span> + name + <span class="string">&quot; not found.&quot;</span>, e);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="type">byte</span>[] loadClassData(String name) <span class="keyword">throws</span> IOException &#123;</span><br><span class="line">        <span class="type">InputStream</span> <span class="variable">stream</span> <span class="operator">=</span> getClass().getClassLoader().getResourceAsStream(path + name.replace(<span class="string">&quot;.&quot;</span>, <span class="string">&quot;/&quot;</span>) + <span class="string">&quot;.class&quot;</span>);</span><br><span class="line">        <span class="type">ByteArrayOutputStream</span> <span class="variable">buffer</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">ByteArrayOutputStream</span>();</span><br><span class="line">        <span class="type">int</span> <span class="variable">data</span> <span class="operator">=</span> stream.read();</span><br><span class="line"></span><br><span class="line">        <span class="keyword">while</span> (data != -<span class="number">1</span>) &#123;</span><br><span class="line">            buffer.write(data);</span><br><span class="line">            data = stream.read();</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        stream.close();</span><br><span class="line">        <span class="keyword">return</span> buffer.toByteArray();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></div>
+<p>上述代码中的自定义类加载器使用了一个路径来指定要加载的类的位置。在<code>findClass</code>方法中，它首先调用<code>loadClassData</code>方法来从文件系统中读取类字节码。然后，它将该字节数组传递给<code>defineClass</code>方法来创建并返回与给定字节数组相关联的Class对象。</p>
+<h3 id="使用自定义的类加载器"><a class="markdownIt-Anchor" href="#使用自定义的类加载器"></a> 使用自定义的类加载器</h3>
+<p>以下是使用我们自定义的类加载器的示例代码：</p>
+<div class="highlight-container" data-rel="Java"><figure class="iseeu highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">Main</span> &#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> Exception &#123;</span><br><span class="line">        <span class="type">MyClassLoader</span> <span class="variable">loader</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">MyClassLoader</span>(<span class="string">&quot;/path/to/classes/&quot;</span>);</span><br><span class="line">        Class&lt;?&gt; clazz = loader.loadClass(<span class="string">&quot;com.example.MyClass&quot;</span>);</span><br><span class="line">        <span class="type">Object</span> <span class="variable">object</span> <span class="operator">=</span> clazz.getDeclaredConstructor().newInstance();</span><br><span class="line">        <span class="type">Method</span> <span class="variable">method</span> <span class="operator">=</span> clazz.getMethod(<span class="string">&quot;hello&quot;</span>);</span><br><span class="line">        method.invoke(object);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">MyClass</span> &#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">hello</span><span class="params">()</span> &#123;</span><br><span class="line">        System.out.println(<span class="string">&quot;Hello, world!&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></div>
+<p>上述代码中的<code>Main</code>类演示了如何使用自定义类加载器在运行时加载类。首先，它创建一个MyClassLoader对象，并使用该对象来加载名为<code>com.example.MyClass</code>的类。然后，它使用反射机制调用<code>hello</code>方法，从而在控制台上输出一条消息。</p>
+<h2 id="总结"><a class="markdownIt-Anchor" href="#总结"></a> 总结</h2>
+<p>通过自定义类加载器，我们可以在运行时加载特定的类或资源。在这个过程中，自定义类加载器会从指定的位置加载字节码，并使用<code>defineClass</code>方法创建Class对象。这种能力可以被用于实现动态加载、模块化和插件系统等高级功能。但是，需要注意的是，自定义类加载器可能会对Java程序的安全性和稳定性产生影响，因此需要谨慎使用。</p>
+]]></content>
+      <categories>
+        <category>JVM</category>
+        <category>类加载</category>
+      </categories>
+      <tags>
+        <tag>JVM</tag>
+        <tag>类加载器</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>JVM - 运行时数据区</title>
     <url>/posts/243280dc/</url>
     <content><![CDATA[<p>JVM（Java Virtual Machine）是一个虚拟机，它是 Java 语言能够运行的关键所在。JVM 的结构包含了多个不同的组件，其中最重要的就是它的运行时数据区。</p>
@@ -1274,125 +1274,6 @@
       <tags>
         <tag>JVM</tag>
         <tag>运行时数据区</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>Java 对象的组成</title>
-    <url>/posts/dcb2c325/</url>
-    <content><![CDATA[<p>在JVM中，每个对象都由三个部分组成：对象头、实例变量和对齐填充。</p>
-<h2 id="组成部分"><a class="markdownIt-Anchor" href="#组成部分"></a> 组成部分</h2>
-<div class="note note-green"><p>在JVM中，每个对象都由三个部分组成：对象头、实例变量和对齐填充。</p>
-</div>
-<h3 id="对象头"><a class="markdownIt-Anchor" href="#对象头"></a> 对象头</h3>
-<p>对象头是存储在每个Java对象之前的一段内存空间，用于存储对象的元数据信息，包括以下内容：</p>
-<ul>
-<li>Mark Word：标记字，用于存储锁相关信息、GC状态信息等。</li>
-<li>Class pointer：指向该对象所属类的指针，用于确定对象类型。</li>
-<li>数组长度：如果该对象是数组，则用于存储数组长度。</li>
-</ul>
-<p>对象头的大小取决于平台的位数以及压缩指针技术的使用情况等因素。</p>
-<h3 id="实例变量"><a class="markdownIt-Anchor" href="#实例变量"></a> 实例变量</h3>
-<p>实例变量是对象的成员变量，定义了该对象的属性。它们被存储在紧随对象头之后的内存空间中。实例变量的大小和类型取决于对象所属类中定义的成员变量。</p>
-<h3 id="对齐填充"><a class="markdownIt-Anchor" href="#对齐填充"></a> 对齐填充</h3>
-<p>为了保证对象的大小是8字节的倍数，JVM会在实例变量之后添加一些额外的字节，即对齐填充。这些额外的字节没有任何实际作用，只是为了满足内存对齐的要求。</p>
-<p>对齐填充的大小取决于对象头和实例变量所占用的内存空间。</p>
-<h3 id="实际大小"><a class="markdownIt-Anchor" href="#实际大小"></a> 实际大小</h3>
-<p>总体来说，一个Java对象的实际大小有以下三个部分组成：</p>
-<ol>
-<li>对象头的大小：在不同的JVM实现中，对象头的大小可能会有所不同。</li>
-<li>实例变量的大小：该对象中定义的所有实例变量的大小。</li>
-<li>对齐填充的大小：为了满足内存对齐的要求而添加的额外字节。</li>
-</ol>
-<p>具体的实际大小取决于平台的位数、操作系统的类型以及JVM实现的不同等因素。</p>
-<h2 id="总结"><a class="markdownIt-Anchor" href="#总结"></a> 总结</h2>
-<p>JVM对象由对象头、实例变量和对齐填充三个部分组成。对象头用于存储对象的元数据信息；实例变量定义了该对象的属性；对齐填充用于保证对象大小是8字节的倍数。理解JVM对象的组成对于Java程序开发人员来说是非常重要的，可以帮助他们更好地管理内存资源，提高程序性能。</p>
-]]></content>
-      <categories>
-        <category>JVM</category>
-        <category>Java 对象</category>
-      </categories>
-      <tags>
-        <tag>Java</tag>
-        <tag>JVM</tag>
-        <tag>Java 对象</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>Java 对象是否存活</title>
-    <url>/posts/6a10d920/</url>
-    <content><![CDATA[<p>在JVM中，垃圾回收器会对内存中的对象进行生死判定，将无用的对象回收以释放内存空间。本篇博客将介绍JVM对象生死判定的过程。</p>
-<h2 id="算法"><a class="markdownIt-Anchor" href="#算法"></a> 算法</h2>
-<div class="note note-green"><p>用来判定对象存亡的常用算法有两种：引用计数法、可达性分析算法。</p>
-</div>
-<h3 id="引用计数法"><a class="markdownIt-Anchor" href="#引用计数法"></a> 引用计数法</h3>
-<p>引用计数法是最简单也是最基础的垃圾回收算法之一。该算法通过跟踪每个对象被引用的次数来判断对象是否已经成为垃圾。</p>
-<p>当一个新对象被创建时，其引用计数为1。当其他对象引用该对象时，其对应的引用计数加1。当某个对象的引用计数变为0时，说明该对象已经成为垃圾，可以被回收。</p>
-<p>然而，引用计数法有一个明显的问题：<span style="border-bottom:2px dashed red;">循环引用。如果两个或多个对象之间互相引用，它们的引用计数永远不会变成0，导致垃圾回收器无法将它们回收。</span>因此，引用计数法并不适用于实际的垃圾回收。</p>
-<h3 id="可达性分析算法"><a class="markdownIt-Anchor" href="#可达性分析算法"></a> 可达性分析算法</h3>
-<div class="note note-green"><p>JVM 使用此算法</p>
-</div>
-<p>可达性分析算法是目前主流的垃圾回收算法之一。它基于“GC Roots”的概念来判断对象是否可达。</p>
-<p>在JVM中，GC Roots包括以下几类：</p>
-<ul>
-<li>虚拟机栈（栈帧中的本地变量表）中引用的对象。</li>
-<li>方法区中静态属性引用的对象。</li>
-<li>方法区中常量引用的对象。</li>
-<li>本地方法栈中JNI（Java Native Interface）引用的对象。</li>
-</ul>
-<p>可达性分析算法从GC Roots开始遍历内存中的所有对象，将可以到达的对象标记为“存活”，而未被标记的对象则被视为垃圾。</p>
-<p>可达性分析算法可以有效地处理循环引用问题，并且能够精确地识别出无用对象。</p>
-<h2 id="对象生死判定流程"><a class="markdownIt-Anchor" href="#对象生死判定流程"></a> 对象生死判定流程</h2>
-<p>JVM中的垃圾回收器会周期性地对内存中的对象进行生死判定，以便将无用对象回收。其具体流程如下：</p>
-<ol>
-<li>根据GC Roots开始遍历内存中的所有对象。</li>
-<li>将所有可以到达的对象标记为“存活”。</li>
-<li>将未被标记的对象视为垃圾，进行回收。</li>
-</ol>
-<p>需要注意的是，在进行垃圾回收时，可能会造成一些短暂的系统停顿。这是因为垃圾回收器需要暂停正在执行的程序，并锁定整个堆空间，以便安全地对内存中的对象进行回收。为了减少这种停顿时间，JVM引入了一些优化措施，如并发标记和整理、增量式收集等。</p>
-<h2 id="总结"><a class="markdownIt-Anchor" href="#总结"></a> 总结</h2>
-<p>JVM对象生死判定是垃圾回收机制的重要组成部分。可达性分析算法是目前主流的垃圾回收算法之一，它可以精确地识别出无用对象，并解决循环引用问题。程序员需要了解JVM对象生死判定的过程，以便更好地管理内存资源，提高程序性能。</p>
-]]></content>
-      <categories>
-        <category>JVM</category>
-        <category>Java 对象</category>
-      </categories>
-      <tags>
-        <tag>Java</tag>
-        <tag>JVM</tag>
-        <tag>Java 对象</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>Java 对象的生命周期</title>
-    <url>/posts/dcb2c325/</url>
-    <content><![CDATA[<p>Java虚拟机（JVM）是一种能够在不同平台上运行Java程序的虚拟机。在JVM中，每个对象都有其自己的生命周期。本篇博客将介绍JVM对象的生命周期。</p>
-<h2 id="生命周期阶段"><a class="markdownIt-Anchor" href="#生命周期阶段"></a> 生命周期阶段</h2>
-<div class="note note-green"><p>Java 对象的生命周期的几个阶段，分别为：对象的创建、使用、回收、销毁，下边逐个来进行介绍；</p>
-</div>
-<h3 id="对象的创建"><a class="markdownIt-Anchor" href="#对象的创建"></a> 对象的创建</h3>
-<p>当使用<code>new</code>关键字创建一个对象时，JVM会先检查类是否已经被加载和链接过。如果没有加载，则先进行类的加载和连接操作。然后为该对象分配内存空间，并对分配到的内存空间进行清零赋值，即初始化对象的所有实例变量为默认值。</p>
-<p>接着，JVM会调用对象的构造函数（Constructor），初始化对象的实例变量。如果该类没有显式地定义构造函数，则JVM会提供一个默认的无参构造函数。</p>
-<p>最后，JVM会把对象的引用返回给程序员，以便程序员可以通过该引用来操作该对象。</p>
-<h3 id="对象的使用"><a class="markdownIt-Anchor" href="#对象的使用"></a> 对象的使用</h3>
-<p>在对象创建后，程序员可以通过对象的引用对它进行操作。对象在内存中的位置由对象的引用来确定。当一个对象被使用时，它可能会被传递给其他方法或者被保存在某些数据结构中。</p>
-<h3 id="对象的回收"><a class="markdownIt-Anchor" href="#对象的回收"></a> 对象的回收</h3>
-<p>当一个对象不再被程序员所引用时，该对象就成了垃圾（Garbage）。JVM需要将这些无用的对象从内存中清除，以便后面的内存分配可以使用这些空间。</p>
-<p>JVM中的垃圾回收（Garbage Collection）机制负责回收这些无用对象。当JVM检测到一个对象已经成为垃圾时，它就会自动地将该对象所占用的内存空间释放出来，以便程序后续的内存分配可以使用这些空间。</p>
-<p>在JVM中，垃圾回收是由垃圾回收器（Garbage Collector）来完成的。不同的垃圾回收器采用不同的算法来实现垃圾回收。常见的垃圾回收算法包括标记-清除算法、复制算法、标记-整理算法和分代收集算法等。</p>
-<h3 id="对象的销毁"><a class="markdownIt-Anchor" href="#对象的销毁"></a> 对象的销毁</h3>
-<p>当一个对象被回收后，JVM并不会立即销毁它。相反，JVM会等待垃圾回收器对内存进行整理后，再对垃圾对象进行销毁。销毁一个对象的最终步骤是调用其<code>finalize()</code>方法。该方法是Object类中定义的一个方法，在GC进行回收之前会先调用该方法。</p>
-<p>在Java 9之后，<code>finalize()</code>方法已经被废弃，取而代之的是使用Cleaner API进行资源管理。</p>
-<h2 id="总结"><a class="markdownIt-Anchor" href="#总结"></a> 总结</h2>
-<p>JVM对象的生命周期包括对象的创建、使用、回收和销毁等阶段。理解JVM对象的生命周期对于Java程序开发人员来说是非常重要的，可以帮助他们更好地管理内存资源，提高程序性能。</p>
-]]></content>
-      <categories>
-        <category>JVM</category>
-        <category>Java 对象</category>
-      </categories>
-      <tags>
-        <tag>Java</tag>
-        <tag>JVM</tag>
-        <tag>Java 对象</tag>
       </tags>
   </entry>
   <entry>
@@ -1541,6 +1422,38 @@
       </tags>
   </entry>
   <entry>
+    <title>JVM 安全点</title>
+    <url>/posts/5a9ba959/</url>
+    <content><![CDATA[<p>JVM的安全点（Safepoint）是JVM执行垃圾回收时的一个重要概念。<span style="border-bottom:2px solid green;">在JVM进行垃圾回收操作时，需要保证堆的一致性，因此需要挂起所有运行Java代码的线程并记录它们的状态。这些特定位置就被称为 <em><strong><code>安全点</code></strong></em>。</span>&gt;</p>
+<h2 id="安全点的作用"><a class="markdownIt-Anchor" href="#安全点的作用"></a> 安全点的作用</h2>
+<p>当一个线程处于安全点时，JVM可以确保该线程不会同时访问堆内存中的对象。如果不挂起所有线程，那么这些线程可能正在访问堆内存中的对象。如果同时执行垃圾回收，则这些线程可能同时修改这些对象，导致数据错误或不一致。因此，在进行垃圾回收操作时，必须等待所有线程到达安全点，并将它们挂起，然后才能继续执行垃圾回收操作。</p>
+<h2 id="安全点的触发条件"><a class="markdownIt-Anchor" href="#安全点的触发条件"></a> 安全点的触发条件</h2>
+<div class="note-large notel-yellow"><div class="notel-title"><p>当一个线程处于安全点时，它必须满足以下条件之一</p>
+</div><div class="notel-content"><ol>
+<li>执行Java方法的字节码指令结束或异常抛出；</li>
+<li>执行JNI（Java Native Interface）方法的字节码指令结束或异常抛出；</li>
+<li>执行VM操作（如Thread.sleep）的字节码指令结束或异常抛出。</li>
+</ol>
+ </div></div>
+<p>这意味着当一个线程处于安全点时，它一定是上述情况之一。只有在这些情况下，线程才被挂起进行垃圾回收操作。</p>
+<h2 id="安全点的影响"><a class="markdownIt-Anchor" href="#安全点的影响"></a> 安全点的影响</h2>
+<p>当JVM进行垃圾回收操作时，必须等待所有线程到达安全点，并将它们挂起，然后才能继续执行垃圾回收操作。这种等待时间可能会导致一些线程长时间等待，从而导致应用程序响应时间变慢。</p>
+<p>为了减少这种情况的发生，JVM提供了多种垃圾回收算法和垃圾回收器，以便在特定的场景中选择最佳的垃圾回收策略。例如CMS（Concurrent Mark Sweep）垃圾回收器就是在并发标记阶段尽可能减少安全点的数量的一种垃圾回收器。</p>
+<p>此外，我们也可以通过调整线程数、线程优先级、堆内存大小等措施来减少安全点的影响。</p>
+<h2 id="总结"><a class="markdownIt-Anchor" href="#总结"></a> 总结</h2>
+<p>安全点是一个重要的概念，在JVM进行垃圾回收操作时扮演着至关重要的角色。了解安全点的作用、触发条件和影响，对于Java开发者来说是非常重要的。在实际开发中，我们需要根据应用场景选择合适的垃圾回收算法和垃圾回收器，并采取相应的措施来减少安全点的影响，以使应用程序能够达到更好的性能和响应速度。</p>
+]]></content>
+      <categories>
+        <category>JVM</category>
+        <category>GC</category>
+      </categories>
+      <tags>
+        <tag>Java</tag>
+        <tag>JVM</tag>
+        <tag>GC</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>G1 垃圾收集器</title>
     <url>/posts/bc8ac7bc/</url>
     <content><![CDATA[<p>G1 垃圾收集器是一种新型的垃圾收集器，专门针对大堆内存的应用程序进行优化，可以更好地处理大量对象的分配和释放，减少停顿时间，并帮助应用程序提高性能。G1 收集器是在 JDK 7 update 4 版本中首次推出的，在 Java 9 中正式成为默认的垃圾收集器。通过启动参数&quot;<code>-XX:+UseG1GC</code>&quot;来使用 G1 垃圾收集器。</p>
@@ -1616,72 +1529,151 @@
       </tags>
   </entry>
   <entry>
-    <title>JVM 安全点</title>
-    <url>/posts/5a9ba959/</url>
-    <content><![CDATA[<p>JVM的安全点（Safepoint）是JVM执行垃圾回收时的一个重要概念。<span style="border-bottom:2px solid green;">在JVM进行垃圾回收操作时，需要保证堆的一致性，因此需要挂起所有运行Java代码的线程并记录它们的状态。这些特定位置就被称为 <em><strong><code>安全点</code></strong></em>。</span>&gt;</p>
-<h2 id="安全点的作用"><a class="markdownIt-Anchor" href="#安全点的作用"></a> 安全点的作用</h2>
-<p>当一个线程处于安全点时，JVM可以确保该线程不会同时访问堆内存中的对象。如果不挂起所有线程，那么这些线程可能正在访问堆内存中的对象。如果同时执行垃圾回收，则这些线程可能同时修改这些对象，导致数据错误或不一致。因此，在进行垃圾回收操作时，必须等待所有线程到达安全点，并将它们挂起，然后才能继续执行垃圾回收操作。</p>
-<h2 id="安全点的触发条件"><a class="markdownIt-Anchor" href="#安全点的触发条件"></a> 安全点的触发条件</h2>
-<div class="note-large notel-yellow"><div class="notel-title"><p>当一个线程处于安全点时，它必须满足以下条件之一</p>
-</div><div class="notel-content"><ol>
-<li>执行Java方法的字节码指令结束或异常抛出；</li>
-<li>执行JNI（Java Native Interface）方法的字节码指令结束或异常抛出；</li>
-<li>执行VM操作（如Thread.sleep）的字节码指令结束或异常抛出。</li>
+    <title>Java 对象的组成</title>
+    <url>/posts/dcb2c325/</url>
+    <content><![CDATA[<p>在JVM中，每个对象都由三个部分组成：对象头、实例变量和对齐填充。</p>
+<h2 id="组成部分"><a class="markdownIt-Anchor" href="#组成部分"></a> 组成部分</h2>
+<div class="note note-green"><p>在JVM中，每个对象都由三个部分组成：对象头、实例变量和对齐填充。</p>
+</div>
+<h3 id="对象头"><a class="markdownIt-Anchor" href="#对象头"></a> 对象头</h3>
+<p>对象头是存储在每个Java对象之前的一段内存空间，用于存储对象的元数据信息，包括以下内容：</p>
+<ul>
+<li>Mark Word：标记字，用于存储锁相关信息、GC状态信息等。</li>
+<li>Class pointer：指向该对象所属类的指针，用于确定对象类型。</li>
+<li>数组长度：如果该对象是数组，则用于存储数组长度。</li>
+</ul>
+<p>对象头的大小取决于平台的位数以及压缩指针技术的使用情况等因素。</p>
+<h3 id="实例变量"><a class="markdownIt-Anchor" href="#实例变量"></a> 实例变量</h3>
+<p>实例变量是对象的成员变量，定义了该对象的属性。它们被存储在紧随对象头之后的内存空间中。实例变量的大小和类型取决于对象所属类中定义的成员变量。</p>
+<h3 id="对齐填充"><a class="markdownIt-Anchor" href="#对齐填充"></a> 对齐填充</h3>
+<p>为了保证对象的大小是8字节的倍数，JVM会在实例变量之后添加一些额外的字节，即对齐填充。这些额外的字节没有任何实际作用，只是为了满足内存对齐的要求。</p>
+<p>对齐填充的大小取决于对象头和实例变量所占用的内存空间。</p>
+<h3 id="实际大小"><a class="markdownIt-Anchor" href="#实际大小"></a> 实际大小</h3>
+<p>总体来说，一个Java对象的实际大小有以下三个部分组成：</p>
+<ol>
+<li>对象头的大小：在不同的JVM实现中，对象头的大小可能会有所不同。</li>
+<li>实例变量的大小：该对象中定义的所有实例变量的大小。</li>
+<li>对齐填充的大小：为了满足内存对齐的要求而添加的额外字节。</li>
 </ol>
- </div></div>
-<p>这意味着当一个线程处于安全点时，它一定是上述情况之一。只有在这些情况下，线程才被挂起进行垃圾回收操作。</p>
-<h2 id="安全点的影响"><a class="markdownIt-Anchor" href="#安全点的影响"></a> 安全点的影响</h2>
-<p>当JVM进行垃圾回收操作时，必须等待所有线程到达安全点，并将它们挂起，然后才能继续执行垃圾回收操作。这种等待时间可能会导致一些线程长时间等待，从而导致应用程序响应时间变慢。</p>
-<p>为了减少这种情况的发生，JVM提供了多种垃圾回收算法和垃圾回收器，以便在特定的场景中选择最佳的垃圾回收策略。例如CMS（Concurrent Mark Sweep）垃圾回收器就是在并发标记阶段尽可能减少安全点的数量的一种垃圾回收器。</p>
-<p>此外，我们也可以通过调整线程数、线程优先级、堆内存大小等措施来减少安全点的影响。</p>
+<p>具体的实际大小取决于平台的位数、操作系统的类型以及JVM实现的不同等因素。</p>
 <h2 id="总结"><a class="markdownIt-Anchor" href="#总结"></a> 总结</h2>
-<p>安全点是一个重要的概念，在JVM进行垃圾回收操作时扮演着至关重要的角色。了解安全点的作用、触发条件和影响，对于Java开发者来说是非常重要的。在实际开发中，我们需要根据应用场景选择合适的垃圾回收算法和垃圾回收器，并采取相应的措施来减少安全点的影响，以使应用程序能够达到更好的性能和响应速度。</p>
+<p>JVM对象由对象头、实例变量和对齐填充三个部分组成。对象头用于存储对象的元数据信息；实例变量定义了该对象的属性；对齐填充用于保证对象大小是8字节的倍数。理解JVM对象的组成对于Java程序开发人员来说是非常重要的，可以帮助他们更好地管理内存资源，提高程序性能。</p>
 ]]></content>
       <categories>
         <category>JVM</category>
-        <category>GC</category>
+        <category>Java 对象</category>
       </categories>
       <tags>
         <tag>Java</tag>
         <tag>JVM</tag>
-        <tag>GC</tag>
+        <tag>Java 对象</tag>
       </tags>
   </entry>
   <entry>
-    <title>函数接口</title>
-    <url>/posts/a65f2ab8/</url>
-    <content><![CDATA[<p>Java 8 中引入了函数式编程的概念，其中函数接口是重要的一部分。函数接口是指只有一个抽象方法的接口，可以使用 lambda 表达式或方法引用来实现该抽象方法。在函数式编程中，函数接口通常用于表示某个操作，例如转换、过滤或消费数据等。通过将函数接口作为参数传递到方法中，可以轻松地实现这些操作。</p>
-<h2 id="函数接口是什么"><a class="markdownIt-Anchor" href="#函数接口是什么"></a> 函数接口是什么？</h2>
-<h3 id="定义"><a class="markdownIt-Anchor" href="#定义"></a> 定义</h3>
-<div class="note note-success icon-padding"><i class="note-icon fa-solid fa-check-circle"></i><p>只有一个抽象方法的接口。</p>
+    <title>Java 对象是否存活</title>
+    <url>/posts/6a10d920/</url>
+    <content><![CDATA[<p>在JVM中，垃圾回收器会对内存中的对象进行生死判定，将无用的对象回收以释放内存空间。本篇博客将介绍JVM对象生死判定的过程。</p>
+<h2 id="算法"><a class="markdownIt-Anchor" href="#算法"></a> 算法</h2>
+<div class="note note-green"><p>用来判定对象存亡的常用算法有两种：引用计数法、可达性分析算法。</p>
 </div>
-<h3 id="典例"><a class="markdownIt-Anchor" href="#典例"></a> 典例</h3>
-<p>Java 中的 Runnable 接口，就是一个典型的函数接口，请看Code：</p>
-<div class="highlight-container" data-rel="Java"><figure class="iseeu highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@FunctionalInterface</span> <span class="comment">// 声明该接口是函数接口</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">interface</span> <span class="title class_">Runnable</span> &#123;</span><br><span class="line">  <span class="comment">// 该接口中只有一个抽象方法</span></span><br><span class="line">  <span class="keyword">public</span> <span class="keyword">abstract</span> <span class="keyword">void</span> <span class="title function_">run</span><span class="params">()</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></div>
-<h3 id="functionalinterface"><a class="markdownIt-Anchor" href="#functionalinterface"></a> @FunctionalInterface</h3>
-<p>@FunctionalInterface：标识一个接口为函数接口，必须满足函数接口的定义：只有一个抽象方法的接口，否则编译时会报错。</p>
-<p>三个接口为例说明，如下：</p>
-<div class="highlight-container" data-rel="Java"><figure class="iseeu highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">// Hello</span></span><br><span class="line"><span class="meta">@FunctionalInterface</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">interface</span> <span class="title class_">Hello</span> &#123;</span><br><span class="line">  <span class="keyword">void</span> <span class="title function_">hello</span><span class="params">()</span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// NiHao </span></span><br><span class="line"><span class="comment">// ！！！错误</span></span><br><span class="line"><span class="meta">@FunctionalInterface</span> </span><br><span class="line"><span class="keyword">public</span> <span class="keyword">interface</span> <span class="title class_">Nihao</span> &#123;</span><br><span class="line">  <span class="keyword">void</span> <span class="title function_">nihao</span><span class="params">()</span>;</span><br><span class="line">  <span class="keyword">void</span> <span class="title function_">shijie</span><span class="params">()</span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// Hi</span></span><br><span class="line"><span class="meta">@FunctionalInterface</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">interface</span> <span class="title class_">Hi</span> &#123;</span><br><span class="line">  <span class="keyword">void</span> <span class="title function_">hi</span><span class="params">()</span>;</span><br><span class="line">  <span class="keyword">default</span> <span class="keyword">void</span> <span class="title function_">shijie</span><span class="params">()</span> &#123;&#125; </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></div>
-<div class="note note-success icon-padding"><i class="note-icon fa-solid fa-check-circle"></i><p>Hello 接口和 Hi 接口都是函数接口，添加 @FunctionalInterface 注解不会报错。</p>
-</div> 
-<div class="note note-danger icon-padding"><i class="note-icon fa-solid fa-times-circle"></i><p>Nihao 接口不是函数接口，添加 @FunctionalInterface 注解会报错。</p>
+<h3 id="引用计数法"><a class="markdownIt-Anchor" href="#引用计数法"></a> 引用计数法</h3>
+<p>引用计数法是最简单也是最基础的垃圾回收算法之一。该算法通过跟踪每个对象被引用的次数来判断对象是否已经成为垃圾。</p>
+<p>当一个新对象被创建时，其引用计数为1。当其他对象引用该对象时，其对应的引用计数加1。当某个对象的引用计数变为0时，说明该对象已经成为垃圾，可以被回收。</p>
+<p>然而，引用计数法有一个明显的问题：<span style="border-bottom:2px dashed red;">循环引用。如果两个或多个对象之间互相引用，它们的引用计数永远不会变成0，导致垃圾回收器无法将它们回收。</span>因此，引用计数法并不适用于实际的垃圾回收。</p>
+<h3 id="可达性分析算法"><a class="markdownIt-Anchor" href="#可达性分析算法"></a> 可达性分析算法</h3>
+<div class="note note-green"><p>JVM 使用此算法</p>
 </div>
-<h3 id="自定义函数接口"><a class="markdownIt-Anchor" href="#自定义函数接口"></a> 自定义函数接口</h3>
-<p>根据函数接口的定义（<code>只有一个抽象方法的接口</code>）来自定义一个函数接口 Me ：</p>
-<div class="highlight-container" data-rel="Java"><figure class="iseeu highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">// 几行 Code 定义了一个函数接口，是不是很简单。</span></span><br><span class="line"><span class="meta">@FunctionalInterface</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">interface</span> <span class="title class_">Me</span> &#123;</span><br><span class="line">  <span class="comment">// Me 接口只有一个抽象方法 i()</span></span><br><span class="line">  <span class="keyword">void</span> <span class="title function_">i</span><span class="params">()</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></div>
-<h3 id="java-内置的函数接口"><a class="markdownIt-Anchor" href="#java-内置的函数接口"></a> Java 内置的函数接口</h3>
-<p>Java 8 中引入了函数式编程的概念，其中函数接口是重要的一部分。Java 8 也内置了一些函数接口，主要常用的有 <code>Function&lt;T, R&gt;</code>、<code>Predicate&lt;T&gt;</code>、<code>Consumer&lt;T&gt;</code>、<code>Supplier&lt;T&gt;</code> 这四个函数对象，此外还有一些相对用的少一点的，比如：<code>BiFunction&lt;T, U, R&gt;</code>、<code>BiPredicate&lt;T, U&gt;</code>、<code>BiConsumer&lt;T, U&gt;</code>、<code>UnaryOperator&lt;T&gt;</code>、<code>BinaryOperator&lt;T&gt;</code>。这些函数接口的使用，我会单独写一篇博文进行介绍的，这篇主要是了解到什么是函数接口就OK了。</p>
-<h2 id="函数接口的应用"><a class="markdownIt-Anchor" href="#函数接口的应用"></a> 函数接口的应用</h2>
-<h3 id="lambda-表达式"><a class="markdownIt-Anchor" href="#lambda-表达式"></a> Lambda 表达式</h3>
-<p><code>Lambda 表达式</code>提供了一种简洁的方式来创建函数接口的实例（实现函数接口）。Lambda 表达式可以使用函数接口来描述其参数和返回类型，并且可以通过将Lambda表达式分配给函数接口类型的变量来使用它。因此，Lambda表达式和函数接口密切相关，它们通常一起使用，以实现简洁、灵活的代码。</p>
-<p>伪代码如下：</p>
-<div class="highlight-container" data-rel="Java"><figure class="iseeu highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">// 函数接口 Hello</span></span><br><span class="line"><span class="meta">@FunctionalInterface</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">interface</span> <span class="title class_">Hello</span> &#123;</span><br><span class="line">  <span class="keyword">void</span> <span class="title function_">hello</span><span class="params">()</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">Hello</span> <span class="variable">h</span> <span class="operator">=</span> () -&gt; &#123;&#125;;</span><br><span class="line"><span class="comment">// Lambda 表达式角度：</span></span><br><span class="line"><span class="comment">//   使用 Lambda 表达式来实现 Hello 接口，并创建了一个 Hello 类型的实例</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 函数接口角度：</span></span><br><span class="line"><span class="comment">//   使用 Hello 函数接口，描述了 Lambda 表达式</span></span><br><span class="line"><span class="comment">//   返回值为 void，没有入参（其实就是 hello() 方法）</span></span><br></pre></td></tr></table></figure></div>
-<h3 id="方法引用"><a class="markdownIt-Anchor" href="#方法引用"></a> 方法引用</h3>
-<p><code>方法引用</code>提供了一种更为简洁的方式来创建函数接口的实例，通过引用现有方法而不是编写 <code>Lambda 表达式</code>的方式；直接使用现有方法的名称，从而简化代码并提高可读性。</p>
-<p>伪代码如下：</p>
-<div class="highlight-container" data-rel="Java"><figure class="iseeu highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">// 内置函数接口 Consumer</span></span><br><span class="line"><span class="meta">@FunctionalInterface</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">interface</span> <span class="title class_">Consumer</span>&lt;T&gt; &#123;</span><br><span class="line">  <span class="keyword">public</span> <span class="keyword">abstract</span> <span class="title function_">accept</span><span class="params">(T t)</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 使用 Lambda 表达式创建一个 Consumer 类型的实例</span></span><br><span class="line">Consumer&lt;String&gt; consumer = s -&gt; System.out.println(s);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 使用方法引用创建一个 Consumer 类型的实例</span></span><br><span class="line">Consumer&lt;String&gt; consumer = System.out::println;</span><br></pre></td></tr></table></figure></div>
+<p>可达性分析算法是目前主流的垃圾回收算法之一。它基于“GC Roots”的概念来判断对象是否可达。</p>
+<p>在JVM中，GC Roots包括以下几类：</p>
+<ul>
+<li>虚拟机栈（栈帧中的本地变量表）中引用的对象。</li>
+<li>方法区中静态属性引用的对象。</li>
+<li>方法区中常量引用的对象。</li>
+<li>本地方法栈中JNI（Java Native Interface）引用的对象。</li>
+</ul>
+<p>可达性分析算法从GC Roots开始遍历内存中的所有对象，将可以到达的对象标记为“存活”，而未被标记的对象则被视为垃圾。</p>
+<p>可达性分析算法可以有效地处理循环引用问题，并且能够精确地识别出无用对象。</p>
+<h2 id="对象生死判定流程"><a class="markdownIt-Anchor" href="#对象生死判定流程"></a> 对象生死判定流程</h2>
+<p>JVM中的垃圾回收器会周期性地对内存中的对象进行生死判定，以便将无用对象回收。其具体流程如下：</p>
+<ol>
+<li>根据GC Roots开始遍历内存中的所有对象。</li>
+<li>将所有可以到达的对象标记为“存活”。</li>
+<li>将未被标记的对象视为垃圾，进行回收。</li>
+</ol>
+<p>需要注意的是，在进行垃圾回收时，可能会造成一些短暂的系统停顿。这是因为垃圾回收器需要暂停正在执行的程序，并锁定整个堆空间，以便安全地对内存中的对象进行回收。为了减少这种停顿时间，JVM引入了一些优化措施，如并发标记和整理、增量式收集等。</p>
 <h2 id="总结"><a class="markdownIt-Anchor" href="#总结"></a> 总结</h2>
-<p>函数接口是 Java 8 中引入函数式编程基础中的基础，它和 Lambda 表达式和方法引用有着密不可分的关系，把这三者的关系理清并掌握后，Java的函数编程那不是小菜一碟，Stream Api 也不是什么大问题 <i class="fa-duotone fa-face-party"></i>。</p>
+<p>JVM对象生死判定是垃圾回收机制的重要组成部分。可达性分析算法是目前主流的垃圾回收算法之一，它可以精确地识别出无用对象，并解决循环引用问题。程序员需要了解JVM对象生死判定的过程，以便更好地管理内存资源，提高程序性能。</p>
+]]></content>
+      <categories>
+        <category>JVM</category>
+        <category>Java 对象</category>
+      </categories>
+      <tags>
+        <tag>Java</tag>
+        <tag>JVM</tag>
+        <tag>Java 对象</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Java 对象的生命周期</title>
+    <url>/posts/dcb2c325/</url>
+    <content><![CDATA[<p>Java虚拟机（JVM）是一种能够在不同平台上运行Java程序的虚拟机。在JVM中，每个对象都有其自己的生命周期。本篇博客将介绍JVM对象的生命周期。</p>
+<h2 id="生命周期阶段"><a class="markdownIt-Anchor" href="#生命周期阶段"></a> 生命周期阶段</h2>
+<div class="note note-green"><p>Java 对象的生命周期的几个阶段，分别为：对象的创建、使用、回收、销毁，下边逐个来进行介绍；</p>
+</div>
+<h3 id="对象的创建"><a class="markdownIt-Anchor" href="#对象的创建"></a> 对象的创建</h3>
+<p>当使用<code>new</code>关键字创建一个对象时，JVM会先检查类是否已经被加载和链接过。如果没有加载，则先进行类的加载和连接操作。然后为该对象分配内存空间，并对分配到的内存空间进行清零赋值，即初始化对象的所有实例变量为默认值。</p>
+<p>接着，JVM会调用对象的构造函数（Constructor），初始化对象的实例变量。如果该类没有显式地定义构造函数，则JVM会提供一个默认的无参构造函数。</p>
+<p>最后，JVM会把对象的引用返回给程序员，以便程序员可以通过该引用来操作该对象。</p>
+<h3 id="对象的使用"><a class="markdownIt-Anchor" href="#对象的使用"></a> 对象的使用</h3>
+<p>在对象创建后，程序员可以通过对象的引用对它进行操作。对象在内存中的位置由对象的引用来确定。当一个对象被使用时，它可能会被传递给其他方法或者被保存在某些数据结构中。</p>
+<h3 id="对象的回收"><a class="markdownIt-Anchor" href="#对象的回收"></a> 对象的回收</h3>
+<p>当一个对象不再被程序员所引用时，该对象就成了垃圾（Garbage）。JVM需要将这些无用的对象从内存中清除，以便后面的内存分配可以使用这些空间。</p>
+<p>JVM中的垃圾回收（Garbage Collection）机制负责回收这些无用对象。当JVM检测到一个对象已经成为垃圾时，它就会自动地将该对象所占用的内存空间释放出来，以便程序后续的内存分配可以使用这些空间。</p>
+<p>在JVM中，垃圾回收是由垃圾回收器（Garbage Collector）来完成的。不同的垃圾回收器采用不同的算法来实现垃圾回收。常见的垃圾回收算法包括标记-清除算法、复制算法、标记-整理算法和分代收集算法等。</p>
+<h3 id="对象的销毁"><a class="markdownIt-Anchor" href="#对象的销毁"></a> 对象的销毁</h3>
+<p>当一个对象被回收后，JVM并不会立即销毁它。相反，JVM会等待垃圾回收器对内存进行整理后，再对垃圾对象进行销毁。销毁一个对象的最终步骤是调用其<code>finalize()</code>方法。该方法是Object类中定义的一个方法，在GC进行回收之前会先调用该方法。</p>
+<p>在Java 9之后，<code>finalize()</code>方法已经被废弃，取而代之的是使用Cleaner API进行资源管理。</p>
+<h2 id="总结"><a class="markdownIt-Anchor" href="#总结"></a> 总结</h2>
+<p>JVM对象的生命周期包括对象的创建、使用、回收和销毁等阶段。理解JVM对象的生命周期对于Java程序开发人员来说是非常重要的，可以帮助他们更好地管理内存资源，提高程序性能。</p>
+]]></content>
+      <categories>
+        <category>JVM</category>
+        <category>Java 对象</category>
+      </categories>
+      <tags>
+        <tag>Java</tag>
+        <tag>JVM</tag>
+        <tag>Java 对象</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>方法引用</title>
+    <url>/posts/4b34576e/</url>
+    <content><![CDATA[<p>在Java 8中，方法引用（method reference）是一种方便的语法，可以将现有的方法作为Lambda表达式传递。这样做可以简化代码，并且使得代码更加易于理解和修改。本文将介绍Java方法引用的基本概念、语法和使用方法。</p>
+<div class="note note-yellow"><p>阅读本篇内容默认认为你已经掌握了<a href="/posts/a65f2ab8/">函数接口</a>、<a href="/posts/9fa75fc1/">Lambda 表达式</a></p>
+</div>
+<h2 id="什么是方法引用"><a class="markdownIt-Anchor" href="#什么是方法引用"></a> 什么是方法引用？</h2>
+<p>方法引用是一种语法，用于将现有的方法作为Lambda表达式传递。通常情况下，我们需要定义一个Lambda表达式来表示一个匿名函数，然后把它传递给另一个函数。但是，如果这个Lambda表达式只是调用了一个已经存在的方法，那么就可以使用方法引用来代替Lambda表达式。方法引用的基本思想是：如果存在一个现有方法，它正好满足Lambda表达式的参数和返回类型，那么就可以使用方法引用来代替Lambda表达式。</p>
+<h2 id="方法引用的语法"><a class="markdownIt-Anchor" href="#方法引用的语法"></a> 方法引用的语法</h2>
+<p>方法引用使用<code>::</code>符号来表示。它的语法有以下几种形式：</p>
+<ul>
+<li>静态方法引用：<code>ClassName::methodName</code></li>
+<li>实例方法引用：<code>objectName::methodName</code></li>
+<li>特定类的任意对象方法引用：<code>ClassName::methodName</code></li>
+<li>构造方法引用：<code>ClassName::new</code></li>
+</ul>
+<p>其中，静态方法引用和实例方法引用是最常用的两种形式。其他两种形式通常用于特殊情况。</p>
+<h3 id="静态方法引用"><a class="markdownIt-Anchor" href="#静态方法引用"></a> 静态方法引用</h3>
+<p>静态方法引用使用<code>ClassName::methodName</code>的形式。例如，如果存在一个静态方法<code>Integer.parseInt(String)</code>，我们可以使用如下的代码来引用它：</p>
+<div class="highlight-container" data-rel="Java"><figure class="iseeu highlight java"><table><tr><td class="code"><pre><span class="line">Function&lt;String, Integer&gt; parser = Integer::parseInt;</span><br></pre></td></tr></table></figure></div>
+<p>上面的代码将<code>Integer.parseInt()</code>方法作为一个函数对象赋值给了<code>parser</code>变量。这样，在程序中就可以像使用其他函数一样使用这个函数对象了。</p>
+<h3 id="实例方法引用"><a class="markdownIt-Anchor" href="#实例方法引用"></a> 实例方法引用</h3>
+<p>实例方法引用使用<code>objectName::methodName</code>的形式。例如，如果存在一个实例方法<code>String.toUpperCase()</code>，我们可以使用如下的代码来引用它：</p>
+<div class="highlight-container" data-rel="Java"><figure class="iseeu highlight java"><table><tr><td class="code"><pre><span class="line">UnaryOperator&lt;String&gt; converter = String::toUpperCase;</span><br></pre></td></tr></table></figure></div>
+<p>上面的代码将<code>String.toUpperCase()</code>方法作为一个函数对象赋值给了<code>converter</code>变量。这样，在程序中就可以像使用其他函数一样使用这个函数对象了。注意：在这个例子中，<code>String::toUpperCase</code>是一个无参方法，因此返回值类型必须与函数接口的返回值类型相同（即<code>UnaryOperator&lt;String&gt;</code>）。</p>
+<h2 id="总结"><a class="markdownIt-Anchor" href="#总结"></a> 总结</h2>
+<p>Java方法引用是一种方便的语法，用于简化Lambda表达式并使代码更加易于理解和修改。方法引用通常可以用于函数式接口的参数或者返回值，以便将现有方法转换成函数式接口的实例。掌握方法引用的基本语法和相关技巧，可以让我们更加高效地编写Java代码。</p>
 ]]></content>
       <categories>
         <category>Java</category>
@@ -1726,32 +1718,40 @@
       </tags>
   </entry>
   <entry>
-    <title>方法引用</title>
-    <url>/posts/4b34576e/</url>
-    <content><![CDATA[<p>在Java 8中，方法引用（method reference）是一种方便的语法，可以将现有的方法作为Lambda表达式传递。这样做可以简化代码，并且使得代码更加易于理解和修改。本文将介绍Java方法引用的基本概念、语法和使用方法。</p>
-<div class="note note-yellow"><p>阅读本篇内容默认认为你已经掌握了<a href="/posts/a65f2ab8/">函数接口</a>、<a href="/posts/9fa75fc1/">Lambda 表达式</a></p>
+    <title>函数接口</title>
+    <url>/posts/a65f2ab8/</url>
+    <content><![CDATA[<p>Java 8 中引入了函数式编程的概念，其中函数接口是重要的一部分。函数接口是指只有一个抽象方法的接口，可以使用 lambda 表达式或方法引用来实现该抽象方法。在函数式编程中，函数接口通常用于表示某个操作，例如转换、过滤或消费数据等。通过将函数接口作为参数传递到方法中，可以轻松地实现这些操作。</p>
+<h2 id="函数接口是什么"><a class="markdownIt-Anchor" href="#函数接口是什么"></a> 函数接口是什么？</h2>
+<h3 id="定义"><a class="markdownIt-Anchor" href="#定义"></a> 定义</h3>
+<div class="note note-success icon-padding"><i class="note-icon fa-solid fa-check-circle"></i><p>只有一个抽象方法的接口。</p>
 </div>
-<h2 id="什么是方法引用"><a class="markdownIt-Anchor" href="#什么是方法引用"></a> 什么是方法引用？</h2>
-<p>方法引用是一种语法，用于将现有的方法作为Lambda表达式传递。通常情况下，我们需要定义一个Lambda表达式来表示一个匿名函数，然后把它传递给另一个函数。但是，如果这个Lambda表达式只是调用了一个已经存在的方法，那么就可以使用方法引用来代替Lambda表达式。方法引用的基本思想是：如果存在一个现有方法，它正好满足Lambda表达式的参数和返回类型，那么就可以使用方法引用来代替Lambda表达式。</p>
-<h2 id="方法引用的语法"><a class="markdownIt-Anchor" href="#方法引用的语法"></a> 方法引用的语法</h2>
-<p>方法引用使用<code>::</code>符号来表示。它的语法有以下几种形式：</p>
-<ul>
-<li>静态方法引用：<code>ClassName::methodName</code></li>
-<li>实例方法引用：<code>objectName::methodName</code></li>
-<li>特定类的任意对象方法引用：<code>ClassName::methodName</code></li>
-<li>构造方法引用：<code>ClassName::new</code></li>
-</ul>
-<p>其中，静态方法引用和实例方法引用是最常用的两种形式。其他两种形式通常用于特殊情况。</p>
-<h3 id="静态方法引用"><a class="markdownIt-Anchor" href="#静态方法引用"></a> 静态方法引用</h3>
-<p>静态方法引用使用<code>ClassName::methodName</code>的形式。例如，如果存在一个静态方法<code>Integer.parseInt(String)</code>，我们可以使用如下的代码来引用它：</p>
-<div class="highlight-container" data-rel="Java"><figure class="iseeu highlight java"><table><tr><td class="code"><pre><span class="line">Function&lt;String, Integer&gt; parser = Integer::parseInt;</span><br></pre></td></tr></table></figure></div>
-<p>上面的代码将<code>Integer.parseInt()</code>方法作为一个函数对象赋值给了<code>parser</code>变量。这样，在程序中就可以像使用其他函数一样使用这个函数对象了。</p>
-<h3 id="实例方法引用"><a class="markdownIt-Anchor" href="#实例方法引用"></a> 实例方法引用</h3>
-<p>实例方法引用使用<code>objectName::methodName</code>的形式。例如，如果存在一个实例方法<code>String.toUpperCase()</code>，我们可以使用如下的代码来引用它：</p>
-<div class="highlight-container" data-rel="Java"><figure class="iseeu highlight java"><table><tr><td class="code"><pre><span class="line">UnaryOperator&lt;String&gt; converter = String::toUpperCase;</span><br></pre></td></tr></table></figure></div>
-<p>上面的代码将<code>String.toUpperCase()</code>方法作为一个函数对象赋值给了<code>converter</code>变量。这样，在程序中就可以像使用其他函数一样使用这个函数对象了。注意：在这个例子中，<code>String::toUpperCase</code>是一个无参方法，因此返回值类型必须与函数接口的返回值类型相同（即<code>UnaryOperator&lt;String&gt;</code>）。</p>
+<h3 id="典例"><a class="markdownIt-Anchor" href="#典例"></a> 典例</h3>
+<p>Java 中的 Runnable 接口，就是一个典型的函数接口，请看Code：</p>
+<div class="highlight-container" data-rel="Java"><figure class="iseeu highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@FunctionalInterface</span> <span class="comment">// 声明该接口是函数接口</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">interface</span> <span class="title class_">Runnable</span> &#123;</span><br><span class="line">  <span class="comment">// 该接口中只有一个抽象方法</span></span><br><span class="line">  <span class="keyword">public</span> <span class="keyword">abstract</span> <span class="keyword">void</span> <span class="title function_">run</span><span class="params">()</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></div>
+<h3 id="functionalinterface"><a class="markdownIt-Anchor" href="#functionalinterface"></a> @FunctionalInterface</h3>
+<p>@FunctionalInterface：标识一个接口为函数接口，必须满足函数接口的定义：只有一个抽象方法的接口，否则编译时会报错。</p>
+<p>三个接口为例说明，如下：</p>
+<div class="highlight-container" data-rel="Java"><figure class="iseeu highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">// Hello</span></span><br><span class="line"><span class="meta">@FunctionalInterface</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">interface</span> <span class="title class_">Hello</span> &#123;</span><br><span class="line">  <span class="keyword">void</span> <span class="title function_">hello</span><span class="params">()</span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// NiHao </span></span><br><span class="line"><span class="comment">// ！！！错误</span></span><br><span class="line"><span class="meta">@FunctionalInterface</span> </span><br><span class="line"><span class="keyword">public</span> <span class="keyword">interface</span> <span class="title class_">Nihao</span> &#123;</span><br><span class="line">  <span class="keyword">void</span> <span class="title function_">nihao</span><span class="params">()</span>;</span><br><span class="line">  <span class="keyword">void</span> <span class="title function_">shijie</span><span class="params">()</span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// Hi</span></span><br><span class="line"><span class="meta">@FunctionalInterface</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">interface</span> <span class="title class_">Hi</span> &#123;</span><br><span class="line">  <span class="keyword">void</span> <span class="title function_">hi</span><span class="params">()</span>;</span><br><span class="line">  <span class="keyword">default</span> <span class="keyword">void</span> <span class="title function_">shijie</span><span class="params">()</span> &#123;&#125; </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></div>
+<div class="note note-success icon-padding"><i class="note-icon fa-solid fa-check-circle"></i><p>Hello 接口和 Hi 接口都是函数接口，添加 @FunctionalInterface 注解不会报错。</p>
+</div> 
+<div class="note note-danger icon-padding"><i class="note-icon fa-solid fa-times-circle"></i><p>Nihao 接口不是函数接口，添加 @FunctionalInterface 注解会报错。</p>
+</div>
+<h3 id="自定义函数接口"><a class="markdownIt-Anchor" href="#自定义函数接口"></a> 自定义函数接口</h3>
+<p>根据函数接口的定义（<code>只有一个抽象方法的接口</code>）来自定义一个函数接口 Me ：</p>
+<div class="highlight-container" data-rel="Java"><figure class="iseeu highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">// 几行 Code 定义了一个函数接口，是不是很简单。</span></span><br><span class="line"><span class="meta">@FunctionalInterface</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">interface</span> <span class="title class_">Me</span> &#123;</span><br><span class="line">  <span class="comment">// Me 接口只有一个抽象方法 i()</span></span><br><span class="line">  <span class="keyword">void</span> <span class="title function_">i</span><span class="params">()</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></div>
+<h3 id="java-内置的函数接口"><a class="markdownIt-Anchor" href="#java-内置的函数接口"></a> Java 内置的函数接口</h3>
+<p>Java 8 中引入了函数式编程的概念，其中函数接口是重要的一部分。Java 8 也内置了一些函数接口，主要常用的有 <code>Function&lt;T, R&gt;</code>、<code>Predicate&lt;T&gt;</code>、<code>Consumer&lt;T&gt;</code>、<code>Supplier&lt;T&gt;</code> 这四个函数对象，此外还有一些相对用的少一点的，比如：<code>BiFunction&lt;T, U, R&gt;</code>、<code>BiPredicate&lt;T, U&gt;</code>、<code>BiConsumer&lt;T, U&gt;</code>、<code>UnaryOperator&lt;T&gt;</code>、<code>BinaryOperator&lt;T&gt;</code>。这些函数接口的使用，我会单独写一篇博文进行介绍的，这篇主要是了解到什么是函数接口就OK了。</p>
+<h2 id="函数接口的应用"><a class="markdownIt-Anchor" href="#函数接口的应用"></a> 函数接口的应用</h2>
+<h3 id="lambda-表达式"><a class="markdownIt-Anchor" href="#lambda-表达式"></a> Lambda 表达式</h3>
+<p><code>Lambda 表达式</code>提供了一种简洁的方式来创建函数接口的实例（实现函数接口）。Lambda 表达式可以使用函数接口来描述其参数和返回类型，并且可以通过将Lambda表达式分配给函数接口类型的变量来使用它。因此，Lambda表达式和函数接口密切相关，它们通常一起使用，以实现简洁、灵活的代码。</p>
+<p>伪代码如下：</p>
+<div class="highlight-container" data-rel="Java"><figure class="iseeu highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">// 函数接口 Hello</span></span><br><span class="line"><span class="meta">@FunctionalInterface</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">interface</span> <span class="title class_">Hello</span> &#123;</span><br><span class="line">  <span class="keyword">void</span> <span class="title function_">hello</span><span class="params">()</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">Hello</span> <span class="variable">h</span> <span class="operator">=</span> () -&gt; &#123;&#125;;</span><br><span class="line"><span class="comment">// Lambda 表达式角度：</span></span><br><span class="line"><span class="comment">//   使用 Lambda 表达式来实现 Hello 接口，并创建了一个 Hello 类型的实例</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 函数接口角度：</span></span><br><span class="line"><span class="comment">//   使用 Hello 函数接口，描述了 Lambda 表达式</span></span><br><span class="line"><span class="comment">//   返回值为 void，没有入参（其实就是 hello() 方法）</span></span><br></pre></td></tr></table></figure></div>
+<h3 id="方法引用"><a class="markdownIt-Anchor" href="#方法引用"></a> 方法引用</h3>
+<p><code>方法引用</code>提供了一种更为简洁的方式来创建函数接口的实例，通过引用现有方法而不是编写 <code>Lambda 表达式</code>的方式；直接使用现有方法的名称，从而简化代码并提高可读性。</p>
+<p>伪代码如下：</p>
+<div class="highlight-container" data-rel="Java"><figure class="iseeu highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">// 内置函数接口 Consumer</span></span><br><span class="line"><span class="meta">@FunctionalInterface</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">interface</span> <span class="title class_">Consumer</span>&lt;T&gt; &#123;</span><br><span class="line">  <span class="keyword">public</span> <span class="keyword">abstract</span> <span class="title function_">accept</span><span class="params">(T t)</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 使用 Lambda 表达式创建一个 Consumer 类型的实例</span></span><br><span class="line">Consumer&lt;String&gt; consumer = s -&gt; System.out.println(s);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 使用方法引用创建一个 Consumer 类型的实例</span></span><br><span class="line">Consumer&lt;String&gt; consumer = System.out::println;</span><br></pre></td></tr></table></figure></div>
 <h2 id="总结"><a class="markdownIt-Anchor" href="#总结"></a> 总结</h2>
-<p>Java方法引用是一种方便的语法，用于简化Lambda表达式并使代码更加易于理解和修改。方法引用通常可以用于函数式接口的参数或者返回值，以便将现有方法转换成函数式接口的实例。掌握方法引用的基本语法和相关技巧，可以让我们更加高效地编写Java代码。</p>
+<p>函数接口是 Java 8 中引入函数式编程基础中的基础，它和 Lambda 表达式和方法引用有着密不可分的关系，把这三者的关系理清并掌握后，Java的函数编程那不是小菜一碟，Stream Api 也不是什么大问题 <i class="fa-duotone fa-face-party"></i>。</p>
 ]]></content>
       <categories>
         <category>Java</category>
