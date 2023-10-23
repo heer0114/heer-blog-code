@@ -4,12 +4,196 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="300a4280-5a73-4561-8b94-53aaf98c9c42" name="更改" comment="修复推荐文章 顶部图片显示不出了的问题 &amp; add posts">
+    <list default="true" id="300a4280-5a73-4561-8b94-53aaf98c9c42" name="更改" comment="修复推荐文章 顶部图片显示不出了的问题&#10;更新主题Redefine到 2.5.0">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/_config.redefine-heer.yml" beforeDir="false" afterPath="$PROJECT_DIR$/_config.redefine.yml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/_config.yml" beforeDir="false" afterPath="$PROJECT_DIR$/_config.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/_config.redefine.yml" beforeDir="false" afterPath="$PROJECT_DIR$/_config.redefine.yml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/package-lock.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/themes/redefine-heer/.editorconfig" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/themes/redefine-heer/.gitignore" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/themes/redefine-heer/.npmignore" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/themes/redefine-heer/CODE_OF_CONDUCT.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/themes/redefine-heer/CONTRIBUTING.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/themes/redefine-heer/DONATION.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/themes/redefine-heer/LICENSE" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/themes/redefine-heer/README.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/themes/redefine-heer/README_zh-CN.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/themes/redefine-heer/README_zh-TW.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/themes/redefine-heer/_config.yml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/themes/redefine-heer/languages/en.yml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/themes/redefine-heer/languages/zh-CN.yml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/themes/redefine-heer/languages/zh-TW.yml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/themes/redefine-heer/layout/404.ejs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/themes/redefine-heer/layout/_meta/article-copyright.ejs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/themes/redefine-heer/layout/_meta/article-info.ejs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/themes/redefine-heer/layout/_meta/home-article.ejs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/themes/redefine-heer/layout/_partials/404-template.ejs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/themes/redefine-heer/layout/_partials/comments/comment.ejs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/themes/redefine-heer/layout/_partials/comments/gitalk.ejs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/themes/redefine-heer/layout/_partials/comments/twikoo.ejs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/themes/redefine-heer/layout/_partials/comments/waline.ejs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/themes/redefine-heer/layout/_partials/footer.ejs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/themes/redefine-heer/layout/_partials/head.ejs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/themes/redefine-heer/layout/_partials/home-banner.ejs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/themes/redefine-heer/layout/_partials/home-content.ejs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/themes/redefine-heer/layout/_partials/home-sidebar.ejs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/themes/redefine-heer/layout/_partials/navbar.ejs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/themes/redefine-heer/layout/_partials/page-template.ejs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/themes/redefine-heer/layout/_partials/scripts.ejs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/themes/redefine-heer/layout/_plugins/aplayer.ejs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/themes/redefine-heer/layout/_plugins/pjax.ejs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/themes/redefine-heer/layout/_widgets/archive-list.ejs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/themes/redefine-heer/layout/_widgets/essays.ejs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/themes/redefine-heer/layout/_widgets/friends-link.ejs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/themes/redefine-heer/layout/_widgets/image-viewer.ejs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/themes/redefine-heer/layout/_widgets/local-search.ejs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/themes/redefine-heer/layout/_widgets/paginator.ejs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/themes/redefine-heer/layout/_widgets/post-tools.ejs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/themes/redefine-heer/layout/_widgets/progress-bar.ejs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/themes/redefine-heer/layout/_widgets/side-tools.ejs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/themes/redefine-heer/layout/_widgets/tagcloud.ejs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/themes/redefine-heer/layout/_widgets/toc.ejs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/themes/redefine-heer/layout/archive-content.ejs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/themes/redefine-heer/layout/archive.ejs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/themes/redefine-heer/layout/article-content.ejs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/themes/redefine-heer/layout/category-content.ejs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/themes/redefine-heer/layout/category-list-sidebar.ejs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/themes/redefine-heer/layout/category-list.ejs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/themes/redefine-heer/layout/category.ejs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/themes/redefine-heer/layout/index.ejs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/themes/redefine-heer/layout/layout.ejs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/themes/redefine-heer/layout/page.ejs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/themes/redefine-heer/layout/tag-content.ejs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/themes/redefine-heer/layout/tag.ejs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/themes/redefine-heer/layout/tags.ejs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/themes/redefine-heer/package.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/themes/redefine-heer/scripts/events/404.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/themes/redefine-heer/scripts/events/welcome.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/themes/redefine-heer/scripts/filters/imgHandle.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/themes/redefine-heer/scripts/filters/lazyloadHandle.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/themes/redefine-heer/scripts/filters/linkHandle.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/themes/redefine-heer/scripts/heer/heer_list_categories.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/themes/redefine-heer/scripts/helpers/articleRecommend.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/themes/redefine-heer/scripts/helpers/autoCanonical.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/themes/redefine-heer/scripts/helpers/configExport.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/themes/redefine-heer/scripts/helpers/seoGenerate.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/themes/redefine-heer/scripts/helpers/themeHelpers.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/themes/redefine-heer/scripts/modules/btn.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/themes/redefine-heer/scripts/modules/btns.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/themes/redefine-heer/scripts/modules/folding.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/themes/redefine-heer/scripts/modules/note-large.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/themes/redefine-heer/scripts/modules/note.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/themes/redefine-heer/scripts/modules/tabs.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/themes/redefine-heer/scripts/use-source-data.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/themes/redefine-heer/source/assets/fonts.css" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/themes/redefine-heer/source/assets/odometer-theme-minimal.css" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/themes/redefine-heer/source/css/common/animated.styl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/themes/redefine-heer/source/css/common/basic.styl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/themes/redefine-heer/source/css/common/codeblock/code-block.styl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/themes/redefine-heer/source/css/common/codeblock/code-theme.styl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/themes/redefine-heer/source/css/common/codeblock/highlight.styl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/themes/redefine-heer/source/css/common/markdown.styl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/themes/redefine-heer/source/css/common/redefine-theme.styl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/themes/redefine-heer/source/css/common/variables.styl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/themes/redefine-heer/source/css/layout/_modules/aplayer.styl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/themes/redefine-heer/source/css/layout/_modules/buttons.styl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/themes/redefine-heer/source/css/layout/_modules/folding.styl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/themes/redefine-heer/source/css/layout/_modules/notes.styl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/themes/redefine-heer/source/css/layout/_modules/tabs.styl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/themes/redefine-heer/source/css/layout/_partials/404.styl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/themes/redefine-heer/source/css/layout/_partials/archive-list.styl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/themes/redefine-heer/source/css/layout/_partials/article-copyright-info.styl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/themes/redefine-heer/source/css/layout/_partials/article-meta-info.styl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/themes/redefine-heer/source/css/layout/_partials/comments/comment.styl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/themes/redefine-heer/source/css/layout/_partials/comments/gitalk.styl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/themes/redefine-heer/source/css/layout/_partials/comments/twikoo.styl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/themes/redefine-heer/source/css/layout/_partials/comments/waline.styl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/themes/redefine-heer/source/css/layout/_partials/footer.styl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/themes/redefine-heer/source/css/layout/_partials/home-banner.styl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/themes/redefine-heer/source/css/layout/_partials/image-viewer.styl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/themes/redefine-heer/source/css/layout/_partials/local-search.styl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/themes/redefine-heer/source/css/layout/_partials/navbar.styl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/themes/redefine-heer/source/css/layout/_partials/page-template.styl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/themes/redefine-heer/source/css/layout/_partials/paginator.styl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/themes/redefine-heer/source/css/layout/_partials/post-tools.styl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/themes/redefine-heer/source/css/layout/_partials/progress-bar.styl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/themes/redefine-heer/source/css/layout/_partials/side-tools.styl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/themes/redefine-heer/source/css/layout/_partials/tagcloud.styl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/themes/redefine-heer/source/css/layout/_partials/toc.styl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/themes/redefine-heer/source/css/layout/archive-content.styl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/themes/redefine-heer/source/css/layout/article-content.styl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/themes/redefine-heer/source/css/layout/category-content.styl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/themes/redefine-heer/source/css/layout/category-list-sidebar.styl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/themes/redefine-heer/source/css/layout/category-list.styl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/themes/redefine-heer/source/css/layout/home-content.styl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/themes/redefine-heer/source/css/layout/home-sidebar.styl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/themes/redefine-heer/source/css/layout/page.styl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/themes/redefine-heer/source/css/layout/tag-content.styl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/themes/redefine-heer/source/css/style.styl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/themes/redefine-heer/source/fontawesome/all.min.css" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/themes/redefine-heer/source/fontawesome/brands.min.css" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/themes/redefine-heer/source/fontawesome/duotone.min.css" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/themes/redefine-heer/source/fontawesome/fontawesome.min.css" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/themes/redefine-heer/source/fontawesome/light.min.css" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/themes/redefine-heer/source/fontawesome/regular.min.css" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/themes/redefine-heer/source/fontawesome/sharp-solid.min.css" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/themes/redefine-heer/source/fontawesome/solid.min.css" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/themes/redefine-heer/source/fontawesome/svg-with-js.min.css" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/themes/redefine-heer/source/fontawesome/thin.min.css" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/themes/redefine-heer/source/fontawesome/v4-font-face.min.css" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/themes/redefine-heer/source/fontawesome/v4-shims.min.css" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/themes/redefine-heer/source/fontawesome/v5-font-face.min.css" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/themes/redefine-heer/source/fonts/OPTIMA.woff" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/themes/redefine-heer/source/fonts/OPTIMA_B.woff" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/themes/redefine-heer/source/fonts/Optima Medium.woff" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/themes/redefine-heer/source/fonts/Optima_Italic.woff" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/themes/redefine-heer/source/images/astronaut.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/themes/redefine-heer/source/images/bg.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/themes/redefine-heer/source/images/loading.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/themes/redefine-heer/source/images/logo.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/themes/redefine-heer/source/images/logo_fav.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/themes/redefine-heer/source/images/rocket.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/themes/redefine-heer/source/images/sidebar_bg.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/themes/redefine-heer/source/js/layouts/lazyload.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/themes/redefine-heer/source/js/layouts/navbarShrink.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/themes/redefine-heer/source/js/layouts/odometer.min.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/themes/redefine-heer/source/js/layouts/toc.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/themes/redefine-heer/source/js/libs/APlayer.min.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/themes/redefine-heer/source/js/libs/APlayer.min.js.map" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/themes/redefine-heer/source/js/libs/Typed.min.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/themes/redefine-heer/source/js/libs/anime.min.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/themes/redefine-heer/source/js/libs/mermaid.min.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/themes/redefine-heer/source/js/libs/mermaid.min.js.map" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/themes/redefine-heer/source/js/libs/pjax.min.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/themes/redefine-heer/source/js/main.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/themes/redefine-heer/source/js/plugins/aplayer.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/themes/redefine-heer/source/js/plugins/mermaid.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/themes/redefine-heer/source/js/plugins/tabs.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/themes/redefine-heer/source/js/plugins/typed.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/themes/redefine-heer/source/js/tools/categoryOper.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/themes/redefine-heer/source/js/tools/codeBlock.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/themes/redefine-heer/source/js/tools/lightDarkSwitch.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/themes/redefine-heer/source/js/tools/localSearch.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/themes/redefine-heer/source/js/tools/runtime.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/themes/redefine-heer/source/js/tools/scrollTopBottom.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/themes/redefine-heer/source/js/tools/tocToggle.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/themes/redefine-heer/source/js/utils.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/themes/redefine-heer/source/webfonts/fa-brands-400.ttf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/themes/redefine-heer/source/webfonts/fa-brands-400.woff2" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/themes/redefine-heer/source/webfonts/fa-duotone-900.ttf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/themes/redefine-heer/source/webfonts/fa-duotone-900.woff2" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/themes/redefine-heer/source/webfonts/fa-light-300.ttf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/themes/redefine-heer/source/webfonts/fa-light-300.woff2" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/themes/redefine-heer/source/webfonts/fa-regular-400.ttf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/themes/redefine-heer/source/webfonts/fa-regular-400.woff2" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/themes/redefine-heer/source/webfonts/fa-sharp-solid-900.ttf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/themes/redefine-heer/source/webfonts/fa-sharp-solid-900.woff2" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/themes/redefine-heer/source/webfonts/fa-solid-900.ttf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/themes/redefine-heer/source/webfonts/fa-solid-900.woff2" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/themes/redefine-heer/source/webfonts/fa-thin-100.ttf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/themes/redefine-heer/source/webfonts/fa-thin-100.woff2" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/themes/redefine-heer/source/webfonts/fa-v4compatibility.ttf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/themes/redefine-heer/source/webfonts/fa-v4compatibility.woff2" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/yarn.lock" beforeDir="false" afterPath="$PROJECT_DIR$/yarn.lock" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -35,9 +219,9 @@
   <component name="MarkdownSettingsMigration">
     <option name="stateVersion" value="1" />
   </component>
-  <component name="ProjectColorInfo"><![CDATA[{
-  "associatedIndex": 6
-}]]></component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 6
+}</component>
   <component name="ProjectId" id="2OXjWyZ9nJbk4HTjRJwB5ftR3NF" />
   <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
   <component name="ProjectViewState">
@@ -114,7 +298,8 @@
       <workItem from="1682934659049" duration="828000" />
       <workItem from="1683017597720" duration="120000" />
       <workItem from="1683200736909" duration="844000" />
-      <workItem from="1697956452366" duration="586000" />
+      <workItem from="1697956452366" duration="777000" />
+      <workItem from="1698044192950" duration="3626000" />
     </task>
     <task id="LOCAL-00001" summary="添加文档">
       <created>1681751966586</created>
@@ -445,7 +630,15 @@
       <option name="project" value="LOCAL" />
       <updated>1682492253766</updated>
     </task>
-    <option name="localTasksCounter" value="48" />
+    <task id="LOCAL-00048" summary="修复推荐文章 顶部图片显示不出了的问题&#10;更新主题Redefine到 2.5.0">
+      <option name="closed" value="true" />
+      <created>1697957147818</created>
+      <option name="number" value="00048" />
+      <option name="presentableId" value="LOCAL-00048" />
+      <option name="project" value="LOCAL" />
+      <updated>1697957147818</updated>
+    </task>
+    <option name="localTasksCounter" value="49" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -479,7 +672,6 @@
       <path value="$PROJECT_DIR$/themes/keep" />
       <path value="$PROJECT_DIR$/themes/redefine-origin" />
     </ignored-roots>
-    <MESSAGE value="delete note" />
     <MESSAGE value="update rgba" />
     <MESSAGE value="修改平板上 展示BUG" />
     <MESSAGE value="enable count" />
@@ -504,6 +696,7 @@
     <MESSAGE value="改整体为星空风" />
     <MESSAGE value="enable" />
     <MESSAGE value="修复推荐文章 顶部图片显示不出了的问题 &amp; add posts" />
-    <option name="LAST_COMMIT_MESSAGE" value="修复推荐文章 顶部图片显示不出了的问题 &amp; add posts" />
+    <MESSAGE value="修复推荐文章 顶部图片显示不出了的问题&#10;更新主题Redefine到 2.5.0" />
+    <option name="LAST_COMMIT_MESSAGE" value="修复推荐文章 顶部图片显示不出了的问题&#10;更新主题Redefine到 2.5.0" />
   </component>
 </project>
